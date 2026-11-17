@@ -40,20 +40,20 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Siapkan project Godot, struktur folder, autoload GameState, dan konvensi penamaan agar semua sistem berikutnya punya tempat yang benar.
 
 **Tugas:**
-- [ ] Buat project Godot 4.x, atur `project.godot` (rendering: Nearest, pixel snap aktif)
-- [ ] Buat struktur folder sesuai ARCHITECT.md (`scenes/`, `scripts/`, `data/npcs/`, `data/recipes/`, `data/items/`, `data/warung/`, `assets/`)
-- [ ] Daftarkan autoload `GameState.gd` di Project Settings
-- [ ] Implementasi variabel global dasar: `player_name`, `current_day`, `current_hour`, `energy`, `reputation`, `warung_tier`
-- [ ] Tentukan ukuran tile (16×16 atau 32×32) dan resolusi dasar
-- [ ] Konvensi penamaan: scene `PascalCase.tscn`, skrip `PascalCase.gd`, node `camelCase`, sinyal `snake_case`, data `snake_case.json`
-- [ ] Buat `.gitignore` untuk `.godot/`, `*.import`, build output
+- [x] Buat project Godot 4.x, atur `project.godot` (rendering: Nearest, pixel snap aktif)
+- [x] Buat struktur folder sesuai ARCHITECT.md (`scenes/`, `scripts/`, `data/npcs/`, `data/recipes/`, `data/items/`, `data/warung/`, `assets/`)
+- [x] Daftarkan autoload `GameState.gd` di Project Settings
+- [x] Implementasi variabel global dasar: `player_name`, `current_day`, `current_hour`, `energy`, `reputation`, `warung_tier`
+- [x] Tentukan ukuran tile (16×16 atau 32×32) dan resolusi dasar
+- [x] Konvensi penamaan: scene `PascalCase.tscn`, skrip `PascalCase.gd`, node `camelCase`, sinyal `snake_case`, data `snake_case.json`
+- [x] Buat `.gitignore` untuk `.godot/`, `*.import`, build output
 
 **Dependensi:** Tidak ada (fase pertama).
 
 **Definition of Done:**
-- Project bisa dibuka di Godot tanpa error
-- Autoload `GameState` bisa diakses dari semua skrip
-- Tidak ada nama file/skrip yang melanggar konvensi AGENTS.md bagian 2
+- [x] Project bisa dibuka dan dijalankan di Godot tanpa error
+- [x] Autoload `GameState` bisa diakses dari semua skrip
+- [x] Tidak ada nama file/skrip yang melanggar konvensi AGENTS.md bagian 2
 
 ---
 
@@ -62,22 +62,22 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Pemain dapat berjalan di dunia, waktu berjalan (06:00–22:00), hari berganti saat tidur, dan energi berkurang/pulih. Ini adalah jantung hampir semua sistem lain.
 
 **Tugas:**
-- [ ] Buat `TimeSystem.gd` (signal `hour_changed`, `day_changed`, `sleep_started`)
-- [ ] Implementasi jam aktif 06:00–22:00, konversi 1 menit game = 1,5 detik nyata
-- [ ] Implementasi logika tidur dan bangun kesiangan (22:00–24:00 → 08:00/80%, 24:00–03:00 → 10:00/60%, 03:00+ → 12:00/40%, tidur paksa 06:00)
-- [ ] Buat `Player.gd` (CharacterBody2D, gerakan, energi, interaksi tile)
-- [ ] Buat `main_tileset.tscn` (satu tileset Eropa abad pertengahan, Nearest + pixel snap)
-- [ ] Buat scene dunia awal: hutan (awal) dan desa (tujuan alur v1.0)
-- [ ] Tampilkan UI jam dan hari (non-intrusif, pojok layar)
-- [ ] Tampilkan indikator energi
+- [x] Buat `TimeSystem.gd` (signal `hour_changed`, `day_changed`, `sleep_started`)
+- [x] Implementasi jam aktif 06:00–22:00, konversi 1 menit game = 1,5 detik nyata
+- [x] Implementasi logika tidur dan bangun kesiangan (22:00–24:00 → 08:00/80%, 24:00–03:00 → 10:00/60%, 03:00+ → 12:00/40%, tidur paksa 06:00)
+- [x] Buat `Player.gd` (CharacterBody2D, gerakan, energi, interaksi tile)
+- [x] Buat `main_tileset.tscn` (satu tileset Eropa abad pertengahan, Nearest + pixel snap)
+- [x] Buat scene dunia awal: hutan (awal) dan desa (tujuan alur v1.0)
+- [x] Tampilkan UI jam dan hari (non-intrusif, pojok layar)
+- [x] Tampilkan indikator energi
 
 **Dependensi:** Fase 0 (GameState, konvensi).
 
 **Definition of Done:**
-- Pemain dapat berjalan di hutan dan desa dengan joystick virtual / keyboard
-- Jam berjalan sendiri, hari berganti saat tidur (tidur paksa di 06:00)
-- Energi berkurang saat berjalan/mengolah dan pulih saat tidur
-- UI jam/hari/energi tampil dengan benar
+- [x] Pemain dapat berjalan di hutan dan desa dengan joystick virtual / keyboard
+- [x] Jam berjalan sendiri, hari berganti saat tidur (tidur paksa di 06:00)
+- [x] Energi berkurang saat berjalan/mengolah dan pulih saat tidur
+- [x] UI jam/hari/energi tampil dengan benar
 
 ---
 
