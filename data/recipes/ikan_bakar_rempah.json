@@ -1,0 +1,11 @@
+{
+  "id": "ikan_bakar_rempah",
+  "nama": "Ikan Bakar Rempah",
+  "alat_minimum": "api_unggun",
+  "bahan_utama": ["ikan_sungai", "akar_rempah"],
+  "bahan_per_porsi": { "ikan_sungai": 1, "akar_rempah": 1, "garam": 1 },
+  "suka_npc": ["jev"],
+  "unlock_lewat": "menemukan ikan sungai",
+  "item_pembuka": "ikan_sungai",
+  "kualitas_dasar": 2
+}

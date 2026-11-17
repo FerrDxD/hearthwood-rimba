@@ -6,6 +6,8 @@ const WORLD_SIZE: Vector2i = Vector2i(1600, 880)
 const FOREST_END_X: float = 560.0
 const BED_POSITION: Vector2 = Vector2(1320.0, 476.0)
 const BED_INTERACTION_RADIUS: float = 76.0
+const COOKING_STATION_POSITION: Vector2 = Vector2(1210.0, 478.0)
+const COOKING_STATION_INTERACTION_RADIUS: float = 64.0
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://scenes/ItemPickup.tscn")
@@ -67,6 +69,13 @@ func _ready() -> void:
 
 func is_near_bed(player_position: Vector2) -> bool:
 	return player_position.distance_to(BED_POSITION) <= BED_INTERACTION_RADIUS
+
+
+func is_near_cooking_station(player_position: Vector2) -> bool:
+	return (
+		player_position.distance_to(COOKING_STATION_POSITION)
+		<= COOKING_STATION_INTERACTION_RADIUS
+	)
 
 
 func get_closest_named_npc(player_position: Vector2, radius: float) -> HearthwoodNPC:
@@ -334,6 +343,15 @@ func _draw() -> void:
 	for building in _building_rects:
 		_draw_building(building)
 
+	draw_line(
+		COOKING_STATION_POSITION + Vector2(-14.0, 12.0),
+		COOKING_STATION_POSITION + Vector2(14.0, 12.0),
+		Color("#76513a"),
+		5.0
+	)
+	draw_circle(COOKING_STATION_POSITION, 12.0, Color("#76513a"))
+	draw_circle(COOKING_STATION_POSITION + Vector2(0.0, -2.0), 8.0, Color("#e38b49"))
+	draw_circle(COOKING_STATION_POSITION + Vector2(0.0, -4.0), 4.0, Color("#ffd26b"))
 	draw_rect(Rect2(1310.0, 465.0, 20.0, 8.0), Color("#d4b481"))
 	draw_rect(Rect2(1312.0, 467.0, 16.0, 3.0), Color("#76513a"))
 

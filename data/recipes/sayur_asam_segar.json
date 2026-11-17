@@ -1,0 +1,11 @@
+{
+  "id": "sayur_asam_segar",
+  "nama": "Sayur Asam Segar",
+  "alat_minimum": "tungku",
+  "bahan_utama": ["buah_liar", "sayur_liar"],
+  "bahan_per_porsi": { "buah_liar": 1, "sayur_liar": 1, "garam": 1 },
+  "suka_npc": ["nue"],
+  "unlock_lewat": "menemukan buah liar",
+  "item_pembuka": "buah_liar",
+  "kualitas_dasar": 2
+}

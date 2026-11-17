@@ -17,6 +17,7 @@ var energy: int = MAX_ENERGY
 var coins: int = STARTING_COINS
 var inventory: Array[Dictionary] = []
 var item_catalog: Dictionary = {}
+var unlocked_recipes: Array[String] = ["sup_sayur_bening", "bubur_hangat_hutan"]
 var npc_heart_levels: Dictionary = {}
 var reputation: int = 0
 var warung_tier: int = 0
@@ -71,25 +72,47 @@ func add_item(
 
 
 func remove_item(item_id: String, quantity: int = 1) -> bool:
-	if quantity <= 0 or get_item_count(item_id) < quantity:
+	return remove_items({item_id: quantity})
+
+
+func remove_items(requirements: Dictionary) -> bool:
+	if requirements.is_empty():
 		return false
+	for item_id in requirements:
+		var quantity := int(requirements[item_id])
+		if quantity <= 0 or get_item_count(str(item_id)) < quantity:
+			return false
 
-	var remaining := quantity
-	for index in range(inventory.size() - 1, -1, -1):
-		var stack: Dictionary = inventory[index]
-		if str(stack.get("id", "")) != item_id:
-			continue
-		var removed := mini(remaining, int(stack.get("jumlah", 0)))
-		stack["jumlah"] = int(stack["jumlah"]) - removed
-		remaining -= removed
-		if int(stack["jumlah"]) == 0:
-			inventory.remove_at(index)
-		if remaining == 0:
-			break
-
+	for item_id in requirements:
+		_remove_item_quantity(str(item_id), int(requirements[item_id]))
 	inventory_changed.emit()
 	state_changed.emit()
 	return true
+
+
+func age_cooked_food() -> void:
+	var inventory_changed_by_age := false
+	for index in range(inventory.size() - 1, -1, -1):
+		var stack: Dictionary = inventory[index]
+		var item_id := str(stack.get("id", ""))
+		if str(get_item_definition(item_id).get("kategori", "")) != "masakan":
+			continue
+		var cooked_on_day := int(stack.get("tanggal_masak", 0))
+		var processed_day := int(stack.get("hari_terakhir_diproses", cooked_on_day))
+		var elapsed_days := current_day - processed_day
+		if elapsed_days <= 0:
+			continue
+		var shelf_life := int(get_item_definition(item_id).get("masa_simpan_hari", 3))
+		if current_day - cooked_on_day >= shelf_life:
+			inventory.remove_at(index)
+		else:
+			stack["kualitas"] = maxi(1, int(stack.get("kualitas", 1)) - elapsed_days)
+			stack["hari_terakhir_diproses"] = current_day
+		inventory_changed_by_age = true
+	if inventory_changed_by_age:
+		_merge_matching_stacks()
+		inventory_changed.emit()
+		state_changed.emit()
 
 
 func get_item_energy(item_id: String, quality: int = 0) -> int:
@@ -176,7 +199,15 @@ func _validate_item_addition(
 		push_error("Cannot add an unknown item or non-positive quantity: %s" % item_id)
 		return false
 	var is_cooked_item := str(item_catalog[item_id].get("kategori", "")) == "masakan"
-	if is_cooked_item and (cooked_on_day < 1 or quality < 1 or quality > 3):
+	if (
+		is_cooked_item
+		and (
+			cooked_on_day < 1
+			or cooked_on_day > current_day
+			or quality < 1
+			or quality > 3
+		)
+	):
 		push_error("Cooked items require a valid cooking day and quality: %s" % item_id)
 		return false
 	if not is_cooked_item and (cooked_on_day >= 1 or quality != 0):
@@ -199,4 +230,41 @@ func _add_item_stack(item_id: String, quantity: int, cooked_on_day: int, quality
 		"jumlah": quantity,
 		"tanggal_masak": cooked_on_day,
 		"kualitas": quality,
+		"hari_terakhir_diproses": cooked_on_day,
 	})
+
+
+func _remove_item_quantity(item_id: String, quantity: int) -> void:
+	var remaining := quantity
+	for index in range(inventory.size() - 1, -1, -1):
+		var stack: Dictionary = inventory[index]
+		if str(stack.get("id", "")) != item_id:
+			continue
+		var removed := mini(remaining, int(stack.get("jumlah", 0)))
+		stack["jumlah"] = int(stack["jumlah"]) - removed
+		remaining -= removed
+		if int(stack["jumlah"]) == 0:
+			inventory.remove_at(index)
+		if remaining == 0:
+			return
+
+
+func _merge_matching_stacks() -> void:
+	var merged_stacks: Array[Dictionary] = []
+	for stack in inventory:
+		var found_matching_stack := false
+		for existing_stack in merged_stacks:
+			if (
+				str(existing_stack.get("id", "")) == str(stack.get("id", ""))
+				and int(existing_stack.get("tanggal_masak", -1))
+				== int(stack.get("tanggal_masak", -1))
+				and int(existing_stack.get("kualitas", 0)) == int(stack.get("kualitas", 0))
+			):
+				existing_stack["jumlah"] = (
+					int(existing_stack.get("jumlah", 0)) + int(stack.get("jumlah", 0))
+				)
+				found_matching_stack = true
+				break
+		if not found_matching_stack:
+			merged_stacks.append(stack)
+	inventory = merged_stacks

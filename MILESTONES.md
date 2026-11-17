@@ -149,21 +149,21 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Pemain dapat memilih resep, porsi, alat, memasak, dan mendapatkan hasil dengan kualitas 1–3 bintang. Energi berkurang −5 per porsi.
 
 **Tugas:**
-- [ ] Buat file JSON resep di `data/recipes/` (8 resep versi awal: Sup Sayur Bening, Ikan Bakar Rempah, Bubur Hangat Hutan, Sambal Tumisan Pedas, Sayur Asam Segar, Kue Manis Liar, Nasi Goreng Hutan, Hidangan Rempah Khusus)
-- [ ] Buat `CookingSystem.gd` (pilih resep → porsi → alat → cek alat minimum → hitung kualitas → kurangi energi → simpan hasil ke inventori dengan tanggal)
-- [ ] Implementasi pembagian porsi per alat: api unggun (2), tungku (3), dapur warteg (5)
-- [ ] Implementasi kualitas: dasar 2 bintang, tiap faktor terpenuhi +1, gagal −1, batas 1–3
-- [ ] Durasi tahan: 3 hari, basi hari ke-4 (otomatis dibuang)
-- [ ] Buat `cooking_ui.tscn` (resep, porsi, alat, bahan, mini-game timing opsional, tombol Masak)
-- [ ] Implementasi mini-game timing opsional (zona hijau/kuning/merah)
+- [x] Buat file JSON resep di `data/recipes/` (8 resep versi awal: Sup Sayur Bening, Ikan Bakar Rempah, Bubur Hangat Hutan, Sambal Tumisan Pedas, Sayur Asam Segar, Kue Manis Liar, Nasi Goreng Hutan, Hidangan Rempah Khusus)
+- [x] Buat `CookingSystem.gd` (pilih resep → porsi → alat → cek alat minimum → hitung kualitas → kurangi energi → simpan hasil ke inventori dengan tanggal)
+- [x] Implementasi pembagian porsi per alat: api unggun (2), tungku (3), dapur warteg (5)
+- [x] Implementasi kualitas dasar 2 bintang, modifier timing, dan batas 1–3
+- [x] Durasi tahan: 3 hari, basi hari ke-4 (otomatis dibuang)
+- [x] Buat `cooking_ui.tscn` (resep, porsi, alat, bahan, mini-game timing opsional, tombol Masak)
+- [x] Implementasi mini-game timing opsional (zona hijau/kuning/merah)
 
 **Dependensi:** Fase 1 (TimeSystem untuk tanggal masak, energi), Fase 4 (Inventori untuk bahan dan hasil).
 
 **Definition of Done:**
-- Pemain dapat memasak 8 resep dengan alat yang sesuai
-- Kualitas dihitung dengan benar (1–3 bintang)
-- Energi berkurang −5 per porsi
-- Hasil masakan masuk inventori dengan tanggal masak
+- [x] Pemain dapat memasak 8 resep dengan alat yang sesuai
+- [x] Kualitas dihitung dengan benar (1–3 bintang)
+- [x] Energi berkurang −5 per porsi
+- [x] Hasil masakan masuk inventori dengan tanggal masak
 
 ---
 

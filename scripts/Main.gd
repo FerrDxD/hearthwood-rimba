@@ -5,6 +5,8 @@ const PLAYER_SCENE: PackedScene = preload("res://scenes/Player.tscn")
 const DIALOG_UI_SCENE: PackedScene = preload("res://scenes/DialogUI.tscn")
 const SHOP_UI_SCENE: PackedScene = preload("res://scenes/ShopUI.tscn")
 const INVENTORY_UI_SCENE: PackedScene = preload("res://scenes/InventoryUI.tscn")
+const COOKING_SYSTEM_SCENE: PackedScene = preload("res://scenes/CookingSystem.tscn")
+const COOKING_UI_SCENE: PackedScene = preload("res://scenes/CookingUI.tscn")
 const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
 
 var _world: HearthwoodWorld
@@ -17,6 +19,8 @@ var _hint_label: Label
 var _dialog_ui: HearthwoodDialogUI
 var _shop_ui: HearthwoodShopUI
 var _inventory_ui: HearthwoodInventoryUI
+var _cooking_system: HearthwoodCookingSystem
+var _cooking_ui: HearthwoodCookingUI
 var _current_shopkeeper: HearthwoodShopNPC
 
 
@@ -43,6 +47,11 @@ func _ready() -> void:
 	_shop_ui.closed.connect(_on_shop_closed)
 	_inventory_ui = INVENTORY_UI_SCENE.instantiate()
 	add_child(_inventory_ui)
+	_cooking_system = COOKING_SYSTEM_SCENE.instantiate()
+	add_child(_cooking_system)
+	_cooking_ui = COOKING_UI_SCENE.instantiate()
+	add_child(_cooking_ui)
+	_cooking_ui.set_cooking_system(_cooking_system)
 	_connect_signals()
 	_update_hud()
 
@@ -55,7 +64,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
-	if _dialog_ui.is_open() or _inventory_ui.is_open():
+	if _dialog_ui.is_open() or _inventory_ui.is_open() or _cooking_ui.is_open():
 		return
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 64.0)
@@ -69,6 +78,10 @@ func _process(_delta: float) -> void:
 	var nearby_pickup := _world.get_closest_item_pickup(_player.global_position, 64.0)
 	if nearby_pickup != null:
 		_hint_label.text = "Ambil %s  |  E" % nearby_pickup.get_display_name()
+		return
+
+	if _world.is_near_cooking_station(_player.global_position):
+		_hint_label.text = "Masak di api unggun  |  E"
 		return
 
 	if _world.is_near_bed(_player.global_position):
@@ -181,13 +194,18 @@ func _on_shop_closed() -> void:
 
 
 func _toggle_inventory() -> void:
-	if _dialog_ui.is_open() or _shop_ui.is_open():
+	if _dialog_ui.is_open() or _shop_ui.is_open() or _cooking_ui.is_open():
 		return
 	_inventory_ui.toggle_inventory()
 
 
 func _interact() -> void:
-	if _dialog_ui.is_open() or _shop_ui.is_open() or _inventory_ui.is_open():
+	if (
+		_dialog_ui.is_open()
+		or _shop_ui.is_open()
+		or _inventory_ui.is_open()
+		or _cooking_ui.is_open()
+	):
 		return
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 56.0)
@@ -218,6 +236,8 @@ func _interact() -> void:
 			if _world.collect_item_pickup(nearby_pickup):
 				_hint_label.text = "%s dikumpulkan." % item_name
 			return
+		elif _world.is_near_cooking_station(_player.global_position):
+			_cooking_ui.open_cooking(_cooking_system)
 		elif _world.is_near_bed(_player.global_position):
 			get_node("/root/TimeSystem").sleep()
 			_hint_label.text = "Hari baru dimulai. Energi sudah pulih."

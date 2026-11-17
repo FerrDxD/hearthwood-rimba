@@ -1,0 +1,16 @@
+{
+  "id": "hidangan_rempah_khusus",
+  "nama": "Hidangan Rempah Khusus",
+  "alat_minimum": "dapur_warteg",
+  "bahan_utama": ["sayur_liar", "rempah_eksklusif"],
+  "bahan_per_porsi": {
+    "sayur_liar": 1,
+    "ikan_sungai": 1,
+    "rempah_eksklusif": 1,
+    "garam": 1
+  },
+  "suka_npc": ["casha"],
+  "unlock_lewat": "membeli rempah eksklusif dari Giral",
+  "item_pembuka": "rempah_eksklusif",
+  "kualitas_dasar": 2
+}

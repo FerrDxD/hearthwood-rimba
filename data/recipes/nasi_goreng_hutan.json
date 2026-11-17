@@ -1,0 +1,11 @@
+{
+  "id": "nasi_goreng_hutan",
+  "nama": "Nasi Goreng Hutan",
+  "alat_minimum": "tungku",
+  "bahan_utama": ["beras", "minyak", "telur"],
+  "bahan_per_porsi": { "beras": 1, "minyak": 1, "telur": 1 },
+  "suka_npc": ["jev", "casha"],
+  "unlock_lewat": "membeli minyak dari Giral",
+  "item_pembuka": "minyak",
+  "kualitas_dasar": 2
+}

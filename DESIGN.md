@@ -122,6 +122,9 @@ Setiap NPC memiliki:
 │  [ Masak ]                  │
 └─────────────────────────────┘
 ```
+- Jumlah bahan dihitung per porsi; UI menampilkan stok dibanding kebutuhan dan biaya energi sebelum memasak. Setiap porsi memakai satu unit tiap bahan yang tercantum di resep.
+- Bahan resep dan asumsi jumlah per porsi disimpan di JSON; timing yang dilewati memberi hasil kualitas acak dalam batas 1–3 bintang.
+- Hasil masakan turun satu bintang setiap pergantian hari dan dibuang saat memasuki hari ke-4.
 
 ### 5.3 UI Dialog NPC
 - Kotak teks besar di bawah layar

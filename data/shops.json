@@ -3,9 +3,11 @@
     "kategori": "Bahan",
     "barang": [
       { "id": "tepung", "nama": "Tepung", "harga": 20 },
+      { "id": "beras", "nama": "Beras", "harga": 20 },
       { "id": "garam", "nama": "Garam", "harga": 10 },
       { "id": "minyak", "nama": "Minyak", "harga": 20 },
-      { "id": "telur", "nama": "Telur", "harga": 10 }
+      { "id": "telur", "nama": "Telur", "harga": 10 },
+      { "id": "rempah_eksklusif", "nama": "Rempah eksklusif", "harga": 40 }
     ]
   },
   "talia": {

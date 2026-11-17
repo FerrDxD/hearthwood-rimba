@@ -87,7 +87,7 @@ res://
 Tanggung jawab:
 - Menyimpan nama pemain (dapat dikustom, placeholder `{nama}`)
 - State global yang diakses semua scene
-- Memuat katalog `data/items/items.json` dan menyimpan inventori dalam stack berjumlah, dengan tanggal masak dan kualitas untuk masakan
+- Memuat katalog `data/items/items.json`, menyimpan inventori dalam stack berjumlah, dan menyimpan resep terbuka; masakan membawa tanggal masak serta kualitas
 - Titik masuk pemuatan dan penyimpanan save file
 - Referensi ke sistem waktu, energi, reputasi
 
@@ -136,6 +136,10 @@ Implementasi:
 - `CookingSystem.gd` mengelola logika memasak
 - Data resep disimpan di `data/recipes/*.json`
 - UI: `cooking_ui.tscn` menampilkan resep, pilihan porsi, alat, mini-game
+- Bahan pada data resep dihitung per porsi; sistem memvalidasi jumlah bahan, tier alat, batas porsi, dan energi sebelum transaksi inventori.
+- Resep default adalah Sup Sayur Bening dan Bubur Hangat Hutan; resep lain terbuka permanen saat item pembukanya ditemukan atau dibeli.
+- Timing hijau menambah satu bintang, kuning mempertahankan kualitas dasar, merah mengurangi satu bintang, dan timing yang dilewati memberi hasil acak; kualitas dibatasi 1–3.
+- Masakan menyimpan hari masak dan kualitas; kualitas turun satu bintang setiap hari dan masakan dibuang saat memasuki hari ke-4.
 
 ---
 
