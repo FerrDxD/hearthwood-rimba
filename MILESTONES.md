@@ -196,20 +196,22 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Warung berkembang dari gubuk → warung kecil → warteg penuh berdasarkan reputasi dan biaya upgrade.
 
 **Tugas:**
-- [ ] Buat `WarungSystem.gd` (cek reputasi dan biaya, naikkan tier)
-- [ ] Implementasi tier: Gubuk (0, reputasi 0), Warung Kecil (1, reputasi 10, 500 koin + kayu), Warteg Penuh (2, reputasi 25, 1500 koin + kayu + batu)
-- [ ] Alat per tier: api unggun → tungku → dapur warteg
-- [ ] Maks porsi per tier: 2 → 3 → 5
-- [ ] Veral memberikan izin usaha saat naik ke Warung Kecil dan Warteg Penuh
-- [ ] Reputasi naik saat pelanggan puas dengan masakan sesuai selera
-- [ ] Setiap tier buka resep baru dan pelanggan baru
+- [x] Buat `WarungSystem.gd` (cek reputasi dan biaya, naikkan tier)
+- [x] Implementasi tier: Gubuk (0, reputasi 0), Warung Kecil (1, reputasi 10, 500 koin + kayu), Warteg Penuh (2, reputasi 25, 1500 koin + kayu + batu)
+- [x] Alat per tier: api unggun → tungku → dapur warteg
+- [x] Maks porsi per tier: 2 → 3 → 5
+- [x] Veral memberikan izin usaha saat naik ke Warung Kecil dan Warteg Penuh
+- [x] Reputasi naik saat pelanggan puas dengan masakan sesuai selera
+- [x] Setiap tier membuka pelanggan baru dan alat untuk resep tingkat lanjut (resep tetap harus terbuka lewat bahan)
+
+**Catatan implementasi:** PRD tidak menentukan jumlah bahan upgrade, harga jual, atau kapasitas harian. Konfigurasi v1 memakai 1 kayu untuk tier 1, 1 kayu + 1 batu untuk tier 2, harga dasar masakan 40 koin pada kualitas 2 (diskalakan menurut kualitas), reputasi +1 per layanan yang disukai, serta kapasitas 2/4/7 pelanggan per hari. Data tier ada di `data/warung/tiers.json`; resep tetap mengikuti unlock berbasis bahan.
 
 **Dependensi:** Fase 5 (CookingSystem untuk masakan yang disajikan), Fase 6 (AffectionSystem untuk reputasi/kedekatan), Fase 3 (Toko untuk bahan upgrade).
 
 **Definition of Done:**
-- Pemain dapat naik tier warung dengan memenuhi ambang reputasi dan biaya
-- Alat dan maks porsi bertambah per tier
-- Veral memberikan izin usaha saat naik ke Warung Kecil dan Warteg Penuh
+- [x] Pemain dapat naik tier warung dengan memenuhi ambang reputasi dan biaya
+- [x] Alat dan maks porsi bertambah per tier
+- [x] Veral memberikan izin usaha saat naik ke Warung Kecil dan Warteg Penuh
 
 ---
 

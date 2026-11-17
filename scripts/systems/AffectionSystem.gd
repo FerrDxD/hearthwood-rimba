@@ -17,11 +17,19 @@ func give_food(
 	item_id: String,
 	cooked_on_day: int,
 	quality: int,
-	is_special: bool = false
+	is_special: bool = false,
+	is_customer_service: bool = false
 ) -> Dictionary:
 	var game_state = get_node("/root/GameState")
-	if game_state.gifts_given_today.has(npc_id):
-		return _invalid_gift("Kamu sudah memberi masakan kepada NPC ini hari ini.")
+	var daily_interactions: Dictionary = (
+		game_state.customers_served_today if is_customer_service else game_state.gifts_given_today
+	)
+	if daily_interactions.has(npc_id):
+		return _invalid_gift(
+			"Pelanggan ini sudah dilayani hari ini."
+			if is_customer_service
+			else "Kamu sudah memberi masakan kepada NPC ini hari ini."
+		)
 
 	var npc_data := _load_npc_data(npc_id)
 	if npc_data.is_empty():
@@ -64,7 +72,7 @@ func give_food(
 		disliked_streak = 0
 	game_state.disliked_gift_streaks[npc_id] = disliked_streak
 
-	game_state.gifts_given_today[npc_id] = true
+	daily_interactions[npc_id] = true
 	var history: Array = game_state.npc_gift_history.get(npc_id, [])
 	if not history.has(item_id):
 		history.append(item_id)
@@ -102,6 +110,21 @@ func give_food(
 		"heart_level": new_level,
 		"pesan": message,
 	}
+
+
+func preview_food_reaction(
+	npc_id: String, item_id: String, is_special: bool = false
+) -> String:
+	var npc_data := _load_npc_data(npc_id)
+	if npc_data.is_empty():
+		return ""
+	if _cooking_system == null:
+		push_error("Affection system requires a cooking system to evaluate food.")
+		return ""
+	var recipe := _cooking_system.get_recipe(item_id)
+	if recipe.is_empty():
+		return ""
+	return _get_reaction(npc_id, item_id, recipe, npc_data, is_special)
 
 
 func _get_reaction(

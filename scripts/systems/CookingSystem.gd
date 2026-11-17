@@ -4,24 +4,16 @@ class_name HearthwoodCookingSystem
 signal recipes_unlocked
 
 const RECIPE_DIRECTORY: String = "res://data/recipes"
-const TOOL_LEVELS: Dictionary = {
-	"api_unggun": 0,
-	"tungku": 1,
-	"dapur_warteg": 2,
-}
-const TOOL_PORTION_LIMITS: Dictionary = {
-	"api_unggun": 2,
-	"tungku": 3,
-	"dapur_warteg": 5,
-}
+const TIER_DATA_PATH: String = "res://data/warung/tiers.json"
 
 var _recipes: Dictionary = {}
+var _tiers: Array[Dictionary] = []
 var _random := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
 	_random.randomize()
-	if not _load_recipes():
+	if not _load_tiers() or not _load_recipes():
 		return
 	var game_state = get_node("/root/GameState")
 	game_state.inventory_changed.connect(_refresh_recipe_unlocks)
@@ -32,6 +24,16 @@ func _ready() -> void:
 func get_recipe(recipe_id: String) -> Dictionary:
 	var recipe: Variant = _recipes.get(recipe_id, {})
 	return recipe if typeof(recipe) == TYPE_DICTIONARY else {}
+
+
+func is_recipe_available(recipe_id: String) -> bool:
+	var recipe := get_recipe(recipe_id)
+	if recipe.is_empty() or not get_node("/root/GameState").unlocked_recipes.has(recipe_id):
+		return false
+	var required_tool := str(recipe.get("alat_minimum", ""))
+	if _get_tool_level(required_tool) < 0:
+		return false
+	return _get_tool_level(required_tool) <= int(get_node("/root/GameState").warung_tier)
 
 
 func unlock_recipe(recipe_id: String) -> bool:
@@ -66,15 +68,24 @@ func get_unlocked_recipe_ids() -> Array[String]:
 
 func get_available_tool_ids() -> Array[String]:
 	var available_tools: Array[String] = []
-	var highest_level := clampi(int(get_node("/root/GameState").warung_tier), 0, 2)
-	for tool_id in TOOL_LEVELS:
-		if int(TOOL_LEVELS[tool_id]) <= highest_level:
-			available_tools.append(str(tool_id))
+	if _tiers.is_empty():
+		return available_tools
+	var highest_level := clampi(
+		int(get_node("/root/GameState").warung_tier),
+		int(_tiers[0]["id"]),
+		int(_tiers[-1]["id"])
+	)
+	for tier in _tiers:
+		if int(tier["id"]) <= highest_level:
+			available_tools.append(str(tier["alat"]))
 	return available_tools
 
 
 func get_max_portions(tool_id: String) -> int:
-	return int(TOOL_PORTION_LIMITS.get(tool_id, 0))
+	for tier in _tiers:
+		if str(tier["alat"]) == tool_id:
+			return int(tier["maks_porsi"])
+	return 0
 
 
 func preview_cooking(recipe_id: String, portions: int, tool_id: String) -> Dictionary:
@@ -82,9 +93,10 @@ func preview_cooking(recipe_id: String, portions: int, tool_id: String) -> Dicti
 	var recipe := get_recipe(recipe_id)
 	if recipe.is_empty() or not game_state.unlocked_recipes.has(recipe_id):
 		return _invalid_preview("Resep belum terbuka.")
-	if not TOOL_LEVELS.has(tool_id) or not get_available_tool_ids().has(tool_id):
+	var tool_level := _get_tool_level(tool_id)
+	if tool_level < 0 or not get_available_tool_ids().has(tool_id):
 		return _invalid_preview("Alat masak belum tersedia.")
-	if int(TOOL_LEVELS[tool_id]) < int(TOOL_LEVELS[str(recipe["alat_minimum"])]):
+	if tool_level < _get_tool_level(str(recipe["alat_minimum"])):
 		return _invalid_preview("Resep ini membutuhkan %s." % _get_tool_name(
 			str(recipe["alat_minimum"])
 		))
@@ -186,6 +198,52 @@ func _load_recipes() -> bool:
 	return not _recipes.is_empty()
 
 
+func _load_tiers() -> bool:
+	if not FileAccess.file_exists(TIER_DATA_PATH):
+		push_error("Warung tier data file not found: %s" % TIER_DATA_PATH)
+		return false
+	var file := FileAccess.open(TIER_DATA_PATH, FileAccess.READ)
+	if file == null:
+		push_error("Could not read warung tier data: %s" % TIER_DATA_PATH)
+		return false
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY or typeof(parsed.get("tiers")) != TYPE_ARRAY:
+		push_error("Warung tier data must contain a tiers array: %s" % TIER_DATA_PATH)
+		return false
+	for tier in parsed["tiers"]:
+		if (
+			typeof(tier) != TYPE_DICTIONARY
+			or not tier.has("id")
+			or not tier.has("alat")
+			or not tier.has("maks_porsi")
+			or not _is_integer_value(tier["id"])
+			or typeof(tier["alat"]) != TYPE_STRING
+			or not _is_integer_value(tier["maks_porsi"])
+			or str(tier["alat"]).is_empty()
+			or int(tier["maks_porsi"]) <= 0
+		):
+			push_error("Warung tier data contains an invalid tool or portion limit.")
+			_tiers.clear()
+			return false
+		_tiers.append(tier)
+	_tiers.sort_custom(func(first: Dictionary, second: Dictionary) -> bool:
+		return int(first["id"]) < int(second["id"])
+	)
+	if (
+		_tiers.size() != 3
+		or int(_tiers[0]["id"]) != 0
+		or int(_tiers[1]["id"]) != 1
+		or int(_tiers[2]["id"]) != 2
+		or str(_tiers[0]["alat"]) == str(_tiers[1]["alat"])
+		or str(_tiers[0]["alat"]) == str(_tiers[2]["alat"])
+		or str(_tiers[1]["alat"]) == str(_tiers[2]["alat"])
+	):
+		push_error("Warung tier data must define tiers 0, 1, and 2.")
+		_tiers.clear()
+		return false
+	return true
+
+
 func _is_valid_recipe(recipe: Dictionary, path: String) -> bool:
 	for key in ["id", "nama", "alat_minimum", "bahan_per_porsi", "kualitas_dasar"]:
 		if not recipe.has(key):
@@ -197,7 +255,7 @@ func _is_valid_recipe(recipe: Dictionary, path: String) -> bool:
 		or typeof(recipe["bahan_per_porsi"]) != TYPE_DICTIONARY
 		or str(recipe["id"]).is_empty()
 		or str(recipe["nama"]).is_empty()
-		or not TOOL_LEVELS.has(str(recipe["alat_minimum"]))
+		or _get_tool_level(str(recipe["alat_minimum"])) < 0
 		or int(recipe["kualitas_dasar"]) < 1
 		or int(recipe["kualitas_dasar"]) > 3
 		or recipe["bahan_per_porsi"].is_empty()
@@ -255,3 +313,17 @@ func _get_tool_name(tool_id: String) -> String:
 		"dapur_warteg":
 			return "dapur warteg"
 	return tool_id
+
+
+func _get_tool_level(tool_id: String) -> int:
+	for tier in _tiers:
+		if str(tier["alat"]) == tool_id:
+			return int(tier["id"])
+	return -1
+
+
+func _is_integer_value(value: Variant) -> bool:
+	return (
+		typeof(value) == TYPE_INT
+		or typeof(value) == TYPE_FLOAT
+	) and is_equal_approx(float(value), float(int(value)))

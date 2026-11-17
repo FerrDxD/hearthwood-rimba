@@ -1,0 +1,37 @@
+{
+  "tiers": [
+    {
+      "id": 0,
+      "nama": "Gubuk",
+      "reputasi": 0,
+      "biaya_koin": 0,
+      "bahan": {},
+      "alat": "api_unggun",
+      "maks_porsi": 2,
+      "kapasitas_pelanggan": 2,
+      "pelanggan": ["vea", "gil"]
+    },
+    {
+      "id": 1,
+      "nama": "Warung Kecil",
+      "reputasi": 10,
+      "biaya_koin": 500,
+      "bahan": { "kayu": 1 },
+      "alat": "tungku",
+      "maks_porsi": 3,
+      "kapasitas_pelanggan": 4,
+      "pelanggan": ["jev", "nue", "rave"]
+    },
+    {
+      "id": 2,
+      "nama": "Warteg Penuh",
+      "reputasi": 25,
+      "biaya_koin": 1500,
+      "bahan": { "kayu": 1, "batu": 1 },
+      "alat": "dapur_warteg",
+      "maks_porsi": 5,
+      "kapasitas_pelanggan": 7,
+      "pelanggan": ["casha", "kila"]
+    }
+  ]
+}

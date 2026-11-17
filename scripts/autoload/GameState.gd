@@ -7,6 +7,7 @@ signal state_changed
 
 const MAX_ENERGY: int = 100
 const STARTING_COINS: int = 100
+const MAX_WARUNG_TIER: int = 2
 const ITEM_CATALOG_PATH: String = "res://data/items/items.json"
 
 var player_name: String = "Pengelana"
@@ -19,9 +20,11 @@ var inventory: Array[Dictionary] = []
 var item_catalog: Dictionary = {}
 var unlocked_recipes: Array[String] = ["sup_sayur_bening", "bubur_hangat_hutan"]
 var unlocked_quests: Array[String] = []
+var business_permits: Array[int] = []
 var npc_heart_levels: Dictionary = {}
 var affection_points: Dictionary = {}
 var gifts_given_today: Dictionary = {}
+var customers_served_today: Dictionary = {}
 var disliked_gift_streaks: Dictionary = {}
 var npc_gift_history: Dictionary = {}
 var current_weather: String = "cerah"
@@ -47,12 +50,57 @@ func sleep(wake_hour: int, recovery_ratio: float) -> void:
 	current_minute = 0
 	energy = roundi(MAX_ENERGY * recovery_ratio)
 	gifts_given_today.clear()
+	customers_served_today.clear()
 	energy_changed.emit(energy)
 	state_changed.emit()
 
 
 func get_npc_heart_level(npc_id: String) -> int:
 	return int(npc_heart_levels.get(npc_id, 0))
+
+
+func earn_coins(amount: int) -> bool:
+	if amount <= 0:
+		push_error("Earned coins must be a positive amount.")
+		return false
+	coins += amount
+	coins_changed.emit(coins)
+	state_changed.emit()
+	return true
+
+
+func increase_reputation(amount: int) -> bool:
+	if amount <= 0:
+		push_error("Reputation increase must be a positive amount.")
+		return false
+	reputation += amount
+	state_changed.emit()
+	return true
+
+
+func upgrade_warung(new_tier: int, coin_cost: int, materials: Dictionary) -> bool:
+	if (
+		new_tier != warung_tier + 1
+		or new_tier > MAX_WARUNG_TIER
+		or coin_cost <= 0
+		or coins < coin_cost
+	):
+		return false
+	for item_id in materials:
+		var quantity := int(materials[item_id])
+		if quantity <= 0 or get_item_count(str(item_id)) < quantity:
+			return false
+
+	for item_id in materials:
+		_remove_item_quantity(str(item_id), int(materials[item_id]))
+	coins -= coin_cost
+	warung_tier = new_tier
+	if not business_permits.has(new_tier):
+		business_permits.append(new_tier)
+	coins_changed.emit(coins)
+	inventory_changed.emit()
+	state_changed.emit()
+	return true
 
 
 func get_item_definition(item_id: String) -> Dictionary:
@@ -208,8 +256,11 @@ func _load_item_catalog() -> void:
 			return
 		if str(entry.get("kategori", "")) == "masakan":
 			var energy_values: Variant = entry.get("energi_per_kualitas")
-			if typeof(energy_values) != TYPE_DICTIONARY:
-				push_error("Cooked items require energy values for each quality: %s" % item_id)
+			if (
+				typeof(energy_values) != TYPE_DICTIONARY
+				or int(entry.get("harga_jual", 0)) <= 0
+			):
+				push_error("Cooked items require quality energy and a sale price: %s" % item_id)
 				item_catalog.clear()
 				return
 			for food_quality in range(1, 4):

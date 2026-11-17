@@ -22,6 +22,8 @@ const FORAGE_SPAWN_POINTS: Array[Dictionary] = [
 	{"id": "akar_rempah", "position": Vector2(184.0, 328.0)},
 	{"id": "jamur_hutan", "position": Vector2(344.0, 272.0)},
 	{"id": "jamur_hutan", "position": Vector2(254.0, 632.0)},
+	{"id": "kayu", "position": Vector2(126.0, 574.0)},
+	{"id": "batu", "position": Vector2(398.0, 512.0)},
 ]
 const NAMED_NPC_IDS: Array[String] = [
 	"giral",

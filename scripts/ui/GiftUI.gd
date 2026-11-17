@@ -3,12 +3,15 @@ class_name HearthwoodGiftUI
 
 var _interface: Control
 var _title_label: Label
+var _instructions_label: Label
 var _status_label: Label
 var _empty_label: Label
 var _food_list: VBoxContainer
 var _npc_id: String = ""
 var _npc_name: String = ""
+var _is_customer_service: bool = false
 var _affection_system: HearthwoodAffectionSystem
+var _warung_system: HearthwoodWarungSystem
 
 
 func _ready() -> void:
@@ -22,13 +25,28 @@ func set_affection_system(affection_system: HearthwoodAffectionSystem) -> void:
 	_affection_system = affection_system
 
 
-func open_gifts(npc_id: String, npc_name: String) -> void:
+func set_warung_system(warung_system: HearthwoodWarungSystem) -> void:
+	_warung_system = warung_system
+
+
+func open_gifts(npc_id: String, npc_name: String, is_customer_service: bool = false) -> void:
 	_npc_id = npc_id
 	_npc_name = npc_name
+	_is_customer_service = is_customer_service
+	var daily_records: Dictionary = (
+		get_node("/root/GameState").customers_served_today
+		if is_customer_service
+		else get_node("/root/GameState").gifts_given_today
+	)
 	_status_label.text = (
-		"Kamu sudah memberi masakan kepada NPC ini hari ini."
-		if get_node("/root/GameState").gifts_given_today.has(_npc_id)
+		"Interaksi dengan NPC ini sudah dilakukan hari ini."
+		if daily_records.has(_npc_id)
 		else ""
+	)
+	_instructions_label.text = (
+		"Pilih masakan yang disukai pelanggan. Hanya pesanan yang memuaskan memberi reputasi."
+		if is_customer_service
+		else "Pilih satu masakan untuk diberikan. Kualitas dan tanggal masak ditampilkan."
 	)
 	_interface.visible = true
 	_refresh_food_list()
@@ -82,10 +100,9 @@ func _create_interface() -> void:
 	_title_label.add_theme_color_override("font_color", Color("#5d422c"))
 	layout.add_child(_title_label)
 
-	var instructions := Label.new()
-	instructions.text = "Pilih satu masakan untuk diberikan. Kualitas dan tanggal masak ditampilkan."
-	instructions.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	layout.add_child(instructions)
+	_instructions_label = Label.new()
+	_instructions_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	layout.add_child(_instructions_label)
 
 	_status_label = Label.new()
 	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -125,8 +142,17 @@ func _refresh_food_list() -> void:
 
 	var game_state = get_node("/root/GameState")
 	var heart_level: int = game_state.get_npc_heart_level(_npc_id)
-	_title_label.text = "Beri masakan ke %s — hati %d" % [_npc_name, heart_level]
-	var already_gifted: bool = game_state.gifts_given_today.has(_npc_id)
+	_title_label.text = "%s ke %s — hati %d" % [
+		"Layani pelanggan" if _is_customer_service else "Beri masakan",
+		_npc_name,
+		heart_level,
+	]
+	var daily_records: Dictionary = (
+		game_state.customers_served_today
+		if _is_customer_service
+		else game_state.gifts_given_today
+	)
+	var already_gifted: bool = daily_records.has(_npc_id)
 	var cooked_stacks: Array[Dictionary] = []
 	for stack in game_state.inventory:
 		var definition: Dictionary = game_state.get_item_definition(str(stack.get("id", "")))
@@ -153,7 +179,11 @@ func _create_food_button(
 	]
 	button.custom_minimum_size = Vector2(0.0, 52.0)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button.disabled = already_gifted or _affection_system == null
+	button.disabled = (
+		already_gifted
+		or _affection_system == null
+		or (_is_customer_service and _warung_system == null)
+	)
 	button.pressed.connect(_on_food_selected.bind(item_id, cooked_on_day, quality))
 	return button
 
@@ -162,12 +192,21 @@ func _on_food_selected(item_id: String, cooked_on_day: int, quality: int) -> voi
 	if _affection_system == null:
 		push_error("Gift UI opened without an affection system.")
 		return
-	var result := _affection_system.give_food(
-		_npc_id,
-		item_id,
-		cooked_on_day,
-		quality
-	)
+	var result: Dictionary
+	if _is_customer_service:
+		result = _warung_system.serve_customer(
+			_npc_id,
+			item_id,
+			cooked_on_day,
+			quality
+		)
+	else:
+		result = _affection_system.give_food(
+			_npc_id,
+			item_id,
+			cooked_on_day,
+			quality
+		)
 	_status_label.text = str(result.get("pesan", ""))
 	_refresh_food_list()
 
