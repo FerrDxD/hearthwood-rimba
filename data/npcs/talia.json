@@ -1,0 +1,39 @@
+{
+  "nama": "Talia",
+  "peran": "Pedagang perkakas",
+  "sifat": "Pendiam, teliti, suka hal sederhana",
+  "suka": ["Sayur", "Hidangan ringan"],
+  "tidak_suka": ["Berminyak"],
+  "jam_buka": {
+    "mulai": 13,
+    "selesai": 18
+  },
+  "ciri_khas": "Memegang palu besi kecil di pinggang, bicara pendek dan langsung.",
+  "palet": {
+    "rambut": "#2F2F2F",
+    "baju": "#808080",
+    "celana": "#555555",
+    "aksesori": "palu_kecil"
+  },
+  "dialog": {
+    "dialog_1": "Talia. Jualan pisau, caping, dan tongkat. Perkakas untuk hutan. Ada yang rusak?",
+    "dialog_2": "Kalau warungmu sudah buka, kamu butuh pisau lebih tajam. Saya punya yang bagus."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Pisau tahan lama lebih efisien untuk memotong sayur daripada kapak."
+    },
+    "hati_2": {
+      "tipe": "diskon",
+      "nilai": 5,
+      "kategori": "perkakas"
+    },
+    "hati_3": {
+      "tipe": "diskon_resep",
+      "nilai": 15,
+      "kategori": "perkakas",
+      "resep": "Nasi Goreng Hutan"
+    }
+  }
+}

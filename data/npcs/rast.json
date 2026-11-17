@@ -1,0 +1,33 @@
+{
+  "nama": "Rast",
+  "peran": "Penebang kayu",
+  "sifat": "Kaku, pemalu, remaja, membantu keluarganya",
+  "suka": ["Masakan hangat"],
+  "tidak_suka": [],
+  "ciri_khas": "Membawa tali atau remi di pinggang, sering salah tingkah.",
+  "palet": {
+    "rambut": "#8B4513",
+    "baju": "#556B2F",
+    "celana": "#654321",
+    "aksesori": "tali"
+  },
+  "dialog": {
+    "dialog_1": "Eh... kamu sudah bangun? Aku Rast. Jangan jalan sendirian terlalu jauh. Desanya... tidak jauh dari sini.",
+    "dialog_2": "Kamu sudah punya tempat tinggal. Kalau butuh kayu untuk warung, aku bisa bantu. Mungkin."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Info hutan tentang area aman untuk menebang dan area yang harus dihindari."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Bubur Hangat Hutan",
+      "bahan": ["Beras", "Sayur liar"]
+    },
+    "hati_3": {
+      "tipe": "quest",
+      "isi": "Buka main quest Rast (fitur quest ditunda)."
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "nama": "Rave",
+  "peran": "Pandai besi",
+  "sifat": "Berisik, percaya diri, suka menantang",
+  "suka": ["Pedas"],
+  "tidak_suka": ["Masakan hambar"],
+  "ciri_khas": "Membawa palu besar dan berbicara keras.",
+  "palet": {
+    "rambut": "#2F2F2F",
+    "baju": "#A52A2A",
+    "celana": "#333333",
+    "aksesori": "palu_besar"
+  },
+  "dialog": {
+    "dialog_1": "Aku Rave, pandai besi. Pedas itu yang bikin hidup enak! Kamu masak pedas nggak?",
+    "dialog_2": "Warungmu? Kalau masak hambar, orang tidak akan datang. Bawa yang pedas ke sini nanti!"
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Info kecil tentang pandai besi."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Sambal Tumisan Pedas"
+    },
+    "hati_3": {
+      "tipe": "cerita",
+      "isi": "Cerita tentang panggangan besi favoritnya."
+    }
+  }
+}

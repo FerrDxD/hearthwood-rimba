@@ -1,0 +1,39 @@
+{
+  "nama": "Giral",
+  "peran": "Pedagang bahan",
+  "sifat": "Rajin, pemalu, senang jalan hutan",
+  "suka": ["Sayur bening", "Hidangan ringan"],
+  "tidak_suka": ["Terlalu manis"],
+  "jam_buka": {
+    "mulai": 7,
+    "selesai": 12
+  },
+  "ciri_khas": "Membawa keranjang bambu sayuran, bicara perlahan dan sering jeda.",
+  "palet": {
+    "rambut": "#8B4513",
+    "baju": "#556B2F",
+    "celana": "#654321",
+    "aksesori": "keranjang"
+  },
+  "dialog": {
+    "dialog_1": "Halo... selamat pagi. Saya Giral. Jualan sayuran dan bumbu dari hutan di sini. Ada yang... mau dibeli?",
+    "dialog_2": "Oh, kamu sudah punya tempat makan? Kalau butuh bahan segar, tinggal bilang saja. Saya selalu siap..."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Sayur liar tumbuh banyak di area timur hutan, terutama setelah hujan."
+    },
+    "hati_2": {
+      "tipe": "diskon",
+      "nilai": 5,
+      "kategori": "bahan"
+    },
+    "hati_3": {
+      "tipe": "diskon_resep",
+      "nilai": 15,
+      "kategori": "bahan",
+      "resep": "Ikan Bakar Rempah"
+    }
+  }
+}

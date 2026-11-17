@@ -1,0 +1,36 @@
+{
+  "giral": [
+    { "mulai": 7, "selesai": 12, "posisi": [1004, 350], "zona": [64, 42] }
+  ],
+  "talia": [
+    { "mulai": 13, "selesai": 18, "posisi": [1148, 350], "zona": [64, 42] }
+  ],
+  "casha": [
+    { "mulai": 14.5, "selesai": 16, "posisi": [1260, 340], "zona": [76, 52] }
+  ],
+  "vea": [
+    { "mulai": 13, "selesai": 14.5, "posisi": [1080, 468], "zona": [72, 54] }
+  ],
+  "nue": [
+    { "mulai": 10, "selesai": 11.5, "posisi": [1000, 370], "zona": [72, 52] }
+  ],
+  "jev": [
+    { "mulai": 11.5, "selesai": 13, "posisi": [870, 430], "zona": [72, 52] }
+  ],
+  "gil": [
+    { "mulai": 7, "selesai": 9, "posisi": [1150, 486], "zona": [76, 54] }
+  ],
+  "rave": [
+    { "mulai": 12, "selesai": 13.5, "posisi": [1220, 505], "zona": [74, 54] }
+  ],
+  "kila": [
+    { "mulai": 16, "selesai": 17.5, "posisi": [1328, 536], "zona": [80, 52] }
+  ],
+  "rast": [
+    { "mulai": 6, "selesai": 16, "posisi": [440, 420], "zona": [112, 82] },
+    { "mulai": 16, "selesai": 17, "posisi": [610, 430], "zona": [76, 48] }
+  ],
+  "veral": [
+    { "mulai": 8, "selesai": 18, "posisi": [1390, 342], "zona": [68, 52] }
+  ]
+}

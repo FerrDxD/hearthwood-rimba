@@ -1,0 +1,32 @@
+{
+  "nama": "Veral",
+  "peran": "Kepala desa",
+  "sifat": "Tua, berwawasan luas, terkendali",
+  "suka": ["Masakan rapi dan hangat"],
+  "tidak_suka": [],
+  "ciri_khas": "Membawa tongkat tua dan berbicara dengan tenang.",
+  "palet": {
+    "rambut": "#A9A9A9",
+    "baju": "#2C3E50",
+    "celana": "#555555",
+    "aksesori": "tongkat_tua"
+  },
+  "dialog": {
+    "dialog_1": "Selamat datang. Saya Veral, kepala desa. Katakan dahulu, dari mana Anda datang dan apa tujuan Anda?",
+    "dialog_2": "Anda telah menunjukkan kemampuan memasak. Izin tinggal di desa ini saya setujui. Bangun kembali warungmu dengan tertib."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Aturan desa, warga, dan lokasi bangunan penting."
+    },
+    "hati_2": {
+      "tipe": "info",
+      "isi": "Sejarah kerajaan, hukum perkotaan, dan hubungan desa dengan kerajaan."
+    },
+    "hati_3": {
+      "tipe": "quest",
+      "isi": "Buka main quest Veral (fitur quest ditunda)."
+    }
+  }
+}

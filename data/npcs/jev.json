@@ -1,0 +1,32 @@
+{
+  "nama": "Jev",
+  "peran": "Prajurit penjaga gerbang",
+  "sifat": "Disiplin, canggung di luar tugas, selalu lapar",
+  "suka": ["Porsi besar", "Gurih", "Berdaging"],
+  "tidak_suka": ["Sayuran"],
+  "ciri_khas": "Memegang tombak di bahu, berdiri tegang, dan selalu bicara soal lapar.",
+  "palet": {
+    "rambut": "#2F2F2F",
+    "baju": "#555555",
+    "celana": "#414141",
+    "aksesori": "tombak"
+  },
+  "dialog": {
+    "dialog_1": "Jev, penjaga gerbang. Siapa kamu? Pergi ke mana? ...Aku lapar, tahu?",
+    "dialog_2": "Kalau kamu buka warung, jaga-jaga porsi besar. Aku selalu lapar."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Info kecil tentang jaga gerbang."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Ikan Bakar Rempah"
+    },
+    "hati_3": {
+      "tipe": "cerita",
+      "isi": "Cerita pribadi tentang masa prajuritnya."
+    }
+  }
+}

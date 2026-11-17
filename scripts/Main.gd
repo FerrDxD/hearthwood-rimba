@@ -2,6 +2,7 @@ extends Node2D
 
 const WORLD_SCENE: PackedScene = preload("res://scenes/tilemap/MainTileset.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/Player.tscn")
+const DIALOG_UI_SCENE: PackedScene = preload("res://scenes/DialogUI.tscn")
 const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
 
 var _world: HearthwoodWorld
@@ -10,6 +11,7 @@ var _clock_label: Label
 var _energy_label: Label
 var _energy_bar: ProgressBar
 var _hint_label: Label
+var _dialog_ui: HearthwoodDialogUI
 
 
 func _ready() -> void:
@@ -27,6 +29,8 @@ func _ready() -> void:
 	camera.limit_bottom = 880
 
 	_create_hud()
+	_dialog_ui = DIALOG_UI_SCENE.instantiate()
+	add_child(_dialog_ui)
 	_connect_signals()
 	_update_hud()
 
@@ -37,6 +41,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	if _dialog_ui.is_open():
+		return
+
+	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 64.0)
+	if nearby_npc != null:
+		_hint_label.text = "Bicara dengan %s  |  E" % nearby_npc.get_display_name()
+		return
+
 	if _world.is_near_bed(_player.global_position):
 		_hint_label.text = "Tempat istirahat  |  E untuk tidur dan berganti hari"
 	else:
@@ -112,7 +124,18 @@ func _on_minute_changed(_day: int, _hour: int, _minute: int) -> void:
 
 
 func _interact() -> void:
-	if _world.is_near_bed(_player.global_position):
+	if _dialog_ui.is_open():
+		return
+
+	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 56.0)
+	if nearby_npc != null:
+		_dialog_ui.open_dialog(
+			nearby_npc.get_display_name(),
+			nearby_npc.get_role(),
+			nearby_npc.get_dialogue()
+		)
+		nearby_npc.mark_met()
+	elif _world.is_near_bed(_player.global_position):
 		get_node("/root/TimeSystem").sleep()
 		_hint_label.text = "Hari baru dimulai. Energi sudah pulih."
 	else:

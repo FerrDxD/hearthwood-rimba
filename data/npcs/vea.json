@@ -1,0 +1,32 @@
+{
+  "nama": "Vea",
+  "peran": "Penenun dan penjahit",
+  "sifat": "Pendiam, teliti, sabar",
+  "suka": ["Sayur bening", "Hidangan ringan"],
+  "tidak_suka": ["Yang berminyak"],
+  "ciri_khas": "Memegang jarum jahit dan kain, bicara pelan dan sabar.",
+  "palet": {
+    "rambut": "#8B4513",
+    "baju": "#C8A2C8",
+    "celana": "#F5F5DC",
+    "aksesori": "jarum_kain"
+  },
+  "dialog": {
+    "dialog_1": "Selamat pagi. Saya Vea. Menjahit pakaian di sini. Kalau baju sobek, bawa saja ke saya.",
+    "dialog_2": "Kalau kau sering masak di warung, baju akan cepat kotor. Aku bisa jahit pakaian baru untukmu."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Info kecil tentang kain dan jahitan."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Sup Sayur Bening"
+    },
+    "hati_3": {
+      "tipe": "info",
+      "isi": "Lokasi kain berkualitas di hutan."
+    }
+  }
+}

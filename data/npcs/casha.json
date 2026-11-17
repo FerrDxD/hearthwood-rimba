@@ -1,0 +1,32 @@
+{
+  "nama": "Casha",
+  "peran": "Penjaga toko kue",
+  "sifat": "Ramah, cerewet, selalu penasaran",
+  "suka": ["Masakan baru yang belum pernah dicoba"],
+  "tidak_suka": ["Menu yang itu-itu saja"],
+  "ciri_khas": "Sibuk dengan adonan kue dan selalu bertanya-tanya.",
+  "palet": {
+    "rambut": "#A52A2A",
+    "baju": "#DB7093",
+    "celana": "#A9A9A9",
+    "aksesori": "adonan"
+  },
+  "dialog": {
+    "dialog_1": "Hai! Kamu orang baru kan? Apa-apa yang kamu masak tadi? Harusnya enak banget! Aku suka coba yang baru-baru!",
+    "dialog_2": "Wah, warungmu sudah buka ya? Bawa masakan terbaru kamu ke toko kue nanti, aku mau coba!"
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Aku suka coba masakan baru-baru!"
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Sayur Asam Segar"
+    },
+    "hati_3": {
+      "tipe": "cerita",
+      "isi": "Cerita tentang toko kue keluarganya."
+    }
+  }
+}

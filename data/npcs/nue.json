@@ -1,0 +1,32 @@
+{
+  "nama": "Nue",
+  "peran": "Pelayan penginapan",
+  "sifat": "Blak-blakan, gesit, tahu semua gosip",
+  "suka": ["Rasa asam segar"],
+  "tidak_suka": ["Yang terlalu manis"],
+  "ciri_khas": "Tertawa cepat, santai, dan selalu tahu gosip desa.",
+  "palet": {
+    "rambut": "#2F2F2F",
+    "baju": "#87CEEB",
+    "celana": "#808080",
+    "aksesori": "tanpa"
+  },
+  "dialog": {
+    "dialog_1": "Selamat datang di penginapan! Saya Nue, siapa nama kamu? Ada kabar baru dari hutan?",
+    "dialog_2": "Dengar warung kamu sudah buka? Semua warga akan datang. Jangan lupa masakan yang enak, ya!"
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Gosip desa terbaru."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Kue Manis Liar"
+    },
+    "hati_3": {
+      "tipe": "cerita",
+      "isi": "Cerita pribadi tentang penginapan."
+    }
+  }
+}

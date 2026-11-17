@@ -1,0 +1,32 @@
+{
+  "nama": "Gil",
+  "peran": "Petani tua",
+  "sifat": "Suka bercerita ngelantur, tradisional",
+  "suka": ["Sup", "Bubur hangat"],
+  "tidak_suka": ["Yang terlalu pedas"],
+  "ciri_khas": "Memegang tongkat kayu dan suka bercerita panjang.",
+  "palet": {
+    "rambut": "#8B4513",
+    "baju": "#556B2F",
+    "celana": "#654321",
+    "aksesori": "tongkat"
+  },
+  "dialog": {
+    "dialog_1": "Selamat pagi, anak muda. Saya Gil, petani di desa ini. Kamu baru datang, ya? Ceritakan...",
+    "dialog_2": "Warung hangat di tengah desa... seperti dulu-dulu. Masak sup hangat untuk warga, ya."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Info kecil tentang pertanian."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Bubur Hangat Hutan"
+    },
+    "hati_3": {
+      "tipe": "cerita",
+      "isi": "Cerita pribadi tentang masa lalu desa."
+    }
+  }
+}

@@ -86,20 +86,20 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** NPC bernama bisa diinteraksi dengan dialog yang dimuat dari JSON (data-driven, tidak hardcode). 11 NPC bernama (9 pelanggan + Rast + Veral) dan 32 NPC ambient.
 
 **Tugas:**
-- [ ] Buat `npc.tscn` (satu scene dipakai ulang, dialog lewat data JSON)
-- [ ] Buat `NPC.gd` (perilaku dasar: jalan acak di zona, tampilkan dialog)
-- [ ] Buat `dialog_ui.tscn` (kotak teks besar, nama NPC di kiri, tombol Lanjutkan/Next)
-- [ ] Buat file JSON untuk 11 NPC bernama di `data/npcs/` (skema: nama, peran, sifat, suka, tidak_suka, jam_buka, ciri_khas, dialog.dialog_1, dialog_2, hadiah.hati_1/2/3)
-- [ ] Isi 2 dialog per NPC (pertemuan awal + setelah progres)
-- [ ] Buat 32 variasi NPC ambient (sprite berlapis + variasi warna, tidak interaktif)
-- [ ] Masukkan NPC ke scene dunia sesuai lokasi dan jendela waktu
+- [x] Buat `npc.tscn` (satu scene dipakai ulang, dialog lewat data JSON)
+- [x] Buat `NPC.gd` (perilaku dasar: jalan acak di zona, tampilkan dialog)
+- [x] Buat `dialog_ui.tscn` (kotak teks besar, nama NPC di kiri, tombol Lanjutkan/Next)
+- [x] Buat file JSON untuk 11 NPC bernama di `data/npcs/` (skema: nama, peran, sifat, suka, tidak_suka, jam_buka, ciri_khas, dialog.dialog_1, dialog_2, hadiah.hati_1/2/3)
+- [x] Isi 2 dialog per NPC (pertemuan awal + setelah progres)
+- [x] Buat 32 variasi NPC ambient (sprite berlapis + variasi warna, tidak interaktif)
+- [x] Masukkan NPC ke scene dunia sesuai lokasi dan jendela waktu
 
 **Dependensi:** Fase 1 (Player, TimeSystem untuk jadwal, DialogUI untuk tampilan).
 
 **Definition of Done:**
-- Pemain dapat berbicara ke semua 11 NPC bernama dan melihat 2 dialog masing-masing
-- Dialog diisi dari JSON, tidak ada hardcode dialog di skrip (lolos checklist AGENTS.md bagian 7)
-- NPC ambient berjalan-jalan di peta tanpa crash
+- [x] Pemain dapat berbicara ke semua 11 NPC bernama dan melihat 2 dialog masing-masing
+- [x] Dialog diisi dari JSON, tidak ada hardcode dialog di skrip (lolos checklist AGENTS.md bagian 7)
+- [x] NPC ambient berjalan-jalan di peta tanpa crash
 
 ---
 

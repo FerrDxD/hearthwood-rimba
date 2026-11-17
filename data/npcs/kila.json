@@ -1,0 +1,32 @@
+{
+  "nama": "Kila",
+  "peran": "Anak desa",
+  "sifat": "Polos, lincah, suka mengikuti tokoh utama",
+  "suka": ["Kudapan manis"],
+  "tidak_suka": ["Yang pahit"],
+  "ciri_khas": "Lincah, suka mengikuti orang baru, dan gemar camilan manis.",
+  "palet": {
+    "rambut": "#DAA520",
+    "baju": "#9ACD32",
+    "celana": "#A9A9A9",
+    "aksesori": "tanpa"
+  },
+  "dialog": {
+    "dialog_1": "Halo! Kamu orang baru? Aku Kila! Aku suka kue manis! Bawa kue nanti ya?",
+    "dialog_2": "Warungmu buka? Aku akan datang setiap hari! Cuma... jangan masak yang pahit, ya!"
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Info kecil tentang bermain di hutan."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Kue Manis Liar"
+    },
+    "hati_3": {
+      "tipe": "cerita",
+      "isi": "Cerita pribadi tentang camilan favoritnya."
+    }
+  }
+}
