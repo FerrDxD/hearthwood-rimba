@@ -2,9 +2,11 @@ extends Control
 class_name TouchControls
 
 signal interact_pressed
+signal inventory_pressed
 
 const JOYSTICK_RADIUS: float = 54.0
 const BUTTON_RADIUS: float = 42.0
+const INVENTORY_RADIUS: float = 35.0
 
 var _joystick_touch: int = -1
 var _interact_touch: int = -1
@@ -13,6 +15,7 @@ var _mouse_interact: bool = false
 var _stick_vector: Vector2 = Vector2.ZERO
 var _stick_center: Vector2
 var _button_center: Vector2
+var _inventory_center: Vector2
 
 
 func _ready() -> void:
@@ -52,6 +55,21 @@ func _draw() -> void:
 		20,
 		Color("#fff9e7")
 	)
+	draw_circle(_inventory_center, INVENTORY_RADIUS, Color(0.56, 0.32, 0.19, 0.72))
+	draw_circle(
+		_inventory_center,
+		INVENTORY_RADIUS - 4.0,
+		Color(0.78, 0.58, 0.36, 0.86)
+	)
+	draw_string(
+		ThemeDB.fallback_font,
+		_inventory_center + Vector2(-7.0, 6.0),
+		"I",
+		HORIZONTAL_ALIGNMENT_LEFT,
+		-1.0,
+		20,
+		Color("#fff9e7")
+	)
 
 
 func _handle_screen_touch(event: InputEventScreenTouch) -> void:
@@ -63,6 +81,8 @@ func _handle_screen_touch(event: InputEventScreenTouch) -> void:
 			_interact_touch = event.index
 			Input.action_press("interact")
 			interact_pressed.emit()
+		elif event.position.distance_to(_inventory_center) <= INVENTORY_RADIUS * 1.5:
+			inventory_pressed.emit()
 	else:
 		if event.index == _joystick_touch:
 			_joystick_touch = -1
@@ -81,6 +101,8 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 			_mouse_interact = true
 			Input.action_press("interact")
 			interact_pressed.emit()
+		elif event.position.distance_to(_inventory_center) <= INVENTORY_RADIUS * 1.5:
+			inventory_pressed.emit()
 	else:
 		if _mouse_joystick:
 			_mouse_joystick = false
@@ -117,4 +139,5 @@ func _set_action_strength(action: StringName, strength: float) -> void:
 func _update_centers() -> void:
 	_stick_center = Vector2(92.0, size.y - 104.0)
 	_button_center = Vector2(size.x - 92.0, size.y - 104.0)
+	_inventory_center = Vector2(size.x - 92.0, size.y - 202.0)
 	queue_redraw()

@@ -4,6 +4,7 @@ const WORLD_SCENE: PackedScene = preload("res://scenes/tilemap/MainTileset.tscn"
 const PLAYER_SCENE: PackedScene = preload("res://scenes/Player.tscn")
 const DIALOG_UI_SCENE: PackedScene = preload("res://scenes/DialogUI.tscn")
 const SHOP_UI_SCENE: PackedScene = preload("res://scenes/ShopUI.tscn")
+const INVENTORY_UI_SCENE: PackedScene = preload("res://scenes/InventoryUI.tscn")
 const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
 
 var _world: HearthwoodWorld
@@ -15,6 +16,7 @@ var _coins_label: Label
 var _hint_label: Label
 var _dialog_ui: HearthwoodDialogUI
 var _shop_ui: HearthwoodShopUI
+var _inventory_ui: HearthwoodInventoryUI
 var _current_shopkeeper: HearthwoodShopNPC
 
 
@@ -39,6 +41,8 @@ func _ready() -> void:
 	add_child(_shop_ui)
 	_shop_ui.talk_requested.connect(_on_shop_talk_requested)
 	_shop_ui.closed.connect(_on_shop_closed)
+	_inventory_ui = INVENTORY_UI_SCENE.instantiate()
+	add_child(_inventory_ui)
 	_connect_signals()
 	_update_hud()
 
@@ -46,10 +50,12 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact") and not (event is InputEventKey and event.is_echo()):
 		_interact()
+	elif event.is_action_pressed("inventory") and not (event is InputEventKey and event.is_echo()):
+		_toggle_inventory()
 
 
 func _process(_delta: float) -> void:
-	if _dialog_ui.is_open():
+	if _dialog_ui.is_open() or _inventory_ui.is_open():
 		return
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 64.0)
@@ -58,6 +64,11 @@ func _process(_delta: float) -> void:
 			_hint_label.text = "Belanja atau bicara dengan %s  |  E" % nearby_npc.get_display_name()
 			return
 		_hint_label.text = "Bicara dengan %s  |  E" % nearby_npc.get_display_name()
+		return
+
+	var nearby_pickup := _world.get_closest_item_pickup(_player.global_position, 64.0)
+	if nearby_pickup != null:
+		_hint_label.text = "Ambil %s  |  E" % nearby_pickup.get_display_name()
 		return
 
 	if _world.is_near_bed(_player.global_position):
@@ -115,6 +126,7 @@ func _create_hud() -> void:
 	controls.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	interface.add_child(controls)
 	controls.interact_pressed.connect(_interact)
+	controls.inventory_pressed.connect(_toggle_inventory)
 
 	_hint_label.text = "WASD / panah untuk bergerak  |  E untuk berinteraksi"
 
@@ -168,8 +180,14 @@ func _on_shop_closed() -> void:
 	_current_shopkeeper = null
 
 
-func _interact() -> void:
+func _toggle_inventory() -> void:
 	if _dialog_ui.is_open() or _shop_ui.is_open():
+		return
+	_inventory_ui.toggle_inventory()
+
+
+func _interact() -> void:
+	if _dialog_ui.is_open() or _shop_ui.is_open() or _inventory_ui.is_open():
 		return
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 56.0)
@@ -193,8 +211,15 @@ func _interact() -> void:
 			nearby_npc.get_dialogue()
 		)
 		nearby_npc.mark_met()
-	elif _world.is_near_bed(_player.global_position):
-		get_node("/root/TimeSystem").sleep()
-		_hint_label.text = "Hari baru dimulai. Energi sudah pulih."
 	else:
-		_hint_label.text = "Jelajahi jalan menuju desa untuk menemukan tempat beristirahat."
+		var nearby_pickup := _world.get_closest_item_pickup(_player.global_position, 56.0)
+		if nearby_pickup != null:
+			var item_name := nearby_pickup.get_display_name()
+			if _world.collect_item_pickup(nearby_pickup):
+				_hint_label.text = "%s dikumpulkan." % item_name
+			return
+		elif _world.is_near_bed(_player.global_position):
+			get_node("/root/TimeSystem").sleep()
+			_hint_label.text = "Hari baru dimulai. Energi sudah pulih."
+		else:
+			_hint_label.text = "Jelajahi jalan menuju desa untuk menemukan tempat beristirahat."

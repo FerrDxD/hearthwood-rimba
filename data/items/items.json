@@ -1,0 +1,25 @@
+{
+  "items": [
+    { "id": "sayur_liar", "nama": "Sayur liar", "kategori": "bahan", "sumber": "hutan", "warna": "#74a653" },
+    { "id": "ikan_sungai", "nama": "Ikan sungai", "kategori": "bahan", "sumber": "sungai", "warna": "#6b9db3" },
+    { "id": "daun_hutan", "nama": "Daun hutan", "kategori": "bahan", "sumber": "hutan", "warna": "#4c8b46" },
+    { "id": "buah_liar", "nama": "Buah liar", "kategori": "bahan", "sumber": "hutan", "warna": "#c66b53" },
+    { "id": "akar_rempah", "nama": "Akar rempah", "kategori": "bahan", "sumber": "hutan", "warna": "#b17b4d" },
+    { "id": "jamur_hutan", "nama": "Jamur hutan", "kategori": "bahan", "sumber": "hutan", "warna": "#d6c6a1" },
+    { "id": "tepung", "nama": "Tepung", "kategori": "bahan", "sumber": "Giral", "warna": "#e9dfc4" },
+    { "id": "garam", "nama": "Garam", "kategori": "bahan", "sumber": "Giral", "warna": "#faf7e9" },
+    { "id": "minyak", "nama": "Minyak", "kategori": "bahan", "sumber": "Giral", "warna": "#d6a64c" },
+    { "id": "telur", "nama": "Telur", "kategori": "bahan", "sumber": "Giral", "warna": "#e5d2ad" },
+    { "id": "pisau_kecil", "nama": "Pisau kecil", "kategori": "perkakas", "sumber": "Talia", "warna": "#9da5a2" },
+    { "id": "caping", "nama": "Caping", "kategori": "perkakas", "sumber": "Talia", "warna": "#bba36f" },
+    { "id": "tongkat", "nama": "Tongkat", "kategori": "perkakas", "sumber": "Talia", "warna": "#876443" },
+    { "id": "sup_sayur_bening", "nama": "Sup Sayur Bening", "kategori": "masakan", "warna": "#d6ba68", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 },
+    { "id": "ikan_bakar_rempah", "nama": "Ikan Bakar Rempah", "kategori": "masakan", "warna": "#bd8057", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 },
+    { "id": "bubur_hangat_hutan", "nama": "Bubur Hangat Hutan", "kategori": "masakan", "warna": "#d4c28e", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 },
+    { "id": "sambal_tumisan_pedas", "nama": "Sambal Tumisan Pedas", "kategori": "masakan", "warna": "#c75d3e", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 },
+    { "id": "sayur_asam_segar", "nama": "Sayur Asam Segar", "kategori": "masakan", "warna": "#88a556", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 },
+    { "id": "kue_manis_liar", "nama": "Kue Manis Liar", "kategori": "masakan", "warna": "#d8a56e", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 },
+    { "id": "nasi_goreng_hutan", "nama": "Nasi Goreng Hutan", "kategori": "masakan", "warna": "#c5a15b", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 },
+    { "id": "hidangan_rempah_khusus", "nama": "Hidangan Rempah Khusus", "kategori": "masakan", "warna": "#a97c4c", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3 }
+  ]
+}

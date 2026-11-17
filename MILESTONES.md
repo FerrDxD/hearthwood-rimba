@@ -129,18 +129,18 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Pemain dapat menahan item, bahan, dan hasil masakan. Diperlukan sebelum sistem memasak (bahan masuk, hasil keluar).
 
 **Tugas:**
-- [ ] Buat entri item di `data/items/` (ID unik, nama tampilan, nilai energi jika bisa dimakan)
-- [ ] Implementasi sistem inventori (array item dengan jumlah)
-- [ ] Buat `inventory_ui.tscn` (grid item, ikon, jumlah, nilai energi untuk makanan)
-- [ ] Tampilkan tanggal masak pada hasil masakan (untuk hitung basi 3 hari)
-- [ ] Integrasi dengan `Player.gd` (ambil item, simpan ke inventori)
+- [x] Buat entri item di `data/items/` (ID unik, nama tampilan, nilai energi jika bisa dimakan)
+- [x] Implementasi sistem inventori (array item dengan jumlah)
+- [x] Buat `inventory_ui.tscn` (grid item, ikon, jumlah, nilai energi untuk makanan)
+- [x] Tampilkan tanggal masak pada hasil masakan (untuk hitung basi 3 hari)
+- [x] Integrasi interaksi pemain untuk mengambil item, lalu menyimpannya ke inventori
 
 **Dependensi:** Fase 1 (Player, energi), Fase 2 (NPC untuk interaksi ambil item).
 
 **Definition of Done:**
-- Pemain dapat mengambil item di dunia dan melihatnya di inventori
-- Makanan menunjukkan nilai energi
-- Hasil masakan menunjukkan tanggal masak
+- [x] Pemain dapat mengambil item di dunia dan melihatnya di inventori
+- [x] Makanan menunjukkan nilai energi
+- [x] Hasil masakan menunjukkan tanggal masak
 
 ---
 

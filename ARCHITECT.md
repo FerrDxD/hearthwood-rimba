@@ -87,6 +87,7 @@ res://
 Tanggung jawab:
 - Menyimpan nama pemain (dapat dikustom, placeholder `{nama}`)
 - State global yang diakses semua scene
+- Memuat katalog `data/items/items.json` dan menyimpan inventori dalam stack berjumlah, dengan tanggal masak dan kualitas untuk masakan
 - Titik masuk pemuatan dan penyimpanan save file
 - Referensi ke sistem waktu, energi, reputasi
 
@@ -99,6 +100,8 @@ var energy: int = 100
 var reputation: int = 0
 var warung_tier: int = 0  # 0=Gubuk, 1=Warung Kecil, 2=Warteg Penuh
 ```
+
+Pickup bahan dikelola `World.gd`, ditambahkan ke inventori lewat `GameState`, dan tumbuh kembali saat hari berganti. `InventoryUI.gd` menampilkan jumlah, energi makanan berdasarkan kualitas, serta tanggal masak; UI dapat dibuka lewat tombol inventori sentuh atau tombol `I`.
 
 ---
 

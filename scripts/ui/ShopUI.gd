@@ -214,7 +214,7 @@ func _refresh_goods() -> void:
 		item_label.add_theme_font_size_override("font_size", 17)
 		var base_price := int(item["harga"])
 		var final_price := _calculate_price(base_price, _discount_percent)
-		var owned_count := int(game_state.inventory.get(str(item["id"]), 0))
+		var owned_count: int = game_state.get_item_count(str(item["id"]))
 		if _discount_percent > 0:
 			item_label.text = "%s  %d -> %d koin  (milik: %d)" % [
 				str(item["nama"]),

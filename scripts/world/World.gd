@@ -8,6 +8,19 @@ const BED_POSITION: Vector2 = Vector2(1320.0, 476.0)
 const BED_INTERACTION_RADIUS: float = 76.0
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
+const ITEM_PICKUP_SCENE: PackedScene = preload("res://scenes/ItemPickup.tscn")
+const FORAGE_SPAWN_POINTS: Array[Dictionary] = [
+	{"id": "sayur_liar", "position": Vector2(104.0, 218.0)},
+	{"id": "sayur_liar", "position": Vector2(360.0, 666.0)},
+	{"id": "ikan_sungai", "position": Vector2(158.0, 720.0)},
+	{"id": "daun_hutan", "position": Vector2(478.0, 166.0)},
+	{"id": "daun_hutan", "position": Vector2(426.0, 738.0)},
+	{"id": "buah_liar", "position": Vector2(290.0, 178.0)},
+	{"id": "buah_liar", "position": Vector2(498.0, 590.0)},
+	{"id": "akar_rempah", "position": Vector2(184.0, 328.0)},
+	{"id": "jamur_hutan", "position": Vector2(344.0, 272.0)},
+	{"id": "jamur_hutan", "position": Vector2(254.0, 632.0)},
+]
 const NAMED_NPC_IDS: Array[String] = [
 	"giral",
 	"talia",
@@ -27,6 +40,7 @@ var _random := RandomNumberGenerator.new()
 var _tree_positions: Array[Vector2] = []
 var _named_npcs: Array[HearthwoodNPC] = []
 var _ambient_npcs: Array[HearthwoodNPC] = []
+var _item_pickups: Array[HearthwoodItemPickup] = []
 var _building_rects: Array[Rect2] = [
 	Rect2(970.0, 246.0, 92.0, 72.0),
 	Rect2(1102.0, 246.0, 92.0, 72.0),
@@ -46,6 +60,8 @@ func _ready() -> void:
 	_add_building_collisions()
 	_spawn_named_npcs()
 	_spawn_ambient_npcs()
+	_spawn_forage_items()
+	get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
 	queue_redraw()
 
 
@@ -64,6 +80,31 @@ func get_closest_named_npc(player_position: Vector2, radius: float) -> Hearthwoo
 			closest = npc
 			closest_distance = distance
 	return closest
+
+
+func get_closest_item_pickup(
+	player_position: Vector2, radius: float
+) -> HearthwoodItemPickup:
+	var closest: HearthwoodItemPickup
+	var closest_distance := radius
+	for pickup in _item_pickups:
+		if not is_instance_valid(pickup) or not pickup.visible:
+			continue
+		var distance := player_position.distance_to(pickup.global_position)
+		if distance <= closest_distance:
+			closest = pickup
+			closest_distance = distance
+	return closest
+
+
+func collect_item_pickup(pickup: HearthwoodItemPickup) -> bool:
+	if not is_instance_valid(pickup) or not _item_pickups.has(pickup):
+		return false
+	if not pickup.collect():
+		return false
+	_item_pickups.erase(pickup)
+	pickup.queue_free()
+	return true
 
 
 func get_named_npc_count() -> int:
@@ -183,6 +224,23 @@ func _spawn_ambient_npcs() -> void:
 		npc.configure_ambient(index, spawn_position, movement_zone)
 		add_child(npc)
 		_ambient_npcs.append(npc)
+
+
+func _spawn_forage_items() -> void:
+	for pickup in _item_pickups:
+		if is_instance_valid(pickup):
+			pickup.queue_free()
+	_item_pickups.clear()
+
+	for spawn_point in FORAGE_SPAWN_POINTS:
+		var pickup := ITEM_PICKUP_SCENE.instantiate() as HearthwoodItemPickup
+		pickup.configure(str(spawn_point["id"]), spawn_point["position"])
+		add_child(pickup)
+		_item_pickups.append(pickup)
+
+
+func _on_day_changed(_day: int) -> void:
+	_spawn_forage_items()
 
 
 func _validate_schedule_segments(npc_id: String, segments: Array) -> bool:

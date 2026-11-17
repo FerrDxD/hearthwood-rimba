@@ -84,13 +84,13 @@ func _run_tests() -> void:
 		quit(1)
 		return
 	buy_button.pressed.emit()
-	if game_state.coins != 81 or int(game_state.inventory.get("tepung", 0)) != 1:
+	if game_state.coins != 81 or game_state.get_item_count("tepung") != 1:
 		push_error("Discounted purchase did not update coins and inventory correctly.")
 		quit(1)
 		return
 
 	game_state.coins = 0
-	if game_state.purchase_item("garam", 10) or game_state.inventory.has("garam"):
+	if game_state.purchase_item("garam", 10) or game_state.get_item_count("garam") > 0:
 		push_error("An unaffordable purchase should not change inventory.")
 		quit(1)
 		return

@@ -141,6 +141,8 @@ Setiap NPC memiliki:
 - Grid item dengan ikon dan jumlah
 - Tampilkan item yang bisa dimakan (dengan nilai energi)
 - Tampilkan item masakan dengan tanggal (untuk hitung basi)
+- Item hutan dapat dipungut saat dijelajahi dan tumbuh kembali setelah pemain tidur.
+- Kartu item memakai warna dari katalog data; inventori dapat dibuka lewat tombol sentuh atau tombol `I`.
 
 ### 5.6 UI Menu Pause / Main Menu
 - Tombol: Continue, New Game, Load Game, Settings, Exit
