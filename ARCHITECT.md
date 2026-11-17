@@ -172,11 +172,12 @@ Implementasi:
 Dari PRD (bagian 7, 9.2):
 - Giral: Pedagang bahan, buka 07.00–12.00
 - Talia: Pedagang perkakas, buka 13.00–18.00
-- Diskon hanya berlaku untuk pedagang (hati 2: 5%, hati 3: 10–15%)
+- Diskon hanya berlaku untuk pedagang (hati 2: 5%, hati 3: 15%)
 
 Implementasi:
-- `ShopNPC.gd`: cek jam buka, tampilkan UI toko jika buka
-- Diskon diterapkan otomatis berdasarkan tingkat hati pedagang
+- `ShopNPC.gd` mewarisi perilaku `NPC.gd`, membaca `jam_buka` dari JSON NPC, dan menolak interaksi di luar jam tersebut.
+- `ShopUI.gd` memuat katalog data-driven dari `data/shops.json`; pembelian memeriksa saldo lalu memperbarui koin dan jumlah item di `GameState`.
+- Diskon pedagang membaca tingkat hati Giral/Talia dari `GameState`; `AffectionSystem` akan mengisi state tersebut pada Fase 6.
 
 ---
 

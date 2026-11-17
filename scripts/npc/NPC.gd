@@ -103,6 +103,10 @@ func get_role() -> String:
 	return _role
 
 
+func get_npc_data() -> Dictionary:
+	return _npc_data
+
+
 func get_dialogue() -> String:
 	var dialog: Dictionary = _npc_data.get("dialog", {})
 	var dialogue_key := "dialog_2" if _has_met else "dialog_1"

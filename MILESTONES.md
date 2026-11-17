@@ -108,19 +108,19 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Pedagang buka sesuai jam buka, menjual bahan/perkakas, dan memberikan diskon berdasarkan tingkat hati.
 
 **Tugas:**
-- [ ] Buat `shop_npc.tscn` (warisan NPC + UI toko)
-- [ ] Buat `ShopNPC.gd` (cek jam buka dari data NPC, tampilkan UI toko jika buka)
-- [ ] Implementasi jadwal: Giral 07:00–12:00 (bahan), Talia 13:00–18:00 (perkakas)
-- [ ] Buat UI toko (daftar barang + harga, tombol Beli/Batal, diskon otomatis)
-- [ ] Diskon: hati 2 = 5%, hati 3 = 15% (hanya pedagang)
-- [ ] Hubungkan diskon dengan `AffectionSystem` (fase 6) — siapkan struktur dulu, nilai diisi setelah fase 6
+- [x] Buat `shop_npc.tscn` (warisan NPC + UI toko)
+- [x] Buat `ShopNPC.gd` (cek jam buka dari data NPC, tampilkan UI toko jika buka)
+- [x] Implementasi jadwal: Giral 07:00–12:00 (bahan), Talia 13:00–18:00 (perkakas)
+- [x] Buat UI toko (daftar barang + harga, tombol Beli/Batal, diskon otomatis)
+- [x] Diskon: hati 2 = 5%, hati 3 = 15% (hanya pedagang)
+- [x] Siapkan state tingkat hati untuk diskon; nilai akan diisi oleh `AffectionSystem` pada Fase 6
 
 **Dependensi:** Fase 1 (TimeSystem untuk jam buka), Fase 2 (NPC scene, dialog UI).
 
 **Definition of Done:**
-- Giral hanya tampil dan bisa berbelanja pukul 07:00–12:00
-- Talia hanya tampil dan bisa berbelanja pukul 13:00–18:00
-- Di luar jam buka, toko tidak muncul (tidak ada crash)
+- [x] Giral hanya tampil dan bisa berbelanja pukul 07:00–12:00
+- [x] Talia hanya tampil dan bisa berbelanja pukul 13:00–18:00
+- [x] Di luar jam buka, toko tidak muncul (tidak ada crash)
 
 ---
 

@@ -1,0 +1,19 @@
+{
+  "giral": {
+    "kategori": "Bahan",
+    "barang": [
+      { "id": "tepung", "nama": "Tepung", "harga": 20 },
+      { "id": "garam", "nama": "Garam", "harga": 10 },
+      { "id": "minyak", "nama": "Minyak", "harga": 20 },
+      { "id": "telur", "nama": "Telur", "harga": 10 }
+    ]
+  },
+  "talia": {
+    "kategori": "Perkakas",
+    "barang": [
+      { "id": "pisau_kecil", "nama": "Pisau kecil", "harga": 50 },
+      { "id": "caping", "nama": "Caping", "harga": 30 },
+      { "id": "tongkat", "nama": "Tongkat", "harga": 40 }
+    ]
+  }
+}

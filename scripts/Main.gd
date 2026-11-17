@@ -3,6 +3,7 @@ extends Node2D
 const WORLD_SCENE: PackedScene = preload("res://scenes/tilemap/MainTileset.tscn")
 const PLAYER_SCENE: PackedScene = preload("res://scenes/Player.tscn")
 const DIALOG_UI_SCENE: PackedScene = preload("res://scenes/DialogUI.tscn")
+const SHOP_UI_SCENE: PackedScene = preload("res://scenes/ShopUI.tscn")
 const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
 
 var _world: HearthwoodWorld
@@ -10,8 +11,11 @@ var _player: CharacterBody2D
 var _clock_label: Label
 var _energy_label: Label
 var _energy_bar: ProgressBar
+var _coins_label: Label
 var _hint_label: Label
 var _dialog_ui: HearthwoodDialogUI
+var _shop_ui: HearthwoodShopUI
+var _current_shopkeeper: HearthwoodShopNPC
 
 
 func _ready() -> void:
@@ -31,6 +35,10 @@ func _ready() -> void:
 	_create_hud()
 	_dialog_ui = DIALOG_UI_SCENE.instantiate()
 	add_child(_dialog_ui)
+	_shop_ui = SHOP_UI_SCENE.instantiate()
+	add_child(_shop_ui)
+	_shop_ui.talk_requested.connect(_on_shop_talk_requested)
+	_shop_ui.closed.connect(_on_shop_closed)
 	_connect_signals()
 	_update_hud()
 
@@ -46,6 +54,9 @@ func _process(_delta: float) -> void:
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 64.0)
 	if nearby_npc != null:
+		if nearby_npc is HearthwoodShopNPC:
+			_hint_label.text = "Belanja atau bicara dengan %s  |  E" % nearby_npc.get_display_name()
+			return
 		_hint_label.text = "Bicara dengan %s  |  E" % nearby_npc.get_display_name()
 		return
 
@@ -59,6 +70,7 @@ func _connect_signals() -> void:
 	var game_state = get_node("/root/GameState")
 	var time_system = get_node("/root/TimeSystem")
 	game_state.energy_changed.connect(_update_energy)
+	game_state.coins_changed.connect(_update_coins)
 	time_system.hour_changed.connect(_update_hud)
 	time_system.day_changed.connect(_update_hud)
 	time_system.minute_changed.connect(_on_minute_changed)
@@ -91,6 +103,9 @@ func _create_hud() -> void:
 	_energy_bar.show_percentage = false
 	status_layout.add_child(_energy_bar)
 
+	_coins_label = Label.new()
+	status_layout.add_child(_coins_label)
+
 	_hint_label = Label.new()
 	_hint_label.position = Vector2(16.0, 106.0)
 	_hint_label.add_theme_font_size_override("font_size", 15)
@@ -112,6 +127,7 @@ func _update_hud(_value: int = 0, _minute: int = 0) -> void:
 		game_state.current_minute,
 	]
 	_update_energy(game_state.energy)
+	_update_coins(game_state.coins)
 
 
 func _update_energy(value: int) -> void:
@@ -119,16 +135,58 @@ func _update_energy(value: int) -> void:
 	_energy_bar.value = value
 
 
+func _update_coins(value: int) -> void:
+	_coins_label.text = "Koin: %d" % value
+
+
 func _on_minute_changed(_day: int, _hour: int, _minute: int) -> void:
 	_update_hud()
 
 
+func _on_shop_talk_requested(shop_id: String) -> void:
+	if not is_instance_valid(_current_shopkeeper) or _current_shopkeeper.npc_id != shop_id:
+		push_error("Shop dialogue requested without a matching shopkeeper.")
+		return
+	_dialog_ui.open_dialog(
+		_current_shopkeeper.get_display_name(),
+		_current_shopkeeper.get_role(),
+		_current_shopkeeper.get_dialogue()
+	)
+	_current_shopkeeper.mark_met()
+
+
+func _on_shop_hours_changed(is_open: bool) -> void:
+	if not is_open and _shop_ui.is_open():
+		_shop_ui.close_shop()
+
+
+func _on_shop_closed() -> void:
+	if is_instance_valid(_current_shopkeeper):
+		var hours_changed_callback := Callable(self, "_on_shop_hours_changed")
+		if _current_shopkeeper.shop_hours_changed.is_connected(hours_changed_callback):
+			_current_shopkeeper.shop_hours_changed.disconnect(hours_changed_callback)
+	_current_shopkeeper = null
+
+
 func _interact() -> void:
-	if _dialog_ui.is_open():
+	if _dialog_ui.is_open() or _shop_ui.is_open():
 		return
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 56.0)
 	if nearby_npc != null:
+		if nearby_npc is HearthwoodShopNPC:
+			_current_shopkeeper = nearby_npc as HearthwoodShopNPC
+			if not _shop_ui.open_shop(
+				_current_shopkeeper.npc_id,
+				_current_shopkeeper.get_display_name(),
+				_current_shopkeeper.get_discount_percent()
+			):
+				_current_shopkeeper = null
+			else:
+				var hours_changed_callback := Callable(self, "_on_shop_hours_changed")
+				if not _current_shopkeeper.shop_hours_changed.is_connected(hours_changed_callback):
+					_current_shopkeeper.shop_hours_changed.connect(hours_changed_callback)
+			return
 		_dialog_ui.open_dialog(
 			nearby_npc.get_display_name(),
 			nearby_npc.get_role(),

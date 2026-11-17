@@ -7,6 +7,7 @@ const FOREST_END_X: float = 560.0
 const BED_POSITION: Vector2 = Vector2(1320.0, 476.0)
 const BED_INTERACTION_RADIUS: float = 76.0
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
+const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
 const NAMED_NPC_IDS: Array[String] = [
 	"giral",
 	"talia",
@@ -150,7 +151,10 @@ func _spawn_named_npcs() -> void:
 			continue
 		if not _validate_schedule_segments(npc_id, segments):
 			continue
-		var npc := NPC_SCENE.instantiate() as HearthwoodNPC
+		var npc_scene: PackedScene = NPC_SCENE
+		if npc_id == "giral" or npc_id == "talia":
+			npc_scene = SHOP_NPC_SCENE
+		var npc := npc_scene.instantiate() as HearthwoodNPC
 		npc.configure_named(
 			npc_id,
 			"res://data/npcs/%s.json" % npc_id,

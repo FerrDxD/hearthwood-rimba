@@ -134,6 +134,8 @@ Setiap NPC memiliki:
 - Daftar barang dengan harga
 - Diskon otomatis berdasarkan tingkat hati pedagang
 - Tombol "Beli" dan "Batal"
+- Katalog barang disimpan di `data/shops.json`; harga bahan dan saldo awal 100 koin adalah nilai awal yang bisa diseimbangkan karena PRD belum menetapkannya.
+- Pembelian mengurangi koin dan mencatat jumlah barang agar hasil transaksi bisa dipakai sistem inventori Fase 4.
 
 ### 5.5 UI Inventori
 - Grid item dengan ikon dan jumlah
