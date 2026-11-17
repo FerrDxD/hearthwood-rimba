@@ -5,6 +5,7 @@
   "bahan_utama": ["daun_hutan", "akar_rempah"],
   "bahan_per_porsi": { "daun_hutan": 1, "akar_rempah": 1, "minyak": 1, "garam": 1 },
   "suka_npc": ["rave"],
+  "sifat_rasa": ["pedas", "berminyak", "sayur"],
   "unlock_lewat": "menemukan akar rempah",
   "item_pembuka": "akar_rempah",
   "kualitas_dasar": 2

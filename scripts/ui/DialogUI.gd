@@ -2,22 +2,29 @@ extends CanvasLayer
 class_name HearthwoodDialogUI
 
 signal closed
+signal gift_requested(npc_id: String, npc_name: String)
 
 var _interface: Control
 var _name_label: Label
 var _role_label: Label
 var _dialogue_label: Label
+var _gift_button: Button
 var _continue_button: Button
+var _npc_id: String = ""
 
 
 func _ready() -> void:
 	_create_interface()
 
 
-func open_dialog(npc_name: String, npc_role: String, dialogue: String) -> void:
+func open_dialog(
+	npc_name: String, npc_role: String, dialogue: String, npc_id: String = ""
+) -> void:
 	_name_label.text = npc_name
 	_role_label.text = npc_role
 	_dialogue_label.text = dialogue
+	_npc_id = npc_id
+	_gift_button.visible = not npc_id.is_empty()
 	_interface.visible = true
 	_continue_button.grab_focus()
 
@@ -82,6 +89,12 @@ func _create_interface() -> void:
 
 	var footer := HBoxContainer.new()
 	layout.add_child(footer)
+	_gift_button = Button.new()
+	_gift_button.text = "Beri masakan"
+	_gift_button.custom_minimum_size = Vector2(156.0, 52.0)
+	_gift_button.pressed.connect(_on_gift_pressed)
+	footer.add_child(_gift_button)
+
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(spacer)
@@ -92,3 +105,8 @@ func _create_interface() -> void:
 	_continue_button.add_theme_font_size_override("font_size", 18)
 	_continue_button.pressed.connect(close_dialog)
 	footer.add_child(_continue_button)
+
+
+func _on_gift_pressed() -> void:
+	gift_requested.emit(_npc_id, _name_label.text)
+	close_dialog()

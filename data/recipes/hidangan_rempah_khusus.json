@@ -10,6 +10,7 @@
     "garam": 1
   },
   "suka_npc": ["casha"],
+  "sifat_rasa": ["rempah", "gurih", "berdaging"],
   "unlock_lewat": "membeli rempah eksklusif dari Giral",
   "item_pembuka": "rempah_eksklusif",
   "kualitas_dasar": 2

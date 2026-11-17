@@ -18,7 +18,14 @@ var coins: int = STARTING_COINS
 var inventory: Array[Dictionary] = []
 var item_catalog: Dictionary = {}
 var unlocked_recipes: Array[String] = ["sup_sayur_bening", "bubur_hangat_hutan"]
+var unlocked_quests: Array[String] = []
 var npc_heart_levels: Dictionary = {}
+var affection_points: Dictionary = {}
+var gifts_given_today: Dictionary = {}
+var disliked_gift_streaks: Dictionary = {}
+var npc_gift_history: Dictionary = {}
+var current_weather: String = "cerah"
+var npc_recently_returned_from_forest: Dictionary = {}
 var reputation: int = 0
 var warung_tier: int = 0
 
@@ -39,6 +46,7 @@ func sleep(wake_hour: int, recovery_ratio: float) -> void:
 	current_hour = wake_hour
 	current_minute = 0
 	energy = roundi(MAX_ENERGY * recovery_ratio)
+	gifts_given_today.clear()
 	energy_changed.emit(energy)
 	state_changed.emit()
 
@@ -88,6 +96,29 @@ func remove_items(requirements: Dictionary) -> bool:
 	inventory_changed.emit()
 	state_changed.emit()
 	return true
+
+
+func remove_item_stack(
+	item_id: String, quantity: int, cooked_on_day: int, quality: int
+) -> bool:
+	if quantity <= 0:
+		return false
+	for index in inventory.size():
+		var stack: Dictionary = inventory[index]
+		if (
+			str(stack.get("id", "")) == item_id
+			and int(stack.get("tanggal_masak", -1)) == cooked_on_day
+			and int(stack.get("kualitas", 0)) == quality
+		):
+			if int(stack.get("jumlah", 0)) < quantity:
+				return false
+			stack["jumlah"] = int(stack["jumlah"]) - quantity
+			if int(stack["jumlah"]) == 0:
+				inventory.remove_at(index)
+			inventory_changed.emit()
+			state_changed.emit()
+			return true
+	return false
 
 
 func age_cooked_food() -> void:

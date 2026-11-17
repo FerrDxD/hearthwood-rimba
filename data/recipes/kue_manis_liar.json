@@ -5,6 +5,7 @@
   "bahan_utama": ["buah_liar", "tepung"],
   "bahan_per_porsi": { "buah_liar": 1, "tepung": 1 },
   "suka_npc": ["kila"],
+  "sifat_rasa": ["manis", "kudapan"],
   "unlock_lewat": "membeli tepung dari Giral",
   "item_pembuka": "tepung",
   "kualitas_dasar": 2

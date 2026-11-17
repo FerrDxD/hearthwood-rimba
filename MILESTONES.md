@@ -172,22 +172,22 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Pemain dapat memberi masakan ke NPC bernama, naik hati (0→1→2→3), dan menerima hadiah (info, diskon, resep).
 
 **Tugas:**
-- [ ] Buat `AffectionSystem.gd` (poin dan hati per NPC)
-- [ ] Implementasi aturan: 1 pemberian per NPC per hari, reset setelah tidur
-- [ ] Poin reaksi: Netral +1, Suka +3, Favorit +5, Spesial +8, Tidak suka +0, Benci −3
-- [ ] Potongan kualitas: −20% poin positif per turun 1 tingkat, dibulatkan ke bawah
-- [ ] Hati: 0→1 (10 poin), 1→2 (30 poin), 2→3 (50 poin, total 90)
-- [ ] Hadiah kumulatif per hati dan per NPC sesuai tabel PRD bagian 9.1
-- [ ] Diskon pedagang otomatis (hati 2: 5%, hati 3: 15%)
-- [ ] Pemberian spesial +8 (saat cuaca dingin, Rast baru pulang dari hutan) — siapkan struktur
+- [x] Buat `AffectionSystem.gd` (poin dan hati per NPC)
+- [x] Implementasi aturan: 1 pemberian per NPC per hari, reset setelah tidur
+- [x] Poin reaksi: Netral +1, Suka +3, Favorit +5, Spesial +8, Tidak suka +0, Benci −3
+- [x] Potongan kualitas: −20% poin positif per turun 1 tingkat, dibulatkan ke bawah
+- [x] Hati: 0→1 (10 poin), 1→2 (30 poin), 2→3 (50 poin, total 90)
+- [x] Hadiah kumulatif per hati dan per NPC sesuai tabel PRD bagian 9.1
+- [x] Diskon pedagang otomatis (hati 2: 5%, hati 3: 15%)
+- [x] Pemberian spesial +8 (saat cuaca dingin, Rast baru pulang dari hutan) — siapkan struktur
 
 **Dependensi:** Fase 2 (NPC data JSON), Fase 5 (CookingSystem untuk hasil masakan yang diberikan).
 
 **Definition of Done:**
-- Pemain dapat memberi masakan ke NPC bernama (maks 1 kali per NPC per hari)
-- Naik hati terbuka hadiah sesuai tabel PRD
-- Diskon pedagang berlaku otomatis di toko
-- Reset pemberian harian setelah tidur
+- [x] Pemain dapat memberi masakan ke NPC bernama (maks 1 kali per NPC per hari)
+- [x] Naik hati terbuka hadiah sesuai tabel PRD
+- [x] Diskon pedagang berlaku otomatis di toko
+- [x] Reset pemberian harian setelah tidur
 
 ---
 

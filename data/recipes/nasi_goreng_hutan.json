@@ -5,6 +5,7 @@
   "bahan_utama": ["beras", "minyak", "telur"],
   "bahan_per_porsi": { "beras": 1, "minyak": 1, "telur": 1 },
   "suka_npc": ["jev", "casha"],
+  "sifat_rasa": ["gurih", "berminyak"],
   "unlock_lewat": "membeli minyak dari Giral",
   "item_pembuka": "minyak",
   "kualitas_dasar": 2

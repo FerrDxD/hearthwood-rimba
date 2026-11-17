@@ -5,6 +5,7 @@
   "bahan_utama": ["beras", "sayur_liar"],
   "bahan_per_porsi": { "beras": 1, "sayur_liar": 1, "garam": 1 },
   "suka_npc": ["gil"],
+  "sifat_rasa": ["bubur", "hangat", "ringan"],
   "unlock_lewat": "default",
   "item_pembuka": "",
   "kualitas_dasar": 2

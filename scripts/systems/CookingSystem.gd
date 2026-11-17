@@ -34,6 +34,27 @@ func get_recipe(recipe_id: String) -> Dictionary:
 	return recipe if typeof(recipe) == TYPE_DICTIONARY else {}
 
 
+func unlock_recipe(recipe_id: String) -> bool:
+	if not _recipes.has(recipe_id):
+		push_error("Cannot unlock an unknown recipe: %s" % recipe_id)
+		return false
+	var game_state = get_node("/root/GameState")
+	if game_state.unlocked_recipes.has(recipe_id):
+		return false
+	game_state.unlocked_recipes.append(recipe_id)
+	recipes_unlocked.emit()
+	game_state.state_changed.emit()
+	return true
+
+
+func unlock_recipe_by_name(recipe_name: String) -> bool:
+	for recipe_id in _recipes:
+		if str(_recipes[recipe_id].get("nama", "")) == recipe_name:
+			return unlock_recipe(str(recipe_id))
+	push_error("Cannot unlock an unknown recipe name: %s" % recipe_name)
+	return false
+
+
 func get_unlocked_recipe_ids() -> Array[String]:
 	var unlocked_ids: Array[String] = []
 	var game_state = get_node("/root/GameState")
@@ -203,7 +224,7 @@ func _is_valid_recipe(recipe: Dictionary, path: String) -> bool:
 
 func _refresh_recipe_unlocks() -> void:
 	var game_state = get_node("/root/GameState")
-	var has_new_unlock := false
+	var newly_unlocked: Array[String] = []
 	for recipe_id in _recipes:
 		var recipe: Dictionary = _recipes[recipe_id]
 		var item_opener := str(recipe.get("item_pembuka", ""))
@@ -212,11 +233,9 @@ func _refresh_recipe_unlocks() -> void:
 			and game_state.get_item_count(item_opener) > 0
 			and not game_state.unlocked_recipes.has(recipe_id)
 		):
-			game_state.unlocked_recipes.append(recipe_id)
-			has_new_unlock = true
-	if has_new_unlock:
-		recipes_unlocked.emit()
-		game_state.state_changed.emit()
+			newly_unlocked.append(str(recipe_id))
+	for recipe_id in newly_unlocked:
+		unlock_recipe(recipe_id)
 
 
 func _on_day_changed(_day: int) -> void:

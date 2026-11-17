@@ -7,6 +7,8 @@ const SHOP_UI_SCENE: PackedScene = preload("res://scenes/ShopUI.tscn")
 const INVENTORY_UI_SCENE: PackedScene = preload("res://scenes/InventoryUI.tscn")
 const COOKING_SYSTEM_SCENE: PackedScene = preload("res://scenes/CookingSystem.tscn")
 const COOKING_UI_SCENE: PackedScene = preload("res://scenes/CookingUI.tscn")
+const AFFECTION_SYSTEM_SCENE: PackedScene = preload("res://scenes/AffectionSystem.tscn")
+const GIFT_UI_SCENE: PackedScene = preload("res://scenes/GiftUI.tscn")
 const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
 
 var _world: HearthwoodWorld
@@ -21,6 +23,8 @@ var _shop_ui: HearthwoodShopUI
 var _inventory_ui: HearthwoodInventoryUI
 var _cooking_system: HearthwoodCookingSystem
 var _cooking_ui: HearthwoodCookingUI
+var _affection_system: HearthwoodAffectionSystem
+var _gift_ui: HearthwoodGiftUI
 var _current_shopkeeper: HearthwoodShopNPC
 
 
@@ -41,6 +45,7 @@ func _ready() -> void:
 	_create_hud()
 	_dialog_ui = DIALOG_UI_SCENE.instantiate()
 	add_child(_dialog_ui)
+	_dialog_ui.gift_requested.connect(_on_gift_requested)
 	_shop_ui = SHOP_UI_SCENE.instantiate()
 	add_child(_shop_ui)
 	_shop_ui.talk_requested.connect(_on_shop_talk_requested)
@@ -49,9 +54,15 @@ func _ready() -> void:
 	add_child(_inventory_ui)
 	_cooking_system = COOKING_SYSTEM_SCENE.instantiate()
 	add_child(_cooking_system)
+	_affection_system = AFFECTION_SYSTEM_SCENE.instantiate()
+	_affection_system.set_cooking_system(_cooking_system)
+	add_child(_affection_system)
 	_cooking_ui = COOKING_UI_SCENE.instantiate()
 	add_child(_cooking_ui)
 	_cooking_ui.set_cooking_system(_cooking_system)
+	_gift_ui = GIFT_UI_SCENE.instantiate()
+	_gift_ui.set_affection_system(_affection_system)
+	add_child(_gift_ui)
 	_connect_signals()
 	_update_hud()
 
@@ -64,7 +75,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
-	if _dialog_ui.is_open() or _inventory_ui.is_open() or _cooking_ui.is_open():
+	if (
+		_dialog_ui.is_open()
+		or _inventory_ui.is_open()
+		or _cooking_ui.is_open()
+		or _gift_ui.is_open()
+	):
 		return
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 64.0)
@@ -175,9 +191,14 @@ func _on_shop_talk_requested(shop_id: String) -> void:
 	_dialog_ui.open_dialog(
 		_current_shopkeeper.get_display_name(),
 		_current_shopkeeper.get_role(),
-		_current_shopkeeper.get_dialogue()
+		_current_shopkeeper.get_dialogue(),
+		_current_shopkeeper.npc_id
 	)
 	_current_shopkeeper.mark_met()
+
+
+func _on_gift_requested(npc_id: String, npc_name: String) -> void:
+	_gift_ui.open_gifts(npc_id, npc_name)
 
 
 func _on_shop_hours_changed(is_open: bool) -> void:
@@ -194,7 +215,12 @@ func _on_shop_closed() -> void:
 
 
 func _toggle_inventory() -> void:
-	if _dialog_ui.is_open() or _shop_ui.is_open() or _cooking_ui.is_open():
+	if (
+		_dialog_ui.is_open()
+		or _shop_ui.is_open()
+		or _cooking_ui.is_open()
+		or _gift_ui.is_open()
+	):
 		return
 	_inventory_ui.toggle_inventory()
 
@@ -205,6 +231,7 @@ func _interact() -> void:
 		or _shop_ui.is_open()
 		or _inventory_ui.is_open()
 		or _cooking_ui.is_open()
+		or _gift_ui.is_open()
 	):
 		return
 
@@ -226,7 +253,8 @@ func _interact() -> void:
 		_dialog_ui.open_dialog(
 			nearby_npc.get_display_name(),
 			nearby_npc.get_role(),
-			nearby_npc.get_dialogue()
+			nearby_npc.get_dialogue(),
+			nearby_npc.npc_id
 		)
 		nearby_npc.mark_met()
 	else:

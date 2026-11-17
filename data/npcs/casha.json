@@ -4,6 +4,10 @@
   "sifat": "Ramah, cerewet, selalu penasaran",
   "suka": ["Masakan baru yang belum pernah dicoba"],
   "tidak_suka": ["Menu yang itu-itu saja"],
+  "selera_masakan": {
+    "suka": ["menu_baru"],
+    "tidak_suka": ["menu_berulang"]
+  },
   "ciri_khas": "Sibuk dengan adonan kue dan selalu bertanya-tanya.",
   "palet": {
     "rambut": "#A52A2A",
