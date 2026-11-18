@@ -1,0 +1,17 @@
+{
+  "id": "ikan_goreng_tegal",
+  "nama": "Ikan Goreng Tegal",
+  "alat_minimum": "api_unggun",
+  "bahan_utama": ["ikan_sungai", "akar_rempah"],
+  "bahan_per_porsi": {
+    "ikan_sungai": 1,
+    "akar_rempah": 1,
+    "minyak": 1,
+    "garam": 1
+  },
+  "suka_npc": ["jev"],
+  "sifat_rasa": ["gurih", "goreng", "ikan"],
+  "unlock_lewat": "Mendapat ikan sungai dari hutan",
+  "item_pembuka": "ikan_sungai",
+  "kualitas_dasar": 2
+}

@@ -174,7 +174,7 @@ func _is_special_gift(npc_id: String, recipe: Dictionary, explicit_condition: bo
 		and bool(game_state.npc_recently_returned_from_forest.get(npc_id, false))
 	):
 		return true
-	if str(game_state.current_weather) != "dingin":
+	if str(game_state.current_weather) not in ["dingin", "hujan", "badai"]:
 		return false
 	for tag_value in recipe.get("sifat_rasa", []):
 		if str(tag_value) in ["hangat", "menghangatkan"]:

@@ -1,0 +1,17 @@
+{
+  "id": "sayur_tumis_pedas",
+  "nama": "Sayur Tumis Pedas",
+  "alat_minimum": "tungku",
+  "bahan_utama": ["daun_hutan", "akar_rempah", "buah_liar"],
+  "bahan_per_porsi": {
+    "daun_hutan": 1,
+    "akar_rempah": 1,
+    "buah_liar": 1,
+    "garam": 1
+  },
+  "suka_npc": ["rave"],
+  "sifat_rasa": ["pedas", "tumis", "hutan"],
+  "unlock_lewat": "Mendapat semua bahan dari hutan",
+  "item_pembuka": "daun_hutan",
+  "kualitas_dasar": 2
+}

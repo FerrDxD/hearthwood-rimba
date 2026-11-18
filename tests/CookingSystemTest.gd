@@ -12,6 +12,14 @@ const RECIPE_IDS: Array[String] = [
 	"nasi_goreng_hutan",
 	"hidangan_rempah_khusus",
 ]
+const EXPANSION_RECIPE_IDS: Array[String] = [
+	"sup_kaldu_kayu",
+	"nasi_kuning_rempah",
+	"kue_coklat",
+	"ikan_goreng_tegal",
+	"sayur_tumis_pedas",
+	"bubur_ayam_hutan",
+]
 
 
 func _initialize() -> void:
@@ -52,6 +60,18 @@ func _run_tests() -> void:
 			push_error("Recipe data is missing: %s" % recipe_id)
 			quit(1)
 			return
+	for recipe_id in EXPANSION_RECIPE_IDS:
+		if cooking_system.get_recipe(recipe_id).is_empty():
+			push_error("Expansion recipe data is missing: %s" % recipe_id)
+			quit(1)
+			return
+	if (
+		game_state.unlocked_recipes.has("sup_kaldu_kayu")
+		or game_state.unlocked_recipes.has("nasi_kuning_rempah")
+	):
+		push_error("Quest-gated recipes should stay locked before their quest chapter.")
+		quit(1)
+		return
 
 	var missing_ingredients := cooking_system.preview_cooking(
 		"sup_sayur_bening",
@@ -130,8 +150,8 @@ func _run_tests() -> void:
 	game_state.add_item("minyak")
 	game_state.purchase_item("tepung", 20)
 	game_state.purchase_item("rempah_eksklusif", 40)
-	if cooking_system.get_unlocked_recipe_ids().size() != 8:
-		push_error("Finding or buying unlock ingredients should unlock all recipes.")
+	if cooking_system.get_unlocked_recipe_ids().size() != 12:
+		push_error("Finding or buying unlock ingredients should unlock twelve recipes.")
 		quit(1)
 		return
 	game_state.warung_tier = 2

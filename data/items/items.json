@@ -25,6 +25,12 @@
     { "id": "sayur_asam_segar", "nama": "Sayur Asam Segar", "kategori": "masakan", "warna": "#88a556", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 },
     { "id": "kue_manis_liar", "nama": "Kue Manis Liar", "kategori": "masakan", "warna": "#d8a56e", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 },
     { "id": "nasi_goreng_hutan", "nama": "Nasi Goreng Hutan", "kategori": "masakan", "warna": "#c5a15b", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 },
-    { "id": "hidangan_rempah_khusus", "nama": "Hidangan Rempah Khusus", "kategori": "masakan", "warna": "#a97c4c", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 }
+    { "id": "hidangan_rempah_khusus", "nama": "Hidangan Rempah Khusus", "kategori": "masakan", "warna": "#a97c4c", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 },
+    { "id": "sup_kaldu_kayu", "nama": "Sup Kaldu Kayu", "kategori": "masakan", "warna": "#b98f5f", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 45 },
+    { "id": "nasi_kuning_rempah", "nama": "Nasi Kuning Rempah", "kategori": "masakan", "warna": "#d9b94f", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 60 },
+    { "id": "kue_coklat", "nama": "Kue Coklat", "kategori": "masakan", "warna": "#7b4b34", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 55 },
+    { "id": "ikan_goreng_tegal", "nama": "Ikan Goreng Tegal", "kategori": "masakan", "warna": "#c98a4b", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 50 },
+    { "id": "sayur_tumis_pedas", "nama": "Sayur Tumis Pedas", "kategori": "masakan", "warna": "#7f9b48", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 45 },
+    { "id": "bubur_ayam_hutan", "nama": "Bubur Ayam Hutan", "kategori": "masakan", "warna": "#dcc78e", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 }
   ]
 }

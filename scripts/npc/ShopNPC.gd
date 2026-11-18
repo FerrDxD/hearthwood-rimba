@@ -8,6 +8,7 @@ const HEART_THREE_DISCOUNT_PERCENT: int = 15
 
 var _shop_hours: Dictionary = {}
 var _valid_shop_hours: bool = false
+var _closed_weathers: Array[String] = []
 var _previous_open_state: bool = false
 
 
@@ -20,6 +21,12 @@ func _ready() -> void:
 	if not hours.has("mulai") or not hours.has("selesai"):
 		push_error("Shop NPC jam_buka must include mulai and selesai: %s" % npc_id)
 		return
+
+	var closed_weathers: Variant = get_npc_data().get("tutup_cuaca", [])
+	if typeof(closed_weathers) == TYPE_ARRAY:
+		for weather_id in closed_weathers:
+			if str(weather_id) in ["cerah", "hujan", "badai"]:
+				_closed_weathers.append(str(weather_id))
 
 	_shop_hours = hours
 	_valid_shop_hours = true
@@ -35,6 +42,8 @@ func is_shop_open() -> bool:
 	if not _valid_shop_hours:
 		return false
 	var game_state = get_node("/root/GameState")
+	if _closed_weathers.has(str(game_state.current_weather)):
+		return false
 	var time_of_day := float(game_state.current_hour % 24) + float(game_state.current_minute) / 60.0
 	return (
 		time_of_day >= float(_shop_hours["mulai"])

@@ -354,18 +354,18 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Empat NPC baru (Arin, Budi, Siti, Pak Udin) hidup di jadwalnya, punya dialog data-driven, dan bisa diberi masakan.
 
 **Tugas:**
-- [ ] `data/npcs/arin.json`, `budi.json`, `siti.json`, `pak_udin.json` dengan skema NPC yang sama (2 dialog, selera, hadiah hati 1–3)
-- [ ] `palet.aksesori` baru didukung `CharacterVisual.gd` (tangkong, tas, jaring, pipa)
-- [ ] Jadwal keempat NPC di `data/schedules.json` sesuai PRD bagian 6.2
-- [ ] NPC baru masuk daftar NPC bernama dunia dan bisa menerima hadiah/afeksi
-- [ ] `tests/NPCSystemTest.gd` diperluas untuk memuat, menjadwalkan, dan memberi hadiah ke NPC baru
+- [x] `data/npcs/arin.json`, `budi.json`, `siti.json`, `pak_udin.json` dengan skema NPC yang sama (2 dialog, selera, hadiah hati 1–3)
+- [x] `palet.aksesori` baru didukung `CharacterVisual.gd` (tangkong, tas, jaring, pipa)
+- [x] Jadwal keempat NPC di `data/schedules.json` sesuai PRD bagian 6.2
+- [x] NPC baru masuk daftar NPC bernama dunia dan bisa menerima hadiah/afeksi
+- [x] `tests/NPCSystemTest.gd` diperluas untuk memuat, menjadwalkan, dan memberi hadiah ke NPC baru
 
 **Dependensi:** Fase 2, Fase 12.
 
 **Definition of Done:**
-- [ ] Keempat NPC muncul sesuai jam dan lokasi masing-masing
-- [ ] Dialog dan selera dimuat dari JSON tanpa hardcode
-- [ ] Pemberian masakan ke NPC baru memakai aturan afeksi yang sama
+- [x] Keempat NPC muncul sesuai jam dan lokasi masing-masing
+- [x] Dialog dan selera dimuat dari JSON tanpa hardcode
+- [x] Pemberian masakan ke NPC baru memakai aturan afeksi yang sama
 
 ---
 
@@ -374,19 +374,19 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Enam resep baru terhubung ke bahan/quest, dan cuaca harian sederhana memengaruhi masakan serta respons NPC.
 
 **Tugas:**
-- [ ] Item dan 6 resep baru di `data/recipes/` sesuai PRD bagian 5.2 (Sup Kaldu Kayu, Nasi Kuning Rempah, Kue Coklat, Ikan Goreng Tegal, Sayur Tumis Pedas, Bubur Ayam Hutan)
-- [ ] Pembuka resep: quest Rast/Veral dan pembelian Giral; tidak ada resep yang mustahil terbuka
-- [ ] Cuaca harian Cerah/Hujan/Badai di `GameState` (berubah saat tidur, deterministik dari hari)
-- [ ] Pengaruh cuaca: pertumbuhan ulang bahan, zona mini-game, respons NPC, dan jam buka toko
-- [ ] Ikon cuaca di HUD dan data ramalan tidak termasuk (non-goal)
-- [ ] `tests/WeatherSystemTest.gd` dan perluasan `CookingSystemTest.gd`
+- [x] Item dan 6 resep baru di `data/recipes/` sesuai PRD bagian 5.2 (Sup Kaldu Kayu, Nasi Kuning Rempah, Kue Coklat, Ikan Goreng Tegal, Sayur Tumis Pedas, Bubur Ayam Hutan)
+- [x] Pembuka resep: quest Rast/Veral dan pembelian Giral; tidak ada resep yang mustahil terbuka
+- [x] Cuaca harian Cerah/Hujan/Badai di `GameState` (berubah saat tidur, deterministik dari hari)
+- [x] Pengaruh cuaca: pertumbuhan ulang bahan, zona mini-game, respons NPC, dan jam buka toko
+- [x] Ikon cuaca di HUD dan data ramalan tidak termasuk (non-goal)
+- [x] `tests/WeatherSystemTest.gd` dan perluasan `CookingSystemTest.gd`
 
 **Dependensi:** Fase 5, Fase 12.
 
 **Definition of Done:**
-- [ ] Enam resep bisa dibuka, dimasak, dan disukai NPC yang ditentukan
-- [ ] Cuaca berubah tiap hari dan hanya memberi efek yang tercantum di PRD
-- [ ] Save/load menyimpan cuaca hari itu
+- [x] Enam resep bisa dibuka, dimasak, dan disukai NPC yang ditentukan
+- [x] Cuaca berubah tiap hari dan hanya memberi efek yang tercantum di PRD
+- [x] Save/load menyimpan cuaca hari itu
 
 ---
 

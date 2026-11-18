@@ -1,0 +1,17 @@
+{
+  "id": "kue_coklat",
+  "nama": "Kue Coklat",
+  "alat_minimum": "dapur_warteg",
+  "bahan_utama": ["buah_liar", "tepung", "rempah_eksklusif"],
+  "bahan_per_porsi": {
+    "buah_liar": 1,
+    "tepung": 1,
+    "telur": 1,
+    "rempah_eksklusif": 1
+  },
+  "suka_npc": ["kila"],
+  "sifat_rasa": ["manis", "coklat", "lembut"],
+  "unlock_lewat": "Membeli rempah eksklusif dari Giral",
+  "item_pembuka": "rempah_eksklusif",
+  "kualitas_dasar": 2
+}

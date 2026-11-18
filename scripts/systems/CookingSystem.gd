@@ -18,6 +18,7 @@ func _ready() -> void:
 		return
 	var game_state = get_node("/root/GameState")
 	game_state.inventory_changed.connect(_refresh_recipe_unlocks)
+	game_state.state_changed.connect(_refresh_recipe_unlocks)
 	get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
 	_refresh_recipe_unlocks()
 
@@ -279,6 +280,21 @@ func _is_valid_recipe(recipe: Dictionary, path: String) -> bool:
 		):
 			push_error("Recipe contains an invalid ingredient: %s" % path)
 			return false
+	var quest_gate: Variant = recipe.get("syarat_quest", {})
+	if typeof(quest_gate) != TYPE_DICTIONARY:
+		push_error("Recipe syarat_quest must be an object: %s" % path)
+		return false
+	if not quest_gate.is_empty():
+		var gate_npc := str(quest_gate.get("npc", ""))
+		var gate_chapter := int(quest_gate.get("bab", -1))
+		if (
+			gate_npc.is_empty()
+			or not FileAccess.file_exists("res://data/npcs/%s.json" % gate_npc)
+			or gate_chapter < 1
+			or gate_chapter > 4
+		):
+			push_error("Recipe has an invalid quest gate: %s" % path)
+			return false
 	return true
 
 
@@ -287,15 +303,25 @@ func _refresh_recipe_unlocks() -> void:
 	var newly_unlocked: Array[String] = []
 	for recipe_id in _recipes:
 		var recipe: Dictionary = _recipes[recipe_id]
-		var item_opener := str(recipe.get("item_pembuka", ""))
-		if (
-			not item_opener.is_empty()
-			and game_state.get_item_count(item_opener) > 0
-			and not game_state.unlocked_recipes.has(recipe_id)
-		):
-			newly_unlocked.append(str(recipe_id))
+		if game_state.unlocked_recipes.has(recipe_id):
+			continue
+		if not _is_unlock_requirement_met(recipe):
+			continue
+		newly_unlocked.append(str(recipe_id))
 	for recipe_id in newly_unlocked:
 		unlock_recipe(recipe_id)
+
+
+func _is_unlock_requirement_met(recipe: Dictionary) -> bool:
+	var game_state = get_node("/root/GameState")
+	var item_opener := str(recipe.get("item_pembuka", ""))
+	if not item_opener.is_empty() and game_state.get_item_count(item_opener) <= 0:
+		return false
+	var quest_gate: Variant = recipe.get("syarat_quest", {})
+	if typeof(quest_gate) != TYPE_DICTIONARY or quest_gate.is_empty():
+		return true
+	var npc_id := str(quest_gate.get("npc", ""))
+	return int(game_state.quest_chapters.get(npc_id, 0)) >= int(quest_gate.get("bab", 0))
 
 
 func _on_day_changed(_day: int) -> void:

@@ -1,0 +1,13 @@
+{
+  "id": "sup_kaldu_kayu",
+  "nama": "Sup Kaldu Kayu",
+  "alat_minimum": "tungku",
+  "bahan_utama": ["kayu", "sayur_liar"],
+  "bahan_per_porsi": { "kayu": 1, "sayur_liar": 1, "garam": 1 },
+  "suka_npc": ["rast"],
+  "sifat_rasa": ["kaldu", "hangat", "hutan"],
+  "unlock_lewat": "Quest Rast hati 2",
+  "item_pembuka": "",
+  "syarat_quest": { "npc": "rast", "bab": 3 },
+  "kualitas_dasar": 2
+}

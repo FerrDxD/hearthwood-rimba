@@ -100,6 +100,8 @@ func _run_tests() -> void:
 		if int(game_state.affection_points.get("jev", 0)) >= 10:
 			break
 		time_system.sleep()
+		# Isolate affection math from weather: rain makes warm food special.
+		game_state.current_weather = "cerah"
 
 	if (
 		game_state.get_npc_heart_level("jev") != 1

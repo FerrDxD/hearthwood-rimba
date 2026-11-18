@@ -14,8 +14,8 @@ func _run_tests() -> void:
 	game_state.inventory.clear()
 	game_state.coins = game_state.STARTING_COINS
 
-	if game_state.item_catalog.size() != 26:
-		push_error("The item catalog should load all 26 item definitions.")
+	if game_state.item_catalog.size() != 32:
+		push_error("The item catalog should load all 32 item definitions.")
 		quit(1)
 		return
 	if not game_state.add_item("sayur_liar", 2) or game_state.get_item_count("sayur_liar") != 2:

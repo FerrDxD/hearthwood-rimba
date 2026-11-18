@@ -2,6 +2,11 @@ extends CanvasLayer
 class_name HearthwoodCookingUI
 
 class TimingTrack extends Control:
+	const GREEN_ZONE_BY_WEATHER: Dictionary = {
+		"cerah": 0.16,
+		"hujan": 0.10,
+		"badai": 0.06,
+	}
 	var active: bool = false
 	var _marker: float = 0.0
 	var _direction: float = 1.0
@@ -14,10 +19,18 @@ class TimingTrack extends Control:
 		active = true
 		set_process(true)
 
+	func get_green_zone_size() -> float:
+		var weather := str(get_node("/root/GameState").current_weather)
+		return float(GREEN_ZONE_BY_WEATHER.get(weather, GREEN_ZONE_BY_WEATHER["cerah"]))
+
+	func get_green_zone_start() -> float:
+		return 0.5 - get_green_zone_size() * 0.5
+
 	func stop_timing() -> String:
 		active = false
 		set_process(false)
-		if _marker >= 0.42 and _marker <= 0.58:
+		var green_start := get_green_zone_start()
+		if _marker >= green_start and _marker <= green_start + get_green_zone_size():
 			return "green"
 		if _marker >= 0.2 and _marker <= 0.8:
 			return "yellow"
@@ -34,9 +47,13 @@ class TimingTrack extends Control:
 		queue_redraw()
 
 	func _draw() -> void:
+		var green_start := get_green_zone_start()
 		draw_rect(Rect2(Vector2.ZERO, size), Color("#b95845"))
 		draw_rect(Rect2(size.x * 0.2, 0.0, size.x * 0.6, size.y), Color("#d5aa4b"))
-		draw_rect(Rect2(size.x * 0.42, 0.0, size.x * 0.16, size.y), Color("#6a9c59"))
+		draw_rect(
+			Rect2(size.x * green_start, 0.0, size.x * get_green_zone_size(), size.y),
+			Color("#6a9c59")
+		)
 		var marker_x := size.x * _marker
 		draw_line(
 			Vector2(marker_x, 0.0),

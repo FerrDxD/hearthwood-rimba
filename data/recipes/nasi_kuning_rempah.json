@@ -1,0 +1,19 @@
+{
+  "id": "nasi_kuning_rempah",
+  "nama": "Nasi Kuning Rempah",
+  "alat_minimum": "dapur_warteg",
+  "bahan_utama": ["beras", "minyak", "telur", "rempah_eksklusif"],
+  "bahan_per_porsi": {
+    "beras": 1,
+    "minyak": 1,
+    "telur": 1,
+    "rempah_eksklusif": 1,
+    "garam": 1
+  },
+  "suka_npc": ["casha"],
+  "sifat_rasa": ["rempah", "gurih", "kuning"],
+  "unlock_lewat": "Quest Veral hati 2 dan membeli rempah eksklusif",
+  "item_pembuka": "rempah_eksklusif",
+  "syarat_quest": { "npc": "veral", "bab": 3 },
+  "kualitas_dasar": 2
+}

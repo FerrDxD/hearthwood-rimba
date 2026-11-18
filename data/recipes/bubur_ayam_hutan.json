@@ -1,0 +1,12 @@
+{
+  "id": "bubur_ayam_hutan",
+  "nama": "Bubur Ayam Hutan",
+  "alat_minimum": "api_unggun",
+  "bahan_utama": ["beras", "telur", "sayur_liar"],
+  "bahan_per_porsi": { "beras": 1, "telur": 1, "sayur_liar": 1, "garam": 1 },
+  "suka_npc": ["vea"],
+  "sifat_rasa": ["bubur", "hangat", "gurih"],
+  "unlock_lewat": "Membeli beras dari Giral",
+  "item_pembuka": "beras",
+  "kualitas_dasar": 2
+}

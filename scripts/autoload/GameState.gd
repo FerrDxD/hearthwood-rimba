@@ -15,6 +15,9 @@ const ITEM_CATALOG_PATH: String = "res://data/items/items.json"
 const SAVE_FILE_PATH: String = "user://savegame.json"
 const SAVE_VERSION: int = 1
 const SAVE_SYSTEM_SCRIPT: Script = preload("res://scripts/systems/SaveSystem.gd")
+const WEATHERS: Array[String] = ["cerah", "hujan", "badai"]
+# Deterministic daily rotation so a loaded day always has the same weather.
+const WEATHER_CYCLE: Array[String] = ["cerah", "hujan", "cerah", "badai", "hujan", "cerah"]
 
 var player_name: String = "Pengelana"
 var current_day: int = 1
@@ -65,12 +68,23 @@ func sleep(wake_hour: int, recovery_ratio: float) -> void:
 	current_day += 1
 	current_hour = wake_hour
 	current_minute = 0
+	current_weather = get_weather_for_day(current_day)
 	energy = roundi(MAX_ENERGY * recovery_ratio)
 	gifts_given_today.clear()
 	customers_served_today.clear()
 	collected_forage_today.clear()
 	energy_changed.emit(energy)
 	state_changed.emit()
+
+
+func get_weather_for_day(day: int) -> String:
+	if day < 1:
+		return WEATHERS[0]
+	return WEATHER_CYCLE[(day - 1) % WEATHER_CYCLE.size()]
+
+
+func is_raining() -> bool:
+	return current_weather == "hujan"
 
 
 func start_new_game(new_player_name: String) -> bool:

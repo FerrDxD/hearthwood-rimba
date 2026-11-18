@@ -28,6 +28,11 @@ const FORAGE_SPAWN_POINTS: Array[Dictionary] = [
 	{"spawn_id": "kayu_1", "id": "kayu", "position": Vector2(126.0, 574.0)},
 	{"spawn_id": "batu_1", "id": "batu", "position": Vector2(398.0, 512.0)},
 ]
+const RAIN_FORAGE_SPAWN: Dictionary = {
+	"spawn_id": "hujan_jamur_1",
+	"id": "jamur_hutan",
+	"position": Vector2(300.0, 700.0),
+}
 const NAMED_NPC_IDS: Array[String] = [
 	"giral",
 	"talia",
@@ -255,7 +260,11 @@ func _spawn_forage_items() -> void:
 	_item_pickups.clear()
 
 	var game_state = get_node("/root/GameState")
-	for spawn_point in FORAGE_SPAWN_POINTS:
+	var spawn_points: Array[Dictionary] = FORAGE_SPAWN_POINTS.duplicate()
+	# Rain speeds up regrowth with one extra forage spot for the day.
+	if game_state.is_raining():
+		spawn_points.append(RAIN_FORAGE_SPAWN)
+	for spawn_point in spawn_points:
 		var spawn_id := str(spawn_point["spawn_id"])
 		if game_state.collected_forage_today.has(spawn_id):
 			continue
