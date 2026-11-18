@@ -19,6 +19,7 @@ var player_name: String = "Pengelana"
 var current_day: int = 1
 var current_hour: int = 6
 var current_minute: int = 0
+var pending_player_position: Vector2 = Vector2(210.0, 432.0)
 var energy: int = MAX_ENERGY
 var coins: int = STARTING_COINS
 var inventory: Array[Dictionary] = []
@@ -66,6 +67,45 @@ func sleep(wake_hour: int, recovery_ratio: float) -> void:
 	collected_forage_today.clear()
 	energy_changed.emit(energy)
 	state_changed.emit()
+
+
+func start_new_game(new_player_name: String) -> bool:
+	var normalized_name := new_player_name.strip_edges()
+	if normalized_name.is_empty():
+		push_error("A new game requires a non-empty player name.")
+		return false
+
+	player_name = normalized_name
+	current_day = 1
+	current_hour = 6
+	current_minute = 0
+	pending_player_position = Vector2(210.0, 432.0)
+	energy = MAX_ENERGY
+	coins = STARTING_COINS
+	inventory.clear()
+	unlocked_recipes.assign(["sup_sayur_bening", "bubur_hangat_hutan"])
+	unlocked_quests.clear()
+	completed_quests.clear()
+	items_received_from_npcs.clear()
+	collected_forage_today.clear()
+	business_permits.clear()
+	npc_heart_levels.clear()
+	npc_met.clear()
+	affection_points.clear()
+	gifts_given_today.clear()
+	customers_served_today.clear()
+	disliked_gift_streaks.clear()
+	npc_gift_history.clear()
+	current_weather = "cerah"
+	npc_recently_returned_from_forest.clear()
+	reputation = 0
+	warung_tier = 0
+	energy_changed.emit(energy)
+	coins_changed.emit(coins)
+	inventory_changed.emit()
+	state_changed.emit()
+	get_node("/root/TimeSystem").sync_from_game_state()
+	return true
 
 
 func get_npc_heart_level(npc_id: String) -> int:
@@ -128,6 +168,31 @@ func complete_quest(quest_id: String) -> bool:
 
 func has_save_game(file_path: String = SAVE_FILE_PATH) -> bool:
 	return FileAccess.file_exists(file_path)
+
+
+func inspect_save_game(file_path: String = SAVE_FILE_PATH) -> Dictionary:
+	if _save_system == null:
+		push_error("GameState save system is not ready.")
+		return {"valid": false, "exists": false, "pesan": "Sistem save belum siap."}
+	var read_result := _save_system.read_save(file_path)
+	if not bool(read_result.get("valid", false)):
+		return read_result
+	var save_data: Dictionary = read_result["data"]
+	if not _is_valid_save_data(save_data):
+		return {
+			"valid": false,
+			"exists": true,
+			"pesan": "Data save tidak lengkap atau tidak sesuai versi.",
+		}
+	return {
+		"valid": true,
+		"exists": true,
+		"nama_pemain": str(save_data["nama_pemain"]),
+		"hari": int(save_data["hari"]),
+		"tier_warung": int(save_data["tier_warung"]),
+		"scene": str(save_data["posisi"]["scene"]),
+		"pesan": "Save siap dimuat.",
+	}
 
 
 func save_game(

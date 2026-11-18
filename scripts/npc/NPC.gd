@@ -1,6 +1,7 @@
 extends CharacterBody2D
 class_name HearthwoodNPC
 
+const CHARACTER_VISUAL_SCRIPT: Script = preload("res://scripts/characters/CharacterVisual.gd")
 const WALK_SPEED: float = 30.0
 
 var npc_id: String = ""
@@ -61,7 +62,7 @@ func _ready() -> void:
 		get_node("/root/TimeSystem").minute_changed.connect(_on_minute_changed)
 		var game_state = get_node("/root/GameState")
 		_refresh_schedule(game_state.current_hour, game_state.current_minute)
-	queue_redraw()
+	_create_character_visual()
 
 
 func _physics_process(delta: float) -> void:
@@ -82,16 +83,6 @@ func _physics_process(delta: float) -> void:
 		velocity = global_position.direction_to(_movement_zone.get_center()) * WALK_SPEED
 	move_and_slide()
 	global_position = global_position.clamp(_movement_zone.position, _movement_zone.end)
-
-
-func _draw() -> void:
-	draw_rect(Rect2(-6.0, -4.0, 12.0, 13.0), _shirt_color)
-	draw_rect(Rect2(-5.0, -10.0, 10.0, 7.0), Color("#e8bf98"))
-	draw_rect(Rect2(-6.0, -12.0, 12.0, 4.0), _hair_color)
-	draw_rect(Rect2(-6.0, 8.0, 5.0, 4.0), _pants_color)
-	draw_rect(Rect2(1.0, 8.0, 5.0, 4.0), _pants_color.darkened(0.12))
-	draw_rect(Rect2(-2.0, -1.0, 2.0, 2.0), Color("#333333"))
-	_draw_accessory()
 
 
 func get_display_name() -> String:
@@ -233,27 +224,13 @@ func _update_physics_state() -> void:
 	set_physics_process(_is_available and _is_on_screen)
 
 
-func _draw_accessory() -> void:
-	match _accessory:
-		"keranjang":
-			draw_rect(Rect2(7.0, -1.0, 5.0, 6.0), Color("#9a7950"))
-			draw_rect(Rect2(8.0, 0.0, 3.0, 1.0), Color("#64894b"))
-		"palu_kecil":
-			draw_rect(Rect2(6.0, 0.0, 3.0, 7.0), Color("#555555"))
-			draw_rect(Rect2(5.0, -2.0, 6.0, 3.0), Color("#b0b0b0"))
-		"adonan":
-			draw_rect(Rect2(7.0, -1.0, 5.0, 5.0), Color("#f0d7b5"))
-			draw_rect(Rect2(8.0, 0.0, 3.0, 2.0), Color("#db7093"))
-		"jarum_kain":
-			draw_rect(Rect2(7.0, -1.0, 5.0, 6.0), Color("#c8a2c8"))
-			draw_line(Vector2(8.0, -3.0), Vector2(12.0, 4.0), Color("#f5f5dc"), 1.0)
-		"tombak":
-			draw_line(Vector2(9.0, 7.0), Vector2(13.0, -18.0), Color("#76513a"), 2.0)
-			draw_line(Vector2(13.0, -18.0), Vector2(14.0, -14.0), Color("#b0b0b0"), 1.0)
-		"tongkat", "tongkat_tua":
-			draw_line(Vector2(8.0, 9.0), Vector2(12.0, -11.0), Color("#76513a"), 2.0)
-		"palu_besar":
-			draw_rect(Rect2(7.0, 0.0, 3.0, 10.0), Color("#76513a"))
-			draw_rect(Rect2(4.0, -3.0, 9.0, 5.0), Color("#555555"))
-		"tali":
-			draw_rect(Rect2(6.0, 0.0, 3.0, 7.0), Color("#b19a70"))
+func _create_character_visual() -> void:
+	var character_visual = CHARACTER_VISUAL_SCRIPT.new()
+	character_visual.name = "characterVisual"
+	add_child(character_visual)
+	character_visual.configure(
+		_hair_color,
+		_shirt_color,
+		_pants_color,
+		_accessory
+	)

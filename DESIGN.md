@@ -61,6 +61,8 @@ Dari PRD bagian 6.1:
 - Lapisan 3: Baju warteg coklat kehijauan
 - Lapisan 4: Celana coklat tua
 - Lapisan 5: Sepatu sederhana (coklat muda)
+- Implementasi memakai layer pixel-art 16×28 yang dipisah untuk rambut, kulit/wajah, baju, celana, dan sepatu; palet MC tetap.
+- Tileset memakai atlas 16×16 dengan variasi rumput, jalan tanah, batu desa, dan air; sampling nearest-neighbor.
 
 ---
 
@@ -94,6 +96,7 @@ Setiap NPC memiliki:
 - Hanya jalan-jalan di peta
 - Menggunakan satu set sprite manusia berlapis dengan variasi warna acak
 - Tidak perlu sprite terpisah per orang
+- NPC bernama memakai palet dan aksesori dari data; 32 NPC ambient memakai layer bersama dengan variasi warna deterministik.
 
 ---
 
@@ -148,8 +151,11 @@ Setiap NPC memiliki:
 - Kartu item memakai warna dari katalog data; inventori dapat dibuka lewat tombol sentuh atau tombol `I`.
 
 ### 5.6 UI Menu Pause / Main Menu
-- Tombol: Continue, New Game, Load Game, Settings, Exit
-- Save otomatis saat tidur (tidak perlu save manual saat keluar)
+- Main menu: Lanjutkan, Permainan Baru, Muat Game, Pengaturan, Keluar; nama pemain diisi sebelum mulai.
+- Slot save tunggal menampilkan ringkasan progres; permainan baru meminta konfirmasi jika save lama ada.
+- Pengaturan: volume utama dan mode layar penuh.
+- Menu jeda: Lanjutkan, Simpan, Muat, atau kembali ke main menu; progres tersimpan sebelum kembali.
+- Game dimulai dari `MainMenu.tscn`, sementara `Main.tscn` berisi dunia aktif.
 
 ---
 
@@ -209,6 +215,8 @@ Setiap NPC memiliki:
 | SFX interaksi | Klik halus | Saat berbicara NPC / interaksi tile |
 | SFX tidur | Napas tenang | Saat pemain tidur |
 | SFX naik hati | Suara lonceng kecil | Saat naik tingkat kedekatan |
+
+Implementasi Fase 9 menyediakan musik loop hutan/desa/malam dan SFX orisinal untuk memasak, interaksi, tidur, serta naik hati di `assets/audio/`.
 
 ---
 

@@ -12,6 +12,8 @@ const GIFT_UI_SCENE: PackedScene = preload("res://scenes/GiftUI.tscn")
 const WARUNG_SYSTEM_SCENE: PackedScene = preload("res://scenes/WarungSystem.tscn")
 const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
 const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
+const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
+const AUDIO_DIRECTOR_SCRIPT: Script = preload("res://scripts/systems/AudioDirector.gd")
 const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
 
 var _world: HearthwoodWorld
@@ -31,24 +33,17 @@ var _gift_ui: HearthwoodGiftUI
 var _warung_system: HearthwoodWarungSystem
 var _warung_ui: HearthwoodWarungUI
 var _pause_menu: HearthwoodPauseMenu
+var _audio_director: HearthwoodAudioDirector
 var _current_shopkeeper: HearthwoodShopNPC
 
 
 func _ready() -> void:
 	var game_state = get_node("/root/GameState")
-	var scene_path := get_tree().current_scene.scene_file_path
-	var saved_game: Dictionary = game_state.load_game(game_state.SAVE_FILE_PATH, scene_path)
-	var player_start := PLAYER_START
-	if bool(saved_game.get("valid", false)):
-		player_start = saved_game["posisi"]
-	elif bool(saved_game.get("exists", false)):
-		push_error("Existing save could not be loaded: %s" % str(saved_game.get("pesan", "")))
-
 	_world = WORLD_SCENE.instantiate()
 	add_child(_world)
 
 	_player = PLAYER_SCENE.instantiate()
-	_player.position = player_start
+	_player.position = game_state.pending_player_position
 	add_child(_player)
 
 	var camera: Camera2D = _player.get_node("camera2d")
@@ -56,6 +51,12 @@ func _ready() -> void:
 	camera.limit_top = 0
 	camera.limit_right = 1600
 	camera.limit_bottom = 880
+
+	_audio_director = AUDIO_DIRECTOR_SCRIPT.new()
+	_audio_director.name = "AudioDirector"
+	_audio_director.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(_audio_director)
+	_update_audio_context()
 
 	_create_hud()
 	_dialog_ui = DIALOG_UI_SCENE.instantiate()
@@ -71,7 +72,9 @@ func _ready() -> void:
 	add_child(_inventory_ui)
 	_cooking_system = COOKING_SYSTEM_SCENE.instantiate()
 	add_child(_cooking_system)
+	_cooking_system.cooking_completed.connect(_on_cooking_completed)
 	_affection_system = AFFECTION_SYSTEM_SCENE.instantiate()
+	_affection_system.heart_level_changed.connect(_on_heart_level_changed)
 	_affection_system.set_cooking_system(_cooking_system)
 	add_child(_affection_system)
 	_warung_system = WARUNG_SYSTEM_SCENE.instantiate()
@@ -91,6 +94,7 @@ func _ready() -> void:
 	add_child(_pause_menu)
 	_pause_menu.save_requested.connect(_on_manual_save_requested)
 	_pause_menu.load_requested.connect(_on_manual_load_requested)
+	_pause_menu.main_menu_requested.connect(_on_main_menu_requested)
 	_connect_signals()
 	_update_hud()
 
@@ -109,6 +113,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	_update_audio_context()
 	if (
 		_dialog_ui.is_open()
 		or _inventory_ui.is_open()
@@ -152,6 +157,7 @@ func _connect_signals() -> void:
 	time_system.hour_changed.connect(_update_hud)
 	time_system.day_changed.connect(_on_day_changed)
 	time_system.minute_changed.connect(_on_minute_changed)
+	time_system.sleep_started.connect(_on_sleep_started)
 
 
 func _create_hud() -> void:
@@ -219,6 +225,19 @@ func _update_hud(_value: int = 0, _minute: int = 0) -> void:
 	]
 	_update_energy(game_state.energy)
 	_update_coins(game_state.coins)
+	_update_audio_context()
+
+
+func _update_audio_context() -> void:
+	if not is_instance_valid(_audio_director) or not is_instance_valid(_player):
+		return
+	var game_state = get_node("/root/GameState")
+	var track := "forest"
+	if game_state.current_hour >= 18 or game_state.current_hour < 6:
+		track = "night"
+	elif _player.global_position.x >= 560.0:
+		track = "village"
+	_audio_director.play_music(track)
 
 
 func _update_energy(value: int) -> void:
@@ -245,6 +264,18 @@ func _on_warung_upgraded(_new_tier: int) -> void:
 
 func _on_quest_completed(_quest_id: String) -> void:
 	_auto_save()
+
+
+func _on_cooking_completed(_recipe_id: String) -> void:
+	_audio_director.play_sfx("cook")
+
+
+func _on_heart_level_changed(_npc_id: String, _new_level: int) -> void:
+	_audio_director.play_sfx("heart_up")
+
+
+func _on_sleep_started(_wake_hour: int) -> void:
+	_audio_director.play_sfx("sleep")
 
 
 func _auto_save() -> void:
@@ -285,6 +316,17 @@ func _on_manual_load_requested() -> void:
 	get_node("/root/TimeSystem").sync_from_game_state()
 	_update_hud()
 	_pause_menu.show_status(str(result.get("pesan", "Game berhasil dimuat.")))
+
+
+func _on_main_menu_requested() -> void:
+	var result := _save_current_game()
+	if not bool(result.get("valid", false)):
+		_pause_menu.show_status(str(result.get("pesan", "Game tidak dapat disimpan.")))
+		return
+	_pause_menu.close_menu()
+	var error := get_tree().change_scene_to_file(MAIN_MENU_SCENE_PATH)
+	if error != OK:
+		push_error("Could not return to the main menu (code %d)." % error)
 
 
 func _open_pause_menu() -> void:
@@ -364,6 +406,7 @@ func _interact() -> void:
 		or _pause_menu.is_open()
 	):
 		return
+	_audio_director.play_sfx("interact")
 
 	var nearby_npc := _world.get_closest_named_npc(_player.global_position, 56.0)
 	if nearby_npc != null:

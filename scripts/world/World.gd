@@ -2,12 +2,14 @@ extends Node2D
 class_name HearthwoodWorld
 
 const TILE_SIZE: int = 16
+const TILE_COUNT: int = 5
 const WORLD_SIZE: Vector2i = Vector2i(1600, 880)
 const FOREST_END_X: float = 560.0
 const BED_POSITION: Vector2 = Vector2(1320.0, 476.0)
 const BED_INTERACTION_RADIUS: float = 76.0
 const COOKING_STATION_POSITION: Vector2 = Vector2(1210.0, 478.0)
 const COOKING_STATION_INTERACTION_RADIUS: float = 64.0
+const TILESET_TEXTURE: Texture2D = preload("res://assets/sprites/tiles/main_tiles.png")
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://scenes/ItemPickup.tscn")
@@ -133,28 +135,10 @@ func get_ambient_npc_count() -> int:
 
 
 func _create_tileset() -> void:
-	var image := Image.create(80, TILE_SIZE, false, Image.FORMAT_RGBA8)
-	var base_colors: Array[Color] = [
-		Color("#597c45"),
-		Color("#64894b"),
-		Color("#9a7950"),
-		Color("#b19a70"),
-		Color("#527b82"),
-	]
-	for tile_index in base_colors.size():
-		for y in TILE_SIZE:
-			for x in TILE_SIZE:
-				var color := base_colors[tile_index]
-				if (x + y * 3 + tile_index) % 11 == 0:
-					color = color.lightened(0.11)
-				elif (x * 2 + y + tile_index) % 13 == 0:
-					color = color.darkened(0.09)
-				image.set_pixel(tile_index * TILE_SIZE + x, y, color)
-
 	var atlas := TileSetAtlasSource.new()
-	atlas.texture = ImageTexture.create_from_image(image)
+	atlas.texture = TILESET_TEXTURE
 	atlas.texture_region_size = Vector2i(TILE_SIZE, TILE_SIZE)
-	for tile_index in base_colors.size():
+	for tile_index in TILE_COUNT:
 		atlas.create_tile(Vector2i(tile_index, 0))
 
 	var terrain := TileSet.new()

@@ -9,6 +9,7 @@ const MAIN_SCENE_PATH: String = "res://scenes/Main.tscn"
 var _quest_completion_count: int = 0
 var _pause_save_request_count: int = 0
 var _pause_load_request_count: int = 0
+var _pause_main_menu_request_count: int = 0
 
 
 func _initialize() -> void:
@@ -185,6 +186,7 @@ func _run_tests() -> void:
 	_pause_load_request_count = 0
 	pause_menu.save_requested.connect(_on_pause_save_requested)
 	pause_menu.load_requested.connect(_on_pause_load_requested)
+	pause_menu.main_menu_requested.connect(_on_pause_main_menu_requested)
 	pause_menu.open_menu()
 	if not pause_menu.is_open() or not paused:
 		push_error("Opening the pause menu should pause the game.")
@@ -192,17 +194,25 @@ func _run_tests() -> void:
 		return
 	var pause_save_button := _find_button(pause_menu, "Simpan game")
 	var pause_load_button := _find_button(pause_menu, "Muat game")
+	var pause_main_menu_button := _find_button(pause_menu, "Ke menu utama")
 	var resume_button := _find_button(pause_menu, "Lanjutkan")
-	if pause_save_button == null or pause_load_button == null or resume_button == null:
-		push_error("Pause menu should expose save, load, and resume actions.")
+	if (
+		pause_save_button == null
+		or pause_load_button == null
+		or pause_main_menu_button == null
+		or resume_button == null
+	):
+		push_error("Pause menu should expose save, load, main-menu, and resume actions.")
 		quit(1)
 		return
 	pause_save_button.pressed.emit()
 	pause_load_button.pressed.emit()
+	pause_main_menu_button.pressed.emit()
 	resume_button.pressed.emit()
 	if (
 		_pause_save_request_count != 1
 		or _pause_load_request_count != 1
+		or _pause_main_menu_request_count != 1
 		or pause_menu.is_open()
 		or paused
 	):
@@ -269,6 +279,10 @@ func _on_pause_save_requested() -> void:
 
 func _on_pause_load_requested() -> void:
 	_pause_load_request_count += 1
+
+
+func _on_pause_main_menu_requested() -> void:
+	_pause_main_menu_request_count += 1
 
 
 func _find_button(parent: Node, button_text: String) -> Button:

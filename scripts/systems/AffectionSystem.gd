@@ -1,6 +1,8 @@
 extends Node
 class_name HearthwoodAffectionSystem
 
+signal heart_level_changed(npc_id: String, new_level: int)
+
 const NPC_DATA_DIRECTORY: String = "res://data/npcs"
 const HEART_POINT_THRESHOLDS: Array[int] = [0, 10, 40, 90]
 const MAX_HEART_LEVEL: int = 3
@@ -98,6 +100,8 @@ func give_food(
 		if not reward_message.is_empty():
 			reward_messages.append(reward_message)
 	game_state.state_changed.emit()
+	if new_level > old_level:
+		heart_level_changed.emit(npc_id, new_level)
 
 	var message := _build_result_message(reaction, points_delta, new_points, new_level)
 	if not reward_messages.is_empty():

@@ -2,6 +2,7 @@ extends Node
 class_name HearthwoodCookingSystem
 
 signal recipes_unlocked
+signal cooking_completed(recipe_id: String)
 
 const RECIPE_DIRECTORY: String = "res://data/recipes"
 const TIER_DATA_PATH: String = "res://data/warung/tiers.json"
@@ -150,6 +151,7 @@ func cook(
 		push_error("Validated cooked item could not be added to inventory: %s" % recipe_id)
 		return _invalid_preview("Hasil masakan gagal disimpan.")
 
+	cooking_completed.emit(recipe_id)
 	return {
 		"valid": true,
 		"resep": recipe_id,

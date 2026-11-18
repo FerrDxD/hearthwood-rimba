@@ -137,7 +137,7 @@ func _create_interface() -> void:
 	recipe_caption.text = "Resep"
 	layout.add_child(recipe_caption)
 	_recipe_option = OptionButton.new()
-	_recipe_option.custom_minimum_size = Vector2(0.0, 48.0)
+	_recipe_option.custom_minimum_size = Vector2(48.0, 48.0)
 	_recipe_option.item_selected.connect(_on_recipe_selected)
 	layout.add_child(_recipe_option)
 
@@ -151,7 +151,7 @@ func _create_interface() -> void:
 	tool_caption.text = "Alat"
 	tool_column.add_child(tool_caption)
 	_tool_option = OptionButton.new()
-	_tool_option.custom_minimum_size = Vector2(0.0, 48.0)
+	_tool_option.custom_minimum_size = Vector2(48.0, 48.0)
 	_tool_option.item_selected.connect(_on_tool_selected)
 	tool_column.add_child(_tool_option)
 

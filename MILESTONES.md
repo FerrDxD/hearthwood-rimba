@@ -217,23 +217,23 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ## Fase 8 — Simpan/Muat (Save/Load)
 
-**Tujuan:** Pemain dapat menyimpan dan memuat game. Auto-save saat tidur, naik tier, selesai quest. Manual save di menu pause/main menu.
+**Tujuan:** Pemain dapat menyimpan dan memuat game. Auto-save saat tidur, naik tier, selesai quest. Manual save tersedia dari menu jeda dan progres disimpan saat kembali ke main menu.
 
 **Tugas:**
 - [x] Buat `SaveSystem.gd` (baca/tulis JSON via `FileAccess`, file `user://savegame.json`)
 - [x] Implementasi struktur data save sesuai PRD bagian 10.1 (nama_pemain, hari, jam, energi, reputasi, posisi, inventori, resep_terbuka, hati_npc, tier_warung, item_dihadikan)
 - [x] Auto-save: tidur (hari berganti), naik tier warung, selesai quest
-- [x] Manual save: menu pause
-- [x] Lanjutkan save yang ada otomatis saat startup dan sediakan load manual di menu pause
+- [x] Manual save: menu pause; simpan progres sebelum kembali ke main menu
+- [x] Continue dan load game tersedia dari main menu
 - [x] `GameState` sebagai titik masuk load/save
 
-**Catatan implementasi:** Proyek belum memiliki main menu. Karena itu, save slot dimuat otomatis saat game mulai; simpan dan muat manual tersedia di menu jeda. Save yang rusak atau berasal dari scene berbeda ditolak tanpa menerapkan sebagian state.
+**Catatan implementasi:** Main menu menjadi scene awal, menawarkan Continue, New Game, Load Game, Pengaturan, dan Keluar. New Game meminta konfirmasi jika slot tunggal berisi save. Save yang rusak atau berasal dari scene berbeda ditolak tanpa menerapkan sebagian state.
 
 **Dependensi:** Fase 0–7 (semua state yang perlu disimpan harus sudah ada).
 
 **Definition of Done:**
 - [x] Game dapat disimpan dan dimuat ulang tanpa data hilang
-- [x] Auto-save berfungsi saat tidur, naik tier, dan menyelesaikan quest
+- [x] Auto-save berfungsi saat tidur, naik tier, menyelesaikan quest, dan kembali ke main menu
 - [x] Load ulang memulihkan hari, jam, energi, inventori, hati NPC, tier warung, posisi, dan state dunia
 
 ---
@@ -243,21 +243,23 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Semua antarmuka terlihat rapi dan nyaman disentuh pada layar Android, aset visual dan audio lengkap untuk v1.0.
 
 **Tugas:**
-- [ ] Buat semua UI: `cooking_ui.tscn`, `inventory_ui.tscn`, `dialog_ui.tscn`, `save_load_ui.tscn`, `shop_npc.tscn` (UI toko)
-- [ ] Tombol interaksi minimal 44×44 dp, joystick virtual kiri bawah, tombol interaksi kanan bawah
-- [ ] Buat sprite berlapis MC (rambut, baju, celana, sepatu) — tampilan tetap
-- [ ] Buat sprite NPC berlapis dengan variasi warna (11 NPC bernama + 32 ambient)
-- [ ] Buat ciri khas visual setiap NPC (keranjang bambu, palu besi, tongkat, tombak, dll.)
-- [ ] Buat tileset utama (Eropa abad pertengahan, Nearest, pixel snap)
-- [ ] Buat audio: musik hutan, desa, malam; SFX memasak, interaksi, tidur, naik hati
-- [ ] Tampilkan jam dan hari di pojok layar (non-intrusif)
+- [x] Lengkapi UI `CookingUI.tscn`, `InventoryUI.tscn`, `DialogUI.tscn`, `MainMenu.tscn`, `PauseMenu.tscn`, `ShopUI.tscn`, dan `ShopNPC.tscn`
+- [x] Tombol sentuh minimal 44×44 dp, joystick virtual kiri bawah, tombol interaksi kanan bawah
+- [x] Buat sprite berlapis MC (rambut, wajah, baju, celana, sepatu) — tampilan tetap
+- [x] Buat sprite NPC berlapis dengan variasi warna (11 NPC bernama + 32 ambient)
+- [x] Buat ciri khas visual setiap NPC (keranjang, palu, kain, tongkat, tombak, dll.)
+- [x] Buat tileset utama bergaya Eropa abad pertengahan dengan Nearest dan pixel snap
+- [x] Buat audio: musik hutan, desa, malam; SFX memasak, interaksi, tidur, naik hati
+- [x] Tampilkan jam dan hari di pojok layar (non-intrusif)
+
+**Catatan implementasi:** Sprite karakter menggunakan layer PNG pixel-art yang dipakai ulang dan diwarnai dari palet NPC; tileset atlas 16×16 dan audio WAV dibuat lokal untuk game ini. Menu utama menyediakan pengaturan volume dan layar penuh. Uji perangkat Android fisik dan penyempurnaan aset final tetap masuk Fase 11.
 
 **Dependensi:** Fase 1–8 (semua sistem UI yang dipanggil harus sudah ada).
 
 **Definition of Done:**
-- Semua UI layak disentuh pada layar kecil (minimal 44×44 dp)
-- Aset visual dan audio tersedia untuk semua scene v1.0
-- Estetika cozy (palet warna hangat, tekstur piksel)
+- [x] Semua UI layak disentuh pada layar kecil (minimal 44×44 dp)
+- [x] Aset visual dan audio tersedia untuk semua scene v1.0
+- [x] Estetika cozy (palet warna hangat, tekstur piksel)
 
 ---
 
