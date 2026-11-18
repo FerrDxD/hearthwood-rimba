@@ -10,6 +10,7 @@ signal quest_completed(quest_id: String)
 const MAX_ENERGY: int = 100
 const STARTING_COINS: int = 100
 const MAX_WARUNG_TIER: int = 2
+const NEW_GAME_START_POSITION: Vector2 = Vector2(210.0, 462.0)
 const ITEM_CATALOG_PATH: String = "res://data/items/items.json"
 const SAVE_FILE_PATH: String = "user://savegame.json"
 const SAVE_VERSION: int = 1
@@ -19,7 +20,7 @@ var player_name: String = "Pengelana"
 var current_day: int = 1
 var current_hour: int = 6
 var current_minute: int = 0
-var pending_player_position: Vector2 = Vector2(210.0, 432.0)
+var pending_player_position: Vector2 = NEW_GAME_START_POSITION
 var energy: int = MAX_ENERGY
 var coins: int = STARTING_COINS
 var inventory: Array[Dictionary] = []
@@ -79,7 +80,7 @@ func start_new_game(new_player_name: String) -> bool:
 	current_day = 1
 	current_hour = 6
 	current_minute = 0
-	pending_player_position = Vector2(210.0, 432.0)
+	pending_player_position = NEW_GAME_START_POSITION
 	energy = MAX_ENERGY
 	coins = STARTING_COINS
 	inventory.clear()

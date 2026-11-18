@@ -14,7 +14,22 @@ const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
 const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
 const AUDIO_DIRECTOR_SCRIPT: Script = preload("res://scripts/systems/AudioDirector.gd")
-const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
+const PROLOGUE_DATA_PATH: String = "res://data/story/prologue.json"
+const PROLOGUE_FIND_RAST: String = "prologue_find_rast"
+const PROLOGUE_COLLECT_SAYUR: String = "prologue_collect_sayur"
+const PROLOGUE_MEET_VERAL: String = "prologue_meet_veral"
+const PROLOGUE_COOK_FIRST_MEAL: String = "prologue_cook_first_meal"
+const PROLOGUE_RECEIVE_RESIDENCE_PERMIT: String = "prologue_receive_residence_permit"
+const PROLOGUE_SETTLE_IN_HUT: String = "prologue_settle_in_hut"
+const PROLOGUE_STEP_IDS: Array[String] = [
+	PROLOGUE_FIND_RAST,
+	PROLOGUE_COLLECT_SAYUR,
+	PROLOGUE_MEET_VERAL,
+	PROLOGUE_COOK_FIRST_MEAL,
+	PROLOGUE_RECEIVE_RESIDENCE_PERMIT,
+	PROLOGUE_SETTLE_IN_HUT,
+]
+const HOME_POSITION: Vector2 = Vector2(1320.0, 476.0)
 
 var _world: HearthwoodWorld
 var _player: CharacterBody2D
@@ -23,6 +38,7 @@ var _energy_label: Label
 var _energy_bar: ProgressBar
 var _coins_label: Label
 var _hint_label: Label
+var _objective_label: Label
 var _dialog_ui: HearthwoodDialogUI
 var _shop_ui: HearthwoodShopUI
 var _inventory_ui: HearthwoodInventoryUI
@@ -35,9 +51,13 @@ var _warung_ui: HearthwoodWarungUI
 var _pause_menu: HearthwoodPauseMenu
 var _audio_director: HearthwoodAudioDirector
 var _current_shopkeeper: HearthwoodShopNPC
+var _prologue_data: Dictionary = {}
+var _hint_feedback_time_remaining: float = 0.0
 
 
 func _ready() -> void:
+	if not _load_prologue_data():
+		return
 	var game_state = get_node("/root/GameState")
 	_world = WORLD_SCENE.instantiate()
 	add_child(_world)
@@ -112,8 +132,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle_inventory()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_update_audio_context()
+	_advance_prologue_after_foraging()
+	if _hint_feedback_time_remaining > 0.0:
+		_hint_feedback_time_remaining = maxf(
+			0.0,
+			_hint_feedback_time_remaining - delta
+		)
+		if _hint_feedback_time_remaining > 0.0:
+			return
 	if (
 		_dialog_ui.is_open()
 		or _inventory_ui.is_open()
@@ -190,8 +218,14 @@ func _create_hud() -> void:
 	_coins_label = Label.new()
 	status_layout.add_child(_coins_label)
 
+	_objective_label = Label.new()
+	_objective_label.custom_minimum_size = Vector2(280.0, 0.0)
+	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_objective_label.add_theme_font_size_override("font_size", 14)
+	status_layout.add_child(_objective_label)
+
 	_hint_label = Label.new()
-	_hint_label.position = Vector2(16.0, 106.0)
+	_hint_label.position = Vector2(16.0, 210.0)
 	_hint_label.add_theme_font_size_override("font_size", 15)
 	interface.add_child(_hint_label)
 
@@ -225,6 +259,7 @@ func _update_hud(_value: int = 0, _minute: int = 0) -> void:
 	]
 	_update_energy(game_state.energy)
 	_update_coins(game_state.coins)
+	_refresh_prologue_objective()
 	_update_audio_context()
 
 
@@ -259,19 +294,33 @@ func _on_day_changed(_day: int) -> void:
 
 
 func _on_warung_upgraded(_new_tier: int) -> void:
+	_update_hud()
 	_auto_save()
 
 
 func _on_quest_completed(_quest_id: String) -> void:
+	_update_hud()
 	_auto_save()
 
 
 func _on_cooking_completed(_recipe_id: String) -> void:
 	_audio_director.play_sfx("cook")
+	if _recipe_id == "sup_sayur_bening" and _current_prologue_step() == PROLOGUE_COOK_FIRST_MEAL:
+		_complete_prologue_step(PROLOGUE_COOK_FIRST_MEAL)
 
 
 func _on_heart_level_changed(_npc_id: String, _new_level: int) -> void:
 	_audio_director.play_sfx("heart_up")
+	var npc_name := _world.get_named_npc_name(_npc_id)
+	if npc_name.is_empty():
+		push_error("Could not display affection progress for NPC: %s" % _npc_id)
+		return
+	_show_hint_feedback("%s mencapai hati %d." % [npc_name, _new_level])
+
+
+func _show_hint_feedback(message: String) -> void:
+	_hint_label.text = message
+	_hint_feedback_time_remaining = 3.0
 
 
 func _on_sleep_started(_wake_hour: int) -> void:
@@ -362,10 +411,16 @@ func _on_gift_requested(npc_id: String, npc_name: String) -> void:
 
 
 func _on_service_requested(npc_id: String, npc_name: String) -> void:
+	if not _is_prologue_complete():
+		_hint_label.text = _get_prologue_objective()
+		return
 	_gift_ui.open_gifts(npc_id, npc_name, true)
 
 
 func _on_upgrade_requested() -> void:
+	if not _is_prologue_complete():
+		_hint_label.text = _get_prologue_objective()
+		return
 	_warung_ui.open_upgrade()
 
 
@@ -423,13 +478,18 @@ func _interact() -> void:
 				if not _current_shopkeeper.shop_hours_changed.is_connected(hours_changed_callback):
 					_current_shopkeeper.shop_hours_changed.connect(hours_changed_callback)
 			return
+		if _handle_prologue_interaction(nearby_npc):
+			return
+		var prologue_complete := _is_prologue_complete()
 		_dialog_ui.open_dialog(
 			nearby_npc.get_display_name(),
 			nearby_npc.get_role(),
 			nearby_npc.get_dialogue(),
 			nearby_npc.npc_id,
-			_warung_system.is_customer_available(nearby_npc.npc_id),
-			nearby_npc.npc_id == "veral" and get_node("/root/GameState").warung_tier < 2
+			prologue_complete and _warung_system.is_customer_available(nearby_npc.npc_id),
+			prologue_complete
+			and nearby_npc.npc_id == "veral"
+			and get_node("/root/GameState").warung_tier < 2
 		)
 		nearby_npc.mark_met()
 	else:
@@ -438,11 +498,137 @@ func _interact() -> void:
 			var item_name := nearby_pickup.get_display_name()
 			if _world.collect_item_pickup(nearby_pickup):
 				_hint_label.text = "%s dikumpulkan." % item_name
+				_advance_prologue_after_foraging()
 			return
 		elif _world.is_near_cooking_station(_player.global_position):
 			_cooking_ui.open_cooking(_cooking_system)
 		elif _world.is_near_bed(_player.global_position):
+			if _current_prologue_step() == PROLOGUE_SETTLE_IN_HUT:
+				_player.global_position = HOME_POSITION
+				_complete_prologue_step(PROLOGUE_SETTLE_IN_HUT)
+				_hint_label.text = "Kamu menetap di gubuk pinggir desa."
+				return
 			get_node("/root/TimeSystem").sleep()
 			_hint_label.text = "Hari baru dimulai. Energi sudah pulih."
 		else:
 			_hint_label.text = "Jelajahi jalan menuju desa untuk menemukan tempat beristirahat."
+
+
+func _load_prologue_data() -> bool:
+	if not FileAccess.file_exists(PROLOGUE_DATA_PATH):
+		push_error("Prologue data file not found: %s" % PROLOGUE_DATA_PATH)
+		return false
+	var file := FileAccess.open(PROLOGUE_DATA_PATH, FileAccess.READ)
+	if file == null:
+		push_error("Could not read prologue data: %s" % PROLOGUE_DATA_PATH)
+		return false
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if (
+		typeof(parsed) != TYPE_DICTIONARY
+		or typeof(parsed.get("dialogues")) != TYPE_DICTIONARY
+		or typeof(parsed.get("objectives")) != TYPE_DICTIONARY
+	):
+		push_error("Prologue data must contain dialogues and objectives objects.")
+		return false
+	for dialogue_key in [
+		"rast_first_meeting",
+		"rast_after_meeting",
+		"veral_cooking_test",
+		"veral_waiting_for_meal",
+		"veral_residence_permit",
+	]:
+		if typeof(parsed["dialogues"].get(dialogue_key)) != TYPE_STRING:
+			push_error("Prologue data is missing dialogue '%s'." % dialogue_key)
+			return false
+	for objective_key in PROLOGUE_STEP_IDS + [
+		"prologue_rebuild_warung",
+		"prologue_warung_complete",
+	]:
+		if typeof(parsed["objectives"].get(objective_key)) != TYPE_STRING:
+			push_error("Prologue data is missing objective '%s'." % objective_key)
+			return false
+	_prologue_data = parsed
+	return true
+
+
+func _current_prologue_step() -> String:
+	var game_state = get_node("/root/GameState")
+	for step_id in PROLOGUE_STEP_IDS:
+		if not game_state.completed_quests.has(step_id):
+			return step_id
+	return ""
+
+
+func _is_prologue_complete() -> bool:
+	return _current_prologue_step().is_empty()
+
+
+func _complete_prologue_step(step_id: String) -> void:
+	if _current_prologue_step() != step_id:
+		return
+	if not get_node("/root/GameState").complete_quest(step_id):
+		push_error("Could not complete prologue step: %s" % step_id)
+
+
+func _advance_prologue_after_foraging() -> void:
+	if (
+		_current_prologue_step() == PROLOGUE_COLLECT_SAYUR
+		and get_node("/root/GameState").get_item_count("sayur_liar") > 0
+	):
+		_complete_prologue_step(PROLOGUE_COLLECT_SAYUR)
+
+
+func _handle_prologue_interaction(npc: HearthwoodNPC) -> bool:
+	var game_state = get_node("/root/GameState")
+	var step_id := _current_prologue_step()
+	var dialogue_key := ""
+
+	if npc.npc_id == "rast":
+		if step_id == PROLOGUE_FIND_RAST:
+			dialogue_key = "rast_first_meeting"
+			_complete_prologue_step(PROLOGUE_FIND_RAST)
+		elif not game_state.completed_quests.has(PROLOGUE_RECEIVE_RESIDENCE_PERMIT):
+			dialogue_key = "rast_after_meeting"
+	elif npc.npc_id == "veral":
+		if step_id == PROLOGUE_MEET_VERAL:
+			if not game_state.add_item("garam"):
+				push_error("Could not provide the tutorial cooking ingredient.")
+				return true
+			dialogue_key = "veral_cooking_test"
+			_complete_prologue_step(PROLOGUE_MEET_VERAL)
+		elif step_id == PROLOGUE_COOK_FIRST_MEAL:
+			dialogue_key = "veral_waiting_for_meal"
+		elif step_id == PROLOGUE_RECEIVE_RESIDENCE_PERMIT:
+			dialogue_key = "veral_residence_permit"
+			_complete_prologue_step(PROLOGUE_RECEIVE_RESIDENCE_PERMIT)
+
+	if dialogue_key.is_empty():
+		return false
+	var dialogue: String = _prologue_data["dialogues"][dialogue_key]
+	dialogue = dialogue.replace("{nama}", str(game_state.player_name))
+	_dialog_ui.open_dialog(
+		npc.get_display_name(),
+		npc.get_role(),
+		dialogue,
+		npc.npc_id
+	)
+	npc.mark_met()
+	return true
+
+
+func _refresh_prologue_objective() -> void:
+	if _objective_label == null:
+		return
+	_objective_label.text = _get_prologue_objective()
+
+
+func _get_prologue_objective() -> String:
+	var game_state = get_node("/root/GameState")
+	var objective_key := _current_prologue_step()
+	if objective_key.is_empty():
+		objective_key = (
+			"prologue_warung_complete"
+			if game_state.warung_tier >= game_state.MAX_WARUNG_TIER
+			else "prologue_rebuild_warung"
+		)
+	return str(_prologue_data["objectives"][objective_key])

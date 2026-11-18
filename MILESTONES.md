@@ -268,21 +268,23 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Menyatukan semua sistem menjadi alur utuh v1.0: pemain terbangun di hutan, bertemu Rast, ke Veral, mendapat izin tinggal, menetap, dan mulai membangun warung.
 
 **Tugas:**
-- [ ] Implementasi scene awal: pemain terbangun di bawah pohon besar di hutan
-- [ ] Tutorial bertemu Rast (penebang kayu) yang menjelaskan bertahan hidup
-- [ ] Tutorial menemui Veral (kepala desa) untuk izin tinggal
-- [ ] Tutorial memasak pertama (momen izin tinggal = tutorial memasak)
-- [ ] Pemain menetap di gubuk kosong di pinggir desa
-- [ ] Implementasi alur membangun kembali warung (gubuk → kecil → penuh)
-- [ ] Hubungkan semua sinyal (waktu, afeksi, memasak, warung) ke UI
-- [ ] Uji alur dari awal sampai akhir (start → hutan → desa → izin → warung)
+- [x] Implementasi scene awal: pemain terbangun di bawah pohon besar di hutan
+- [x] Tutorial bertemu Rast (penebang kayu) yang menjelaskan bertahan hidup
+- [x] Tutorial menemui Veral (kepala desa) untuk izin tinggal
+- [x] Tutorial memasak pertama (momen izin tinggal = tutorial memasak)
+- [x] Pemain menetap di gubuk kosong di pinggir desa
+- [x] Implementasi alur membangun kembali warung (gubuk → kecil → penuh)
+- [x] Hubungkan semua sinyal (waktu, afeksi, memasak, warung) ke UI
+- [x] Uji alur dari awal sampai akhir (start → hutan → desa → izin → warung)
+
+**Catatan implementasi:** Dialog dan objective prolog disimpan di `data/story/prologue.json`; progresnya memakai quest selesai yang sudah tercakup dalam save. Rast mengarahkan pemain mencari sayur liar, Veral menyediakan garam untuk ujian memasak, dan izin tinggal membuka langkah menetap di gubuk. Setelah menetap, layanan pelanggan dan permintaan izin upgrade warung tersedia. Visual bangunan warung berubah saat tier naik.
 
 **Dependensi:** Fase 1–9 (semua sistem harus siap).
 
 **Definition of Done:**
-- Pemain dapat menyelesaikan alur v1.0 dari awal sampai akhir tanpa crash
-- Semua sinyal terhubung dan UI terupdate otomatis
-- Tidak ada hardcode dialog di skrip
+- [x] Pemain dapat menyelesaikan alur v1.0 dari awal sampai akhir tanpa crash
+- [x] Semua sinyal terhubung dan UI terupdate otomatis
+- [x] Tidak ada hardcode dialog di skrip
 
 ---
 

@@ -5,6 +5,7 @@ const TILE_SIZE: int = 16
 const TILE_COUNT: int = 5
 const WORLD_SIZE: Vector2i = Vector2i(1600, 880)
 const FOREST_END_X: float = 560.0
+const GREAT_TREE_POSITION: Vector2 = Vector2(210.0, 414.0)
 const BED_POSITION: Vector2 = Vector2(1320.0, 476.0)
 const BED_INTERACTION_RADIUS: float = 76.0
 const COOKING_STATION_POSITION: Vector2 = Vector2(1210.0, 478.0)
@@ -68,6 +69,7 @@ func _ready() -> void:
 	_spawn_ambient_npcs()
 	_spawn_forage_items()
 	get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
+	get_node("/root/GameState").state_changed.connect(_on_state_changed)
 	queue_redraw()
 
 
@@ -130,6 +132,13 @@ func get_named_npc_count() -> int:
 	return _named_npcs.size()
 
 
+func get_named_npc_name(npc_id: String) -> String:
+	for npc in _named_npcs:
+		if npc.npc_id == npc_id:
+			return npc.get_display_name()
+	return ""
+
+
 func get_ambient_npc_count() -> int:
 	return _ambient_npcs.size()
 
@@ -169,11 +178,19 @@ func _place_trees() -> void:
 			_random.randf_range(42.0, FOREST_END_X - 42.0),
 			_random.randf_range(54.0, WORLD_SIZE.y - 54.0)
 		)
+		if tree_position.distance_to(GREAT_TREE_POSITION) < 70.0:
+			continue
 		var path_center := 432.0 + sin(tree_position.x / 16.0 * 0.085) * 32.0
 		if absf(tree_position.y - path_center) < 82.0:
 			continue
 		_tree_positions.append(tree_position)
 		_add_obstacle(Rect2(tree_position.x - 7.0, tree_position.y - 2.0, 14.0, 16.0))
+	_add_obstacle(Rect2(
+		GREAT_TREE_POSITION.x - 9.0,
+		GREAT_TREE_POSITION.y - 5.0,
+		18.0,
+		26.0
+	))
 
 
 func _add_building_collisions() -> void:
@@ -248,6 +265,10 @@ func _on_day_changed(_day: int) -> void:
 	_spawn_forage_items()
 
 
+func _on_state_changed() -> void:
+	queue_redraw()
+
+
 func _validate_schedule_segments(npc_id: String, segments: Array) -> bool:
 	if segments.is_empty():
 		push_error("NPC schedule must contain at least one segment: %s" % npc_id)
@@ -318,6 +339,7 @@ func _add_obstacle(rect: Rect2) -> void:
 
 
 func _draw() -> void:
+	_draw_great_tree()
 	for tree_position in _tree_positions:
 		draw_rect(
 			Rect2(tree_position.x - 5.0, tree_position.y - 3.0, 10.0, 21.0),
@@ -336,8 +358,8 @@ func _draw() -> void:
 			Color("#75934f")
 		)
 
-	for building in _building_rects:
-		_draw_building(building)
+	for index in _building_rects.size():
+		_draw_building(_building_rects[index], index == _building_rects.size() - 1)
 
 	draw_line(
 		COOKING_STATION_POSITION + Vector2(-14.0, 12.0),
@@ -352,14 +374,40 @@ func _draw() -> void:
 	draw_rect(Rect2(1312.0, 467.0, 16.0, 3.0), Color("#76513a"))
 
 
-func _draw_building(building: Rect2) -> void:
+func _draw_great_tree() -> void:
+	draw_rect(
+		Rect2(GREAT_TREE_POSITION.x - 9.0, GREAT_TREE_POSITION.y - 4.0, 18.0, 29.0),
+		Color("#654321")
+	)
+	draw_rect(
+		Rect2(GREAT_TREE_POSITION.x - 34.0, GREAT_TREE_POSITION.y - 43.0, 68.0, 43.0),
+		Color("#294d35")
+	)
+	draw_rect(
+		Rect2(GREAT_TREE_POSITION.x - 24.0, GREAT_TREE_POSITION.y - 54.0, 48.0, 27.0),
+		Color("#4e7943")
+	)
+	draw_rect(
+		Rect2(GREAT_TREE_POSITION.x - 20.0, GREAT_TREE_POSITION.y - 37.0, 15.0, 7.0),
+		Color("#75934f")
+	)
+
+
+func _draw_building(building: Rect2, is_warung: bool = false) -> void:
+	var wall_color := Color("#d2b48c")
+	if is_warung:
+		match int(get_node("/root/GameState").warung_tier):
+			1:
+				wall_color = Color("#cba77b")
+			2:
+				wall_color = Color("#e0c99d")
 	draw_rect(
 		Rect2(building.position.x - 7.0, building.position.y - 16.0, building.size.x + 14.0, 30.0),
 		Color("#76513a")
 	)
 	draw_rect(
 		Rect2(building.position.x, building.position.y, building.size.x, building.size.y),
-		Color("#d2b48c")
+		wall_color
 	)
 	draw_rect(
 		Rect2(building.position.x - 7.0, building.position.y - 18.0, building.size.x + 14.0, 13.0),
@@ -369,3 +417,27 @@ func _draw_building(building: Rect2) -> void:
 		Rect2(building.position.x + building.size.x * 0.5 - 8.0, building.end.y - 25.0, 16.0, 25.0),
 		Color("#654321")
 	)
+	if is_warung:
+		var tier: int = get_node("/root/GameState").warung_tier
+		draw_rect(
+			Rect2(building.position.x + 8.0, building.position.y - 5.0, 20.0, 11.0),
+			Color("#8fbc8f")
+		)
+		if tier >= 1:
+			draw_rect(
+				Rect2(building.position.x - 18.0, building.end.y - 7.0, 26.0, 6.0),
+				Color("#76513a")
+			)
+			draw_rect(
+				Rect2(building.end.x - 8.0, building.end.y - 7.0, 26.0, 6.0),
+				Color("#76513a")
+			)
+		if tier >= 2:
+			draw_rect(
+				Rect2(building.position.x + 14.0, building.position.y + 18.0, 15.0, 15.0),
+				Color("#87ceeb")
+			)
+			draw_rect(
+				Rect2(building.end.x - 29.0, building.position.y + 18.0, 15.0, 15.0),
+				Color("#87ceeb")
+			)

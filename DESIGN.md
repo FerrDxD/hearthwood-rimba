@@ -157,6 +157,13 @@ Setiap NPC memiliki:
 - Menu jeda: Lanjutkan, Simpan, Muat, atau kembali ke main menu; progres tersimpan sebelum kembali.
 - Game dimulai dari `MainMenu.tscn`, sementara `Main.tscn` berisi dunia aktif.
 
+### 5.7 Alur Awal Hutan ke Warung
+- Permainan baru dimulai di bawah pohon besar di hutan; objective selalu terlihat di HUD.
+- Dialog dan objective prolog dimuat dari `data/story/prologue.json`, sedangkan tahapnya disimpan bersama quest agar dapat dilanjutkan setelah load.
+- Rast mengajarkan mencari sayur liar. Setelah bertemu Veral, pemain menerima garam untuk memasak Sup Sayur Bening sebagai bukti kemampuan.
+- Veral memberikan izin tinggal setelah masakan selesai. Berinteraksi pertama kali dengan tempat tidur di gubuk menetapkan tempat tinggal tanpa langsung melewati satu hari.
+- Setelah menetap, pemain dapat melayani pelanggan yang menyukai masakannya dan meminta izin upgrade warung kepada Veral. Bangunan berubah visual pada tier Warung Kecil dan Warteg Penuh.
+
 ---
 
 ## 6. Desain Layar (Wireframe Tekstual)

@@ -1,0 +1,19 @@
+{
+  "dialogues": {
+    "rast_first_meeting": "Eh... kamu sudah bangun, {nama}? Aku Rast. Desa ada di ujung jalan ini. Ambil sayur liar di sekitar hutan untuk bekal, lalu temui Veral. Dia yang memutuskan siapa boleh tinggal.",
+    "rast_after_meeting": "Sayur liar bisa jadi bekal. Ikuti jalan tanah ke desa dan temui Veral di rumah kepala desa. Jangan khawatir, dia memang bicara pelan begitu.",
+    "veral_cooking_test": "Saya Veral, kepala desa. Rast bercerita Anda terbangun di hutan. Untuk tinggal di sini, tunjukkan keahlian yang bisa berguna bagi warga: masak satu Sup Sayur Bening. Ini sedikit garam dari persediaan desa; sayurnya bisa Anda petik di hutan.",
+    "veral_waiting_for_meal": "Api unggun di halaman dapat dipakai memasak. Buat satu Sup Sayur Bening, lalu temui saya lagi. Rumah yang hangat dimulai dari hidangan yang baik.",
+    "veral_residence_permit": "Sup yang hangat dan rapi. Baik, saya memberi Anda izin tinggal di desa. Gubuk di pinggir desa kosong; beristirahatlah di sana dan bangun kembali warung Anda dengan tertib."
+  },
+  "objectives": {
+    "prologue_find_rast": "Kamu terbangun di bawah pohon besar. Temui Rast di jalan hutan untuk mengetahui cara bertahan hidup.",
+    "prologue_collect_sayur": "Petik setidaknya satu Sayur liar di hutan sebagai bekal perjalanan.",
+    "prologue_meet_veral": "Ikuti jalan menuju desa dan temui Veral, kepala desa.",
+    "prologue_cook_first_meal": "Masak satu Sup Sayur Bening di api unggun dengan Sayur liar dan Garam.",
+    "prologue_receive_residence_permit": "Bawa kabar masakanmu kepada Veral untuk memperoleh izin tinggal.",
+    "prologue_settle_in_hut": "Pergi ke gubuk kosong di pinggir desa dan berinteraksi dengan tempat tidurnya untuk menetap.",
+    "prologue_rebuild_warung": "Warungmu dimulai dari gubuk. Layani pelanggan dengan masakan yang mereka sukai, kumpulkan reputasi, koin, dan bahan, lalu minta izin upgrade dari Veral.",
+    "prologue_warung_complete": "Warteg penuhmu sudah berdiri. Sajikan masakan hangat untuk warga dan nikmati kehidupan baru di desa."
+  }
+}
