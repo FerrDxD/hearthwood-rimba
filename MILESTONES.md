@@ -293,20 +293,22 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Memastikan game stabil, nyaman dimainkan di Android, dan siap dirilis di itch.io / Play Store.
 
 **Tugas:**
-- [ ] Uji coba pada perangkat Android rendah (performa, sentuh, ukuran tombol)
-- [ ] Perbaiki bug yang ditemukan saat uji alur utama
-- [ ] Pastikan save/load tidak crash dan tidak menyimpan data sensitif/bug
-- [ ] Uji ulang checklist sebelum commit (AGENTS.md bagian 7)
-- [ ] Build untuk Android (Play Store) dan itch.io (web/desktop)
-- [ ] Dokumentasi build dan rilis
-- [ ] Catat pertanyaan terbuka (jadwal rilis, misteri asap) untuk versi berikutnya
+- [ ] Uji coba pada perangkat Android rendah (performa, sentuh, ukuran tombol) — belum ada perangkat Android terhubung
+- [x] Uji otomatis alur utama; tidak ditemukan crash atau bug baru
+- [x] Pastikan save/load tidak crash dan tidak menyimpan data sensitif/bug — uji round-trip dan validasi lulus
+- [x] Uji ulang checklist sebelum commit (AGENTS.md bagian 7); catat item fallback JSON yang belum terpenuhi di `RELEASE.md`
+- [ ] Build untuk Android (Play Store) dan itch.io (web/desktop) — tertahan template/SDK/signing yang belum tersedia
+- [x] Dokumentasi build dan rilis di `RELEASE.md`
+- [x] Catat pertanyaan terbuka (jadwal rilis, misteri asap) di `RELEASE.md`
 
 **Dependensi:** Fase 0–10.
 
 **Definition of Done:**
-- Game dapat di-build dan dijalankan di Android
-- Tidak ada bug crash pada alur v1.0
-- Siap dirilis
+- [ ] Game dapat di-build dan dijalankan di Android
+- [x] Tidak ada crash pada alur v1.0 yang tercakup tes otomatis
+- [ ] Siap dirilis setelah ekspor dan uji perangkat fisik lulus
+
+**Status:** QA otomatis lulus, tetapi Fase 11 belum selesai dan game belum siap dirilis. Build target dan uji perangkat Android harus diulang setelah prasyarat di `RELEASE.md` tersedia.
 
 ---
 
