@@ -1,0 +1,106 @@
+{
+  "quests": {
+    "rast": {
+      "nama": "Rast — Penebang Kayu",
+      "bab": [
+        {
+          "hati": 0,
+          "judul": "Bantuan Kayu Pertama",
+          "objective": "Bawa 1 Kayu kepada Rast di hutan agar keluarganya tetap hangat.",
+          "dialog_aktif": "Keluargaku butuh kayu bakar, tapi aku belum sempat menebang. Kalau kamu menemukan satu Kayu di hutan, bawa ke sini. Aku akan menggantinya dengan upah.",
+          "butuh": { "kayu": 1 },
+          "biaya_koin": 0,
+          "dialog_selesai": "Ini kayunya? Terima kasih. Ibu pasti senang. Aku belum bisa memberi banyak, tapi ambil upah ini.",
+          "hadiah": { "koin": 40, "reputasi": 1 },
+          "petunjuk_asap": ""
+        },
+        {
+          "hati": 1,
+          "judul": "Keberanian di Depan Warga",
+          "objective": "Kumpulkan 2 Jamur hutan sebagai bekal pertemuan Rast dengan warga desa.",
+          "dialog_aktif": "Veral ingin aku bicara di depan warga besok. Aku... gugup. Bantu aku menyiapkan bekal jamur agar aku punya alasan untuk datang lebih awal?",
+          "butuh": { "jamur_hutan": 2 },
+          "biaya_koin": 0,
+          "dialog_selesai": "Aku berhasil bicara tanpa menunduk! Warga mendengarkan. Ini untukmu, tanda terima kasihku.",
+          "hadiah": { "koin": 60, "reputasi": 2 },
+          "petunjuk_asap": ""
+        },
+        {
+          "hati": 2,
+          "judul": "Menembus Hutan Dalam",
+          "objective": "Bawa 1 Kayu dan 2 Daun hutan sebagai markah jalan menembus hutan dalam.",
+          "dialog_aktif": "Ada jalur baru di hutan dalam. Aku butuh markah daun dan sebatang kayu untuk menandai jalan agar warga tidak tersesat. Mau ikut menyiapkannya?",
+          "butuh": { "kayu": 1, "daun_hutan": 2 },
+          "biaya_koin": 0,
+          "dialog_selesai": "Markahnya terpasang. Di ujung jalur, aku menemukan tulang kayu yang aneh — seperti sisa bangunan, bukan pohon. Bawa tombak ini; hutan dalam tidak selalu ramah.",
+          "hadiah": { "koin": 80, "reputasi": 2, "item": "tombak_hutan" },
+          "petunjuk_asap": "Tulang kayu yang tidak biasa di hutan dalam — bentuknya seperti sisa bangunan, bukan pohon."
+        },
+        {
+          "hati": 3,
+          "judul": "Ekspedisi Kayu Desa",
+          "objective": "Kumpulkan 3 Kayu untuk ekspedisi kayu Rast bagi desa.",
+          "dialog_aktif": "Veral mempercayakanku memimpin ekspedisi kayu untuk desa. Aku tidak bisa melakukannya sendiri. Bawa tiga Kayu ke sini, dan kita akan membuktikan bahwa hutan bisa menghidupi desa.",
+          "butuh": { "kayu": 3 },
+          "biaya_koin": 0,
+          "dialog_selesai": "Ekspedisi berhasil. Warga menyiapkan gudang bahan untuk hasil hutan, dan Veral menyebut namamu di depan semua orang. Terima kasih, kawan.",
+          "hadiah": { "koin": 150, "reputasi": 5, "fitur": "gudang_bahan" },
+          "petunjuk_asap": ""
+        }
+      ]
+    },
+    "veral": {
+      "nama": "Veral — Kepala Desa",
+      "bab": [
+        {
+          "hati": 0,
+          "judul": "Berkas Izin Usaha",
+          "objective": "Bantu Veral menyiapkan papan pengumuman desa: bawa 1 Kayu.",
+          "dialog_aktif": "Warungmu berdiri di tanah desa, jadi catatannya harus rapi. Bantu aku memasang papan pengumuman dari satu Kayu; setelah itu urusan izin usahamu akan lebih mudah.",
+          "butuh": { "kayu": 1 },
+          "biaya_koin": 0,
+          "dialog_selesai": "Papan pengumuman sudah berdiri. Catatan warungmu kini tercatat resmi. Desa menghargai orang yang menepati janji.",
+          "hadiah": { "koin": 50, "reputasi": 2 },
+          "petunjuk_asap": ""
+        },
+        {
+          "hati": 1,
+          "judul": "Mediasi Warga",
+          "objective": "Masak 1 Sup Sayur Bening untuk jamuan mediasi dua warga desa.",
+          "dialog_aktif": "Dua warga berselisih soal batas tanah. Perut yang hangat sering melunakkan kepala yang panas. Masakkan satu Sup Sayur Bening untuk jamuan mereka.",
+          "butuh": { "sup_sayur_bening": 1 },
+          "biaya_koin": 0,
+          "dialog_selesai": "Mereka duduk satu meja dan akhirnya mau mendengar. Kau punya bakat meredakan orang, bukan hanya memasak.",
+          "hadiah": { "koin": 70, "reputasi": 3 },
+          "petunjuk_asap": ""
+        },
+        {
+          "hati": 2,
+          "judul": "Rapat Desa",
+          "objective": "Bawa 1 Kue Manis Liar untuk rapat desa dan buka area pertanian.",
+          "dialog_aktif": "Rapat desa akan membahas lahan baru. Bawa satu Kue Manis Liar agar suasana rapat hangat. Setelah itu, area pertanian di sisi desa akan dibuka untukmu.",
+          "butuh": { "kue_manis_liar": 1 },
+          "biaya_koin": 0,
+          "dialog_selesai": "Rapat berjalan tenang, dan lahan pertanian disetujui. Saat membereskan gudang, aku melihat bercak asap di dinding yang lama terbakar. Aneh; baunya bukan kayu desa.",
+          "hadiah": { "koin": 90, "reputasi": 3, "fitur": "area_tani" },
+          "petunjuk_asap": "Bercak asap di belakang gudang desa yang terbakar. Aroma kayunya tidak seperti kayu hutan."
+        },
+        {
+          "hati": 3,
+          "judul": "Perjalanan ke Kerajaan",
+          "objective": "Siapkan 2 Rempah eksklusif dan 100 koin untuk perjalanan perwakilan desa ke kerajaan.",
+          "dialog_aktif": "Desa akhirnya diundang menghadap kerajaan. Aku butuh rempah eksklusif sebagai persembahan dan seratus koin untuk bekal perjalanan. Mau menjadi perwakilan bersama kami?",
+          "butuh": { "rempah_eksklusif": 2 },
+          "biaya_koin": 100,
+          "dialog_selesai": "Kami pulang dengan perjanjian dagang. Sebelum berangkat, aku sempat membaca buku lama tentang 'geleger dari luar dimensi'. Jawabannya belum lengkap, tapi jejaknya nyata.",
+          "hadiah": {
+            "koin": 200,
+            "reputasi": 5,
+            "fitur": "perdagangan_kerajaan"
+          },
+          "petunjuk_asap": "Buku rahasia Veral menyebut 'geleger dari luar dimensi' — jawabannya belum lengkap."
+        }
+      ]
+    }
+  }
+}

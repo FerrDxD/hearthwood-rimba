@@ -10,6 +10,7 @@ const COOKING_UI_SCENE: PackedScene = preload("res://scenes/CookingUI.tscn")
 const AFFECTION_SYSTEM_SCENE: PackedScene = preload("res://scenes/AffectionSystem.tscn")
 const GIFT_UI_SCENE: PackedScene = preload("res://scenes/GiftUI.tscn")
 const WARUNG_SYSTEM_SCENE: PackedScene = preload("res://scenes/WarungSystem.tscn")
+const QUEST_SYSTEM_SCENE: PackedScene = preload("res://scenes/QuestSystem.tscn")
 const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
 const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
@@ -48,6 +49,7 @@ var _affection_system: HearthwoodAffectionSystem
 var _gift_ui: HearthwoodGiftUI
 var _warung_system: HearthwoodWarungSystem
 var _warung_ui: HearthwoodWarungUI
+var _quest_system: HearthwoodQuestSystem
 var _pause_menu: HearthwoodPauseMenu
 var _audio_director: HearthwoodAudioDirector
 var _current_shopkeeper: HearthwoodShopNPC
@@ -100,6 +102,8 @@ func _ready() -> void:
 	_warung_system = WARUNG_SYSTEM_SCENE.instantiate()
 	_warung_system.set_systems(_cooking_system, _affection_system)
 	add_child(_warung_system)
+	_quest_system = QUEST_SYSTEM_SCENE.instantiate()
+	add_child(_quest_system)
 	_cooking_ui = COOKING_UI_SCENE.instantiate()
 	add_child(_cooking_ui)
 	_cooking_ui.set_cooking_system(_cooking_system)
@@ -316,6 +320,7 @@ func _on_heart_level_changed(_npc_id: String, _new_level: int) -> void:
 		push_error("Could not display affection progress for NPC: %s" % _npc_id)
 		return
 	_show_hint_feedback("%s mencapai hati %d." % [npc_name, _new_level])
+	_update_hud()
 
 
 func _show_hint_feedback(message: String) -> void:
@@ -484,7 +489,7 @@ func _interact() -> void:
 		_dialog_ui.open_dialog(
 			nearby_npc.get_display_name(),
 			nearby_npc.get_role(),
-			nearby_npc.get_dialogue(),
+			_get_interaction_dialogue(nearby_npc),
 			nearby_npc.npc_id,
 			prologue_complete and _warung_system.is_customer_available(nearby_npc.npc_id),
 			prologue_complete
@@ -619,7 +624,39 @@ func _handle_prologue_interaction(npc: HearthwoodNPC) -> bool:
 func _refresh_prologue_objective() -> void:
 	if _objective_label == null:
 		return
-	_objective_label.text = _get_prologue_objective()
+	_objective_label.text = _get_objective_text()
+
+
+func _get_objective_text() -> String:
+	if not _is_prologue_complete() or _quest_system == null:
+		return _get_prologue_objective()
+	var lines := PackedStringArray([_get_prologue_objective()])
+	for npc_id in ["rast", "veral"]:
+		var chapter := _quest_system.get_chapter(npc_id)
+		if chapter.is_empty():
+			continue
+		lines.append("%s: %s" % [
+			str(chapter.get("judul", "")),
+			str(chapter.get("objective", "")),
+		])
+	return "\n".join(lines)
+
+
+func _get_interaction_dialogue(npc: HearthwoodNPC) -> String:
+	if not _is_prologue_complete() or _quest_system == null:
+		return npc.get_dialogue()
+	var chapter := _quest_system.get_chapter(npc.npc_id)
+	if chapter.is_empty():
+		return npc.get_dialogue()
+	if _quest_system.can_turn_in(npc.npc_id):
+		var result: Dictionary = _quest_system.turn_in(npc.npc_id)
+		if bool(result.get("valid", false)):
+			return str(result.get("pesan", ""))
+		push_error("A ready quest chapter could not be turned in: %s" % npc.npc_id)
+	return "%s\n\n%s" % [
+		str(chapter.get("dialog_aktif", "")),
+		_quest_system.get_requirement_text(npc.npc_id),
+	]
 
 
 func _get_prologue_objective() -> String:

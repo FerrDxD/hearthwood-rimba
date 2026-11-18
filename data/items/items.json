@@ -17,6 +17,7 @@
     { "id": "pisau_kecil", "nama": "Pisau kecil", "kategori": "perkakas", "sumber": "Talia", "warna": "#9da5a2" },
     { "id": "caping", "nama": "Caping", "kategori": "perkakas", "sumber": "Talia", "warna": "#bba36f" },
     { "id": "tongkat", "nama": "Tongkat", "kategori": "perkakas", "sumber": "Talia", "warna": "#876443" },
+    { "id": "tombak_hutan", "nama": "Tombak hutan", "kategori": "perkakas", "sumber": "Rast", "warna": "#8d6a4b" },
     { "id": "sup_sayur_bening", "nama": "Sup Sayur Bening", "kategori": "masakan", "warna": "#d6ba68", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 },
     { "id": "ikan_bakar_rempah", "nama": "Ikan Bakar Rempah", "kategori": "masakan", "warna": "#bd8057", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 },
     { "id": "bubur_hangat_hutan", "nama": "Bubur Hangat Hutan", "kategori": "masakan", "warna": "#d4c28e", "energi_per_kualitas": { "1": 15, "2": 25, "3": 40 }, "masa_simpan_hari": 3, "harga_jual": 40 },

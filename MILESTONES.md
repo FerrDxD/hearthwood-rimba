@@ -331,21 +331,21 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Main quest dua tokoh utama berjalan dari hati 0 sampai hati 3, dengan objective yang terlihat, penyerahan bahan, hadiah, dan clue misteri asap.
 
 **Tugas:**
-- [ ] `data/story/quests.json`: 4 bab per NPC (hati 0–3) berisi objective, dialog aktif, kebutuhan item/koin, dialog selesai, hadiah, dan petunjuk asap
-- [ ] `QuestSystem.gd`: memuat data, gerbang hati, validasi kebutuhan, penyerahan hadiah, dan penandaan quest selesai lewat `GameState.complete_quest`
-- [ ] State baru `bab_quest`, `petunjuk_asap`, `fitur_terbuka` disimpan di save dan kompatibel dengan save v1.0
-- [ ] HUD menampilkan objective warung dan objective quest Rast/Veral yang sedang berjalan
-- [ ] Interaksi Rast/Veral memakai dialog bab aktif dan menyerahkan bahan saat syarat terpenuhi; tombol layani/izin warung tetap berfungsi
-- [ ] Hadiah bab: koin, reputasi, alat pertahanan, fitur baru, dan 3 clue misteri asap
-- [ ] `tests/QuestSystemTest.gd`: gerbang hati, kebutuhan, hadiah, clue, integrasi dialog, dan round-trip save
+- [x] `data/story/quests.json`: 4 bab per NPC (hati 0–3) berisi objective, dialog aktif, kebutuhan item/koin, dialog selesai, hadiah, dan petunjuk asap
+- [x] `QuestSystem.gd`: memuat data, gerbang hati, validasi kebutuhan, penyerahan hadiah, dan penandaan quest selesai lewat `GameState.complete_quest`
+- [x] State baru `bab_quest`, `petunjuk_asap`, `fitur_terbuka` disimpan di save dan kompatibel dengan save v1.0
+- [x] HUD menampilkan objective warung dan objective quest Rast/Veral yang sedang berjalan
+- [x] Interaksi Rast/Veral memakai dialog bab aktif dan menyerahkan bahan saat syarat terpenuhi; tombol layani/izin warung tetap berfungsi
+- [x] Hadiah bab: koin, reputasi, alat pertahanan, fitur baru, dan 3 clue misteri asap
+- [x] `tests/QuestSystemTest.gd`: gerbang hati, kebutuhan, hadiah, clue, integrasi dialog, dan round-trip save
 
 **Dependensi:** Fase 6, Fase 7, Fase 10.
 
 **Definition of Done:**
-- [ ] Rast dan Veral masing-masing punya 4 bab yang hanya bisa diserahkan pada hati yang sesuai
-- [ ] Penyerahan memakai bahan/koin, memberi hadiah, dan tidak bisa diulang
-- [ ] Tiga clue misteri asap terkumpul dari bab yang ditentukan
-- [ ] Save/load mempertahankan progres bab, clue, dan fitur terbuka
+- [x] Rast dan Veral masing-masing punya 4 bab yang hanya bisa diserahkan pada hati yang sesuai
+- [x] Penyerahan memakai bahan/koin, memberi hadiah, dan tidak bisa diulang
+- [x] Tiga clue misteri asap terkumpul dari bab yang ditentukan
+- [x] Save/load mempertahankan progres bab, clue, dan fitur terbuka
 
 ---
 

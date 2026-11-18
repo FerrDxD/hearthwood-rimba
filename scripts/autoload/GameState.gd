@@ -28,6 +28,9 @@ var item_catalog: Dictionary = {}
 var unlocked_recipes: Array[String] = ["sup_sayur_bening", "bubur_hangat_hutan"]
 var unlocked_quests: Array[String] = []
 var completed_quests: Array[String] = []
+var quest_chapters: Dictionary = {}
+var smoke_clues: Array[String] = []
+var unlocked_features: Array[String] = []
 var items_received_from_npcs: Array[String] = []
 var collected_forage_today: Array[String] = []
 var business_permits: Array[int] = []
@@ -87,6 +90,9 @@ func start_new_game(new_player_name: String) -> bool:
 	unlocked_recipes.assign(["sup_sayur_bening", "bubur_hangat_hutan"])
 	unlocked_quests.clear()
 	completed_quests.clear()
+	quest_chapters.clear()
+	smoke_clues.clear()
+	unlocked_features.clear()
 	items_received_from_npcs.clear()
 	collected_forage_today.clear()
 	business_permits.clear()
@@ -118,6 +124,15 @@ func earn_coins(amount: int) -> bool:
 		push_error("Earned coins must be a positive amount.")
 		return false
 	coins += amount
+	coins_changed.emit(coins)
+	state_changed.emit()
+	return true
+
+
+func spend_coins(amount: int) -> bool:
+	if amount <= 0 or coins < amount:
+		return false
+	coins -= amount
 	coins_changed.emit(coins)
 	state_changed.emit()
 	return true
@@ -407,6 +422,9 @@ func _create_save_data(player_position: Vector2, scene_path: String) -> Dictiona
 		"item_dihadikan": items_received_from_npcs.duplicate(),
 		"quest_terbuka": unlocked_quests.duplicate(),
 		"quest_selesai": completed_quests.duplicate(),
+		"bab_quest": quest_chapters.duplicate(true),
+		"petunjuk_asap": smoke_clues.duplicate(),
+		"fitur_terbuka": unlocked_features.duplicate(),
 		"npc_ditemui": npc_met.duplicate(true),
 		"forage_terkumpul_hari_ini": collected_forage_today.duplicate(),
 		"hadiah_hari_ini": gifts_given_today.duplicate(true),
@@ -497,6 +515,7 @@ func _is_valid_save_data(data: Dictionary) -> bool:
 		and _is_valid_received_items(data["item_dihadikan"])
 		and _is_valid_unique_string_array(data["quest_terbuka"])
 		and _is_valid_unique_string_array(data["quest_selesai"])
+		and _is_valid_optional_quest_state(data)
 		and _is_valid_npc_boolean_dictionary(data["npc_ditemui"])
 		and _is_valid_unique_string_array(data["forage_terkumpul_hari_ini"])
 		and _is_valid_npc_boolean_dictionary(data["hadiah_hari_ini"])
@@ -505,6 +524,23 @@ func _is_valid_save_data(data: Dictionary) -> bool:
 		and _is_valid_npc_recipe_history(data["riwayat_masakan_npc"])
 		and _is_valid_npc_boolean_dictionary(data["rast_kembali_dari_hutan"])
 	)
+
+
+func _is_valid_optional_quest_state(data: Dictionary) -> bool:
+	# Saves written before 0.2.0 have no quest fields; absent means empty progress.
+	if data.has("bab_quest") and not _is_valid_npc_integer_dictionary(
+		data["bab_quest"], 0, 4
+	):
+		return false
+	if data.has("petunjuk_asap") and not _is_valid_unique_string_array(
+		data["petunjuk_asap"]
+	):
+		return false
+	if data.has("fitur_terbuka") and not _is_valid_unique_string_array(
+		data["fitur_terbuka"]
+	):
+		return false
+	return true
 
 
 func _restore_save_data(data: Dictionary) -> void:
@@ -542,6 +578,13 @@ func _restore_save_data(data: Dictionary) -> void:
 	completed_quests.clear()
 	for quest_id in data["quest_selesai"]:
 		completed_quests.append(str(quest_id))
+	quest_chapters = data.get("bab_quest", {}).duplicate(true)
+	smoke_clues.clear()
+	for clue in data.get("petunjuk_asap", []):
+		smoke_clues.append(str(clue))
+	unlocked_features.clear()
+	for feature_id in data.get("fitur_terbuka", []):
+		unlocked_features.append(str(feature_id))
 	npc_met = data["npc_ditemui"].duplicate(true)
 	collected_forage_today.clear()
 	for spawn_id in data["forage_terkumpul_hari_ini"]:

@@ -280,9 +280,9 @@ func _run_tests() -> void:
 	)
 	if (
 		int(rast_quest_reward.get("heart_level", 0)) != 3
-		or not game_state.unlocked_quests.has("rast_main")
+		or not str(rast_quest_reward.get("pesan", "")).contains("ekspedisi kayu")
 	):
-		push_error("Heart three should mark Rast's deferred main quest as unlocked.")
+		push_error("Heart three should reveal Rast's expedition story reward.")
 		quit(1)
 		return
 

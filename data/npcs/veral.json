@@ -25,8 +25,8 @@
       "isi": "Sejarah kerajaan, hukum perkotaan, dan hubungan desa dengan kerajaan."
     },
     "hati_3": {
-      "tipe": "quest",
-      "isi": "Buka main quest Veral (fitur quest ditunda)."
+      "tipe": "info",
+      "isi": "Veral membuka jalan perdagangan desa dengan kerajaan."
     }
   }
 }

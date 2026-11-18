@@ -26,8 +26,8 @@
       "bahan": ["Beras", "Sayur liar"]
     },
     "hati_3": {
-      "tipe": "quest",
-      "isi": "Buka main quest Rast (fitur quest ditunda)."
+      "tipe": "info",
+      "isi": "Rast memimpin ekspedisi kayu untuk desa dan membuka gudang bahan."
     }
   }
 }

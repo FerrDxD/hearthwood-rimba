@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/QuestSystem.gd" id="1_quest_system"]
+
+[node name="QuestSystem" type="Node"]
+script = ExtResource("1_quest_system")
