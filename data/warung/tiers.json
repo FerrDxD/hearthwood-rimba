@@ -32,6 +32,17 @@
       "maks_porsi": 5,
       "kapasitas_pelanggan": 7,
       "pelanggan": ["casha", "kila"]
+    },
+    {
+      "id": 3,
+      "nama": "Warung Besar",
+      "reputasi": 40,
+      "biaya_koin": 3000,
+      "bahan": { "kayu": 2, "batu": 1 },
+      "alat": "dapur_besar",
+      "maks_porsi": 8,
+      "kapasitas_pelanggan": 8,
+      "pelanggan": ["rast", "veral", "arin"]
     }
   ]
 }

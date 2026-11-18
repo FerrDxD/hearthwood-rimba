@@ -395,19 +395,19 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Warung bisa naik ke tier 4 dengan alat baru, kapasitas 8 porsi, pelanggan quest, dan fitur gudang.
 
 **Tugas:**
-- [ ] `data/warung/tiers.json` tier 4: reputasi 40, 3000 koin + 2 kayu + 1 batu, alat `dapur_besar`, maks porsi 8, kapasitas 8
-- [ ] `GameState.MAX_WARUNG_TIER` menjadi 3 dan validasi save mengikuti
-- [ ] Pelanggan tier 4 memakai NPC quest (Rast/Veral/Arin) dan mendukung dialog izin Veral
-- [ ] Visual bangunan tier 4 dan alat `dapur_besar` di UI memasak
-- [ ] Save v1.0/v0.2.0 dengan tier 0–2 tetap valid
-- [ ] `tests/WarungSystemTest.gd` diperluas untuk tier 4
+- [x] `data/warung/tiers.json` tier 4: reputasi 40, 3000 koin + 2 kayu + 1 batu, alat `dapur_besar`, maks porsi 8, kapasitas 8
+- [x] `GameState.MAX_WARUNG_TIER` menjadi 3 dan validasi save mengikuti
+- [x] Pelanggan tier 4 memakai NPC quest (Rast/Veral/Arin) dan mendukung dialog izin Veral
+- [x] Visual bangunan tier 4 dan alat `dapur_besar` di UI memasak
+- [x] Save v1.0/v0.2.0 dengan tier 0–2 tetap valid
+- [x] `tests/WarungSystemTest.gd` diperluas untuk tier 4
 
 **Dependensi:** Fase 7, Fase 12, Fase 14.
 
 **Definition of Done:**
-- [ ] Upgrade ke tier 4 memakai biaya dan syarat baru
-- [ ] Masak 8 porsi dan layani pelanggan tier 4 bekerja
-- [ ] Tidak ada save lama yang ditolak karena tier
+- [x] Upgrade ke tier 4 memakai biaya dan syarat baru
+- [x] Masak 8 porsi dan layani pelanggan tier 4 bekerja
+- [x] Tidak ada save lama yang ditolak karena tier
 
 ---
 

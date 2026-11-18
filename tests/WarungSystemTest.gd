@@ -312,9 +312,9 @@ func _run_tests() -> void:
 		or not cooking_system.is_recipe_available("hidangan_rempah_khusus")
 		or not warung_system.is_customer_available("casha")
 		or not warung_system.is_customer_available("kila")
-		or bool(warung_system.get_upgrade_preview().get("valid", true))
+		or int(warung_system.get_upgrade_preview().get("tier", {}).get("id", -1)) != 3
 	):
-		push_error("Tier two should unlock its permit, tools, customers, and maximum-tier state.")
+		push_error("Tier two should unlock its permit, tools, and customers while tier three remains open.")
 		quit(1)
 		return
 
@@ -345,6 +345,57 @@ func _run_tests() -> void:
 		or int(warung_system.get_current_tier().get("kapasitas_pelanggan", 0)) != 7
 	):
 		push_error("Tier two should serve at most seven customers per day.")
+		quit(1)
+		return
+
+	# Tier three: Warung Besar.
+	game_state.reputation = 39
+	game_state.coins = 3000
+	game_state.add_item("kayu", 2)
+	game_state.add_item("batu", 1)
+	if bool(warung_system.get_upgrade_preview().get("valid", true)):
+		push_error("Tier three should require forty reputation.")
+		quit(1)
+		return
+	game_state.reputation = 40
+	var tier_three_result := warung_system.upgrade_tier()
+	if (
+		not bool(tier_three_result.get("valid", false))
+		or game_state.warung_tier != 3
+		or not game_state.business_permits.has(3)
+		or game_state.coins != 0
+		or game_state.get_item_count("kayu") != 0
+		or game_state.get_item_count("batu") != 0
+		or cooking_system.get_available_tool_ids() != [
+			"api_unggun",
+			"tungku",
+			"dapur_warteg",
+			"dapur_besar",
+		]
+		or cooking_system.get_max_portions("dapur_besar") != 8
+		or int(warung_system.get_current_tier().get("kapasitas_pelanggan", 0)) != 8
+		or not warung_system.is_customer_available("rast")
+		or not warung_system.is_customer_available("veral")
+		or not warung_system.is_customer_available("arin")
+		or bool(warung_system.get_upgrade_preview().get("valid", true))
+	):
+		push_error("Tier three should unlock dapur besar, eight portions, and quest customers.")
+		quit(1)
+		return
+
+	game_state.add_item("sup_sayur_bening", 1, game_state.current_day, 2)
+	var eighth_order: Dictionary = warung_system.serve_customer(
+		"rast",
+		"sup_sayur_bening",
+		game_state.current_day,
+		2
+	)
+	if (
+		not bool(eighth_order.get("valid", false))
+		or game_state.customers_served_today.size() != 8
+		or warung_system.is_customer_available("veral")
+	):
+		push_error("Tier three should sell eight portions and then close for the day.")
 		quit(1)
 		return
 

@@ -77,8 +77,7 @@ func upgrade_tier() -> Dictionary:
 	return {
 		"valid": true,
 		"tier": int(next_tier["id"]),
-		"pesan": "Izin usaha %s diberikan Veral. Warung menjadi %s; %s (maks. %d porsi), kapasitas %d pelanggan/hari, dan pelanggan baru terbuka." % [
-			"warung kecil" if int(next_tier["id"]) == 1 else "warteg penuh",
+		"pesan": "Izin usaha diberikan Veral. Warung menjadi %s; %s (maks. %d porsi), kapasitas %d pelanggan/hari, dan pelanggan baru terbuka." % [
 			str(next_tier["nama"]),
 			_get_tool_name(str(next_tier["alat"])),
 			int(next_tier["maks_porsi"]),
@@ -196,12 +195,13 @@ func _load_tiers() -> void:
 		return int(first["id"]) < int(second["id"])
 	)
 	if (
-		_tiers.size() != 3
+		_tiers.size() != 4
 		or int(_tiers[0]["id"]) != 0
 		or int(_tiers[1]["id"]) != 1
 		or int(_tiers[2]["id"]) != 2
+		or int(_tiers[3]["id"]) != 3
 	):
-		push_error("Warung tier data must define tiers 0, 1, and 2.")
+		push_error("Warung tier data must define tiers 0, 1, 2, and 3.")
 		_tiers.clear()
 
 
@@ -262,10 +262,14 @@ func _is_valid_tier(tier: Variant) -> bool:
 
 func _get_tool_name(tool_id: String) -> String:
 	match tool_id:
+		"api_unggun":
+			return "api unggun"
 		"tungku":
 			return "tungku"
 		"dapur_warteg":
 			return "dapur warteg"
+		"dapur_besar":
+			return "dapur besar"
 	return "alat masak"
 
 

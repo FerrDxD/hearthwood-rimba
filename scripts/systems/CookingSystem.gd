@@ -233,15 +233,19 @@ func _load_tiers() -> bool:
 		return int(first["id"]) < int(second["id"])
 	)
 	if (
-		_tiers.size() != 3
+		_tiers.size() != 4
 		or int(_tiers[0]["id"]) != 0
 		or int(_tiers[1]["id"]) != 1
 		or int(_tiers[2]["id"]) != 2
+		or int(_tiers[3]["id"]) != 3
 		or str(_tiers[0]["alat"]) == str(_tiers[1]["alat"])
 		or str(_tiers[0]["alat"]) == str(_tiers[2]["alat"])
+		or str(_tiers[0]["alat"]) == str(_tiers[3]["alat"])
 		or str(_tiers[1]["alat"]) == str(_tiers[2]["alat"])
+		or str(_tiers[1]["alat"]) == str(_tiers[3]["alat"])
+		or str(_tiers[2]["alat"]) == str(_tiers[3]["alat"])
 	):
-		push_error("Warung tier data must define tiers 0, 1, and 2.")
+		push_error("Warung tier data must define tiers 0, 1, 2, and 3.")
 		_tiers.clear()
 		return false
 	return true
@@ -340,6 +344,8 @@ func _get_tool_name(tool_id: String) -> String:
 			return "tungku"
 		"dapur_warteg":
 			return "dapur warteg"
+		"dapur_besar":
+			return "dapur besar"
 	return tool_id
 
 

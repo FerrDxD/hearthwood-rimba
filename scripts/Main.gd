@@ -494,7 +494,7 @@ func _interact() -> void:
 			prologue_complete and _warung_system.is_customer_available(nearby_npc.npc_id),
 			prologue_complete
 			and nearby_npc.npc_id == "veral"
-			and get_node("/root/GameState").warung_tier < 2
+			and get_node("/root/GameState").warung_tier < GameState.MAX_WARUNG_TIER
 		)
 		nearby_npc.mark_met()
 	else:

@@ -414,6 +414,8 @@ func _draw_building(building: Rect2, is_warung: bool = false) -> void:
 				wall_color = Color("#cba77b")
 			2:
 				wall_color = Color("#e0c99d")
+			3:
+				wall_color = Color("#f0dcae")
 	draw_rect(
 		Rect2(building.position.x - 7.0, building.position.y - 16.0, building.size.x + 14.0, 30.0),
 		Color("#76513a")
@@ -453,4 +455,13 @@ func _draw_building(building: Rect2, is_warung: bool = false) -> void:
 			draw_rect(
 				Rect2(building.end.x - 29.0, building.position.y + 18.0, 15.0, 15.0),
 				Color("#87ceeb")
+			)
+		if tier >= 3:
+			draw_rect(
+				Rect2(building.position.x - 14.0, building.position.y - 24.0, 34.0, 8.0),
+				Color("#b8860b")
+			)
+			draw_rect(
+				Rect2(building.end.x - 20.0, building.position.y - 24.0, 34.0, 8.0),
+				Color("#b8860b")
 			)

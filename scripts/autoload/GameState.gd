@@ -9,7 +9,7 @@ signal quest_completed(quest_id: String)
 
 const MAX_ENERGY: int = 100
 const STARTING_COINS: int = 100
-const MAX_WARUNG_TIER: int = 2
+const MAX_WARUNG_TIER: int = 3
 const NEW_GAME_START_POSITION: Vector2 = Vector2(210.0, 462.0)
 const ITEM_CATALOG_PATH: String = "res://data/items/items.json"
 const SAVE_FILE_PATH: String = "user://savegame.json"
