@@ -436,18 +436,18 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Menghasilkan build Windows, Web, dan Android non-debug untuk rilis 0.2.0.
 
 **Tugas:**
-- [ ] Perbarui versi project menjadi 0.2.0
-- [ ] Ekspor Windows Desktop, Web, dan Android AAB bertanda tangan non-debug
-- [ ] Uji build Web dan desktop pada mesin bersih; uji save/load rilis
-- [ ] Uji perangkat Android kelas rendah jika perangkat tersedia
-- [ ] Perbarui `RELEASE.md` dengan hasil build, keterbatasan, dan checklist rilis
+- [x] Perbarui versi project menjadi 0.2.0
+- [x] Ekspor Windows Desktop, Web, dan Android AAB bertanda tangan non-debug (dicoba; ketiganya gagal karena export template standar 4.7.2, Java SDK, dan Android SDK belum tersedia — tercatat di `RELEASE.md`)
+- [ ] Uji build Web dan desktop pada mesin bersih; uji save/load rilis (terblokir: belum ada build)
+- [ ] Uji perangkat Android kelas rendah jika perangkat tersedia (terblokir: tidak ada perangkat/adb)
+- [x] Perbarui `RELEASE.md` dengan hasil build, keterbatasan, dan checklist rilis
 
-**Dependensi:** Fase 12–16, prasyarat ekspor di `RELEASE.md`.
+**Dependensi:** Fase 12-16, prasyarat ekspor di `RELEASE.md`.
 
 **Definition of Done:**
-- [ ] Ketiga target build dihasilkan atau blocker dicatat eksplisit di `RELEASE.md`
-- [ ] Build yang dihasilkan bisa dimainkan dan memuat save
-- [ ] Versi project dan dokumentasi rilis sesuai 0.2.0
+- [x] Ketiga target build dihasilkan atau blocker dicatat eksplisit di `RELEASE.md`
+- [ ] Build yang dihasilkan bisa dimainkan dan memuat save (belum ada build; QA save/load otomatis 14/14 lulus)
+- [x] Versi project dan dokumentasi rilis sesuai 0.2.0
 
 ---
 
