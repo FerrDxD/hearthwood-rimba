@@ -2,12 +2,14 @@ extends Node2D
 class_name HearthwoodItemPickup
 
 var item_id: String = ""
+var spawn_id: String = ""
 var _display_name: String = ""
 var _item_color: Color = Color("#74a653")
 
 
-func configure(pickup_item_id: String, spawn_position: Vector2) -> void:
+func configure(pickup_item_id: String, spawn_position: Vector2, pickup_spawn_id: String) -> void:
 	item_id = pickup_item_id
+	spawn_id = pickup_spawn_id
 	position = spawn_position
 
 

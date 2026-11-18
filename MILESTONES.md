@@ -220,19 +220,21 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Pemain dapat menyimpan dan memuat game. Auto-save saat tidur, naik tier, selesai quest. Manual save di menu pause/main menu.
 
 **Tugas:**
-- [ ] Buat `SaveSystem.gd` (baca/tulis JSON via `FileAccess`, file `user://savegame.json`)
-- [ ] Implementasi struktur data save sesuai PRD bagian 10.1 (nama_pemain, hari, jam, energi, reputasi, posisi, inventori, resep_terbuka, hati_npc, tier_warung, item_dihadikan)
-- [ ] Auto-save: tidur (hari berganti), naik tier warung, selesai quest
-- [ ] Manual save: menu pause + main menu
-- [ ] Load dari main menu (Continue) atau opsi load game
-- [ ] `GameState` sebagai titik masuk load/save
+- [x] Buat `SaveSystem.gd` (baca/tulis JSON via `FileAccess`, file `user://savegame.json`)
+- [x] Implementasi struktur data save sesuai PRD bagian 10.1 (nama_pemain, hari, jam, energi, reputasi, posisi, inventori, resep_terbuka, hati_npc, tier_warung, item_dihadikan)
+- [x] Auto-save: tidur (hari berganti), naik tier warung, selesai quest
+- [x] Manual save: menu pause
+- [x] Lanjutkan save yang ada otomatis saat startup dan sediakan load manual di menu pause
+- [x] `GameState` sebagai titik masuk load/save
+
+**Catatan implementasi:** Proyek belum memiliki main menu. Karena itu, save slot dimuat otomatis saat game mulai; simpan dan muat manual tersedia di menu jeda. Save yang rusak atau berasal dari scene berbeda ditolak tanpa menerapkan sebagian state.
 
 **Dependensi:** Fase 0–7 (semua state yang perlu disimpan harus sudah ada).
 
 **Definition of Done:**
-- Game dapat disimpan dan dimuat ulang tanpa data hilang
-- Auto-save berfungsi saat tidur
-- Load ulang memulihkan hari, jam, energi, inventori, hati NPC, dan tier warung
+- [x] Game dapat disimpan dan dimuat ulang tanpa data hilang
+- [x] Auto-save berfungsi saat tidur, naik tier, dan menyelesaikan quest
+- [x] Load ulang memulihkan hari, jam, energi, inventori, hati NPC, tier warung, posisi, dan state dunia
 
 ---
 

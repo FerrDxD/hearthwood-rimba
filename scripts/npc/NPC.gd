@@ -21,7 +21,6 @@ var _move_timer: float = 0.0
 var _current_segment: int = -2
 var _is_available: bool = false
 var _is_on_screen: bool = false
-var _has_met: bool = false
 
 
 func configure_named(id: String, data_path: String, schedule_segments: Array) -> void:
@@ -109,12 +108,16 @@ func get_npc_data() -> Dictionary:
 
 func get_dialogue() -> String:
 	var dialog: Dictionary = _npc_data.get("dialog", {})
-	var dialogue_key := "dialog_2" if _has_met else "dialog_1"
+	var has_met: bool = get_node("/root/GameState").npc_met.get(npc_id, false)
+	var dialogue_key := "dialog_2" if has_met else "dialog_1"
 	return str(dialog.get(dialogue_key, ""))
 
 
 func mark_met() -> void:
-	_has_met = true
+	var game_state = get_node("/root/GameState")
+	if not bool(game_state.npc_met.get(npc_id, false)):
+		game_state.npc_met[npc_id] = true
+		game_state.state_changed.emit()
 
 
 func can_interact() -> bool:

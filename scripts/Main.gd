@@ -11,6 +11,7 @@ const AFFECTION_SYSTEM_SCENE: PackedScene = preload("res://scenes/AffectionSyste
 const GIFT_UI_SCENE: PackedScene = preload("res://scenes/GiftUI.tscn")
 const WARUNG_SYSTEM_SCENE: PackedScene = preload("res://scenes/WarungSystem.tscn")
 const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
+const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const PLAYER_START: Vector2 = Vector2(210.0, 432.0)
 
 var _world: HearthwoodWorld
@@ -29,15 +30,25 @@ var _affection_system: HearthwoodAffectionSystem
 var _gift_ui: HearthwoodGiftUI
 var _warung_system: HearthwoodWarungSystem
 var _warung_ui: HearthwoodWarungUI
+var _pause_menu: HearthwoodPauseMenu
 var _current_shopkeeper: HearthwoodShopNPC
 
 
 func _ready() -> void:
+	var game_state = get_node("/root/GameState")
+	var scene_path := get_tree().current_scene.scene_file_path
+	var saved_game: Dictionary = game_state.load_game(game_state.SAVE_FILE_PATH, scene_path)
+	var player_start := PLAYER_START
+	if bool(saved_game.get("valid", false)):
+		player_start = saved_game["posisi"]
+	elif bool(saved_game.get("exists", false)):
+		push_error("Existing save could not be loaded: %s" % str(saved_game.get("pesan", "")))
+
 	_world = WORLD_SCENE.instantiate()
 	add_child(_world)
 
 	_player = PLAYER_SCENE.instantiate()
-	_player.position = PLAYER_START
+	_player.position = player_start
 	add_child(_player)
 
 	var camera: Camera2D = _player.get_node("camera2d")
@@ -76,12 +87,22 @@ func _ready() -> void:
 	_warung_ui = WARUNG_UI_SCENE.instantiate()
 	_warung_ui.set_warung_system(_warung_system)
 	add_child(_warung_ui)
+	_pause_menu = PAUSE_MENU_SCENE.instantiate()
+	add_child(_pause_menu)
+	_pause_menu.save_requested.connect(_on_manual_save_requested)
+	_pause_menu.load_requested.connect(_on_manual_load_requested)
 	_connect_signals()
 	_update_hud()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("interact") and not (event is InputEventKey and event.is_echo()):
+	if event.is_action_pressed("ui_cancel") and not (
+		event is InputEventKey and event.is_echo()
+	):
+		_open_pause_menu()
+	elif event.is_action_pressed("interact") and not (
+		event is InputEventKey and event.is_echo()
+	):
 		_interact()
 	elif event.is_action_pressed("inventory") and not (event is InputEventKey and event.is_echo()):
 		_toggle_inventory()
@@ -94,6 +115,7 @@ func _process(_delta: float) -> void:
 		or _cooking_ui.is_open()
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
+		or _pause_menu.is_open()
 	):
 		return
 
@@ -125,8 +147,10 @@ func _connect_signals() -> void:
 	var time_system = get_node("/root/TimeSystem")
 	game_state.energy_changed.connect(_update_energy)
 	game_state.coins_changed.connect(_update_coins)
+	game_state.warung_upgraded.connect(_on_warung_upgraded)
+	game_state.quest_completed.connect(_on_quest_completed)
 	time_system.hour_changed.connect(_update_hud)
-	time_system.day_changed.connect(_update_hud)
+	time_system.day_changed.connect(_on_day_changed)
 	time_system.minute_changed.connect(_on_minute_changed)
 
 
@@ -165,6 +189,18 @@ func _create_hud() -> void:
 	_hint_label.add_theme_font_size_override("font_size", 15)
 	interface.add_child(_hint_label)
 
+	var pause_button := Button.new()
+	pause_button.text = "Menu"
+	pause_button.anchor_left = 1.0
+	pause_button.anchor_right = 1.0
+	pause_button.offset_left = -84.0
+	pause_button.offset_top = 16.0
+	pause_button.offset_right = -16.0
+	pause_button.offset_bottom = 68.0
+	pause_button.custom_minimum_size = Vector2(68.0, 52.0)
+	pause_button.pressed.connect(_open_pause_menu)
+	interface.add_child(pause_button)
+
 	var controls := TouchControls.new()
 	controls.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	interface.add_child(controls)
@@ -196,6 +232,73 @@ func _update_coins(value: int) -> void:
 
 func _on_minute_changed(_day: int, _hour: int, _minute: int) -> void:
 	_update_hud()
+
+
+func _on_day_changed(_day: int) -> void:
+	_update_hud()
+	_auto_save()
+
+
+func _on_warung_upgraded(_new_tier: int) -> void:
+	_auto_save()
+
+
+func _on_quest_completed(_quest_id: String) -> void:
+	_auto_save()
+
+
+func _auto_save() -> void:
+	var result := _save_current_game()
+	if not bool(result.get("valid", false)):
+		push_error("Automatic save failed: %s" % str(result.get("pesan", "")))
+
+
+func _save_current_game() -> Dictionary:
+	var current_scene := get_tree().current_scene
+	if current_scene == null or not is_instance_valid(_player):
+		push_error("Cannot save without an active scene and player.")
+		return {"valid": false, "pesan": "Lokasi pemain tidak tersedia."}
+	return get_node("/root/GameState").save_game(
+		_player.global_position,
+		current_scene.scene_file_path
+	)
+
+
+func _on_manual_save_requested() -> void:
+	var result := _save_current_game()
+	_pause_menu.show_status(str(result.get("pesan", "Save tidak dapat dilakukan.")))
+
+
+func _on_manual_load_requested() -> void:
+	var current_scene := get_tree().current_scene
+	if current_scene == null:
+		_pause_menu.show_status("Scene aktif tidak tersedia.")
+		return
+	var result: Dictionary = get_node("/root/GameState").load_game(
+		get_node("/root/GameState").SAVE_FILE_PATH,
+		current_scene.scene_file_path
+	)
+	if not bool(result.get("valid", false)):
+		_pause_menu.show_status(str(result.get("pesan", "Game tidak dapat dimuat.")))
+		return
+	_player.global_position = result["posisi"]
+	get_node("/root/TimeSystem").sync_from_game_state()
+	_update_hud()
+	_pause_menu.show_status(str(result.get("pesan", "Game berhasil dimuat.")))
+
+
+func _open_pause_menu() -> void:
+	if (
+		_pause_menu.is_open()
+		or _dialog_ui.is_open()
+		or _shop_ui.is_open()
+		or _inventory_ui.is_open()
+		or _cooking_ui.is_open()
+		or _gift_ui.is_open()
+		or _warung_ui.is_open()
+	):
+		return
+	_pause_menu.open_menu()
 
 
 func _on_shop_talk_requested(shop_id: String) -> void:
@@ -244,6 +347,7 @@ func _toggle_inventory() -> void:
 		or _cooking_ui.is_open()
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
+		or _pause_menu.is_open()
 	):
 		return
 	_inventory_ui.toggle_inventory()
@@ -257,6 +361,7 @@ func _interact() -> void:
 		or _cooking_ui.is_open()
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
+		or _pause_menu.is_open()
 	):
 		return
 

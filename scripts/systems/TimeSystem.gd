@@ -45,6 +45,18 @@ func sleep() -> void:
 	)
 
 
+func sync_from_game_state() -> void:
+	var game_state = get_node("/root/GameState")
+	_elapsed_seconds = 0.0
+	day_changed.emit(game_state.current_day)
+	hour_changed.emit(game_state.current_hour % 24, game_state.current_minute)
+	minute_changed.emit(
+		game_state.current_day,
+		game_state.current_hour % 24,
+		game_state.current_minute
+	)
+
+
 func _advance_minute() -> void:
 	var game_state = get_node("/root/GameState")
 	game_state.current_minute += 1
