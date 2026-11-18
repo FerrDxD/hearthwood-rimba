@@ -416,18 +416,18 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 **Tujuan:** Pemain dapat membuka quest log untuk melihat progres hati, objective, hadiah berikutnya, dan clue misteri asap.
 
 **Tugas:**
-- [ ] `QuestUI.gd` + `QuestUI.tscn`: daftar quest Rast/Veral, hati, status bab, objective, hadiah berikutnya
-- [ ] Daftar clue misteri asap yang sudah terkumpul
-- [ ] Tombol `Quest` di HUD dan tombol `J` untuk membuka/menutup
-- [ ] UI menjadi modal: menahan input dunia selama terbuka
-- [ ] Tombol memenuhi minimum 44×44 dan tes `UITouchTargetTest.gd` diperluas
+- [x] `QuestUI.gd` + `QuestUI.tscn`: daftar quest Rast/Veral, hati, status bab, objective, hadiah berikutnya
+- [x] Daftar clue misteri asap yang sudah terkumpul
+- [x] Tombol `Quest` di HUD dan tombol `J` untuk membuka/menutup
+- [x] UI menjadi modal: menahan input dunia selama terbuka
+- [x] Tombol memenuhi minimum 44×44 dan tes `UITouchTargetTest.gd` diperluas
 
 **Dependensi:** Fase 12, Fase 16 memakai `QuestSystem`.
 
 **Definition of Done:**
-- [ ] Quest log menampilkan semua progres quest tanpa crash saat data kosong
-- [ ] Clue hanya tampil jika sudah terkumpul
-- [ ] Membuka quest log menahan input dan tombolnya layak disentuh
+- [x] Quest log menampilkan semua progres quest tanpa crash saat data kosong
+- [x] Clue hanya tampil jika sudah terkumpul
+- [x] Membuka quest log menahan input dan tombolnya layak disentuh
 
 ---
 

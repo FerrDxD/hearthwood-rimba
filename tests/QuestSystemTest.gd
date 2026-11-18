@@ -1,6 +1,7 @@
 extends SceneTree
 
 const QUEST_SYSTEM_SCENE: PackedScene = preload("res://scenes/QuestSystem.tscn")
+const QUEST_UI_SCENE: PackedScene = preload("res://scenes/QuestUI.tscn")
 const MAIN_SCENE_PATH: String = "res://scenes/Main.tscn"
 const TEST_SAVE_PATH: String = "user://phase12-quest-test.json"
 const PROLOGUE_STEPS: Array[String] = [
@@ -142,6 +143,28 @@ func _run_tests() -> void:
 		quit(1)
 		return
 
+	# Quest log shows chapters, rewards, and collected smoke clues.
+	var quest_ui := QUEST_UI_SCENE.instantiate() as HearthwoodQuestUI
+	root.add_child(quest_ui)
+	await process_frame
+	quest_ui.set_quest_system(quest_system)
+	quest_ui.open_quests()
+	await process_frame
+	if (
+		not quest_ui.is_open()
+		or not _contains_text(quest_ui, "Rast")
+		or not _contains_text(quest_ui, "Veral")
+		or not _contains_text(quest_ui, "Selesai")
+		or not _contains_text(quest_ui, "Petunjuk Misteri Asap")
+		or not _contains_text(quest_ui, "tulang kayu")
+	):
+		push_error("The quest log should list both quests and every collected smoke clue.")
+		quit(1)
+		return
+	quest_ui.close_quests()
+	quest_ui.queue_free()
+	await process_frame
+
 	# Quest state survives a save/load round trip.
 	var save_result: Dictionary = game_state.save_game(
 		Vector2(210.0, 462.0),
@@ -229,6 +252,19 @@ func _run_tests() -> void:
 		return
 	dialog_ui.close_dialog()
 
+	var quest_ui_main := main.get("_quest_ui") as HearthwoodQuestUI
+	if quest_ui_main == null:
+		push_error("The main scene should expose its quest log UI.")
+		quit(1)
+		return
+	quest_ui_main.open_quests()
+	main.call("_interact")
+	if dialog_ui.is_open():
+		push_error("An open quest log should hold world interaction.")
+		quit(1)
+		return
+	quest_ui_main.close_quests()
+
 	main.queue_free()
 	await process_frame
 	await create_timer(0.5).timeout
@@ -276,6 +312,20 @@ func _find_npc(world: HearthwoodWorld, npc_id: String) -> HearthwoodNPC:
 func _dialog_contains(dialog_ui: HearthwoodDialogUI, text: String) -> bool:
 	var dialogue_label := dialog_ui.get("_dialogue_label") as Label
 	return dialogue_label != null and dialogue_label.text.to_lower().contains(text.to_lower())
+
+
+func _contains_text(parent: Node, text: String) -> bool:
+	var needle := text.to_lower()
+	for child in parent.get_children():
+		if child is Label and (child as Label).text.to_lower().contains(needle):
+			return true
+		if child is Button and (child as Button).text.to_lower().contains(needle):
+			return true
+		if child is RichTextLabel and (child as RichTextLabel).text.to_lower().contains(needle):
+			return true
+		if _contains_text(child, text):
+			return true
+	return false
 
 
 func _read_json(path: String) -> Dictionary:

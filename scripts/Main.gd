@@ -11,6 +11,7 @@ const AFFECTION_SYSTEM_SCENE: PackedScene = preload("res://scenes/AffectionSyste
 const GIFT_UI_SCENE: PackedScene = preload("res://scenes/GiftUI.tscn")
 const WARUNG_SYSTEM_SCENE: PackedScene = preload("res://scenes/WarungSystem.tscn")
 const QUEST_SYSTEM_SCENE: PackedScene = preload("res://scenes/QuestSystem.tscn")
+const QUEST_UI_SCENE: PackedScene = preload("res://scenes/QuestUI.tscn")
 const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
 const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
@@ -50,6 +51,7 @@ var _gift_ui: HearthwoodGiftUI
 var _warung_system: HearthwoodWarungSystem
 var _warung_ui: HearthwoodWarungUI
 var _quest_system: HearthwoodQuestSystem
+var _quest_ui: HearthwoodQuestUI
 var _pause_menu: HearthwoodPauseMenu
 var _audio_director: HearthwoodAudioDirector
 var _current_shopkeeper: HearthwoodShopNPC
@@ -104,6 +106,9 @@ func _ready() -> void:
 	add_child(_warung_system)
 	_quest_system = QUEST_SYSTEM_SCENE.instantiate()
 	add_child(_quest_system)
+	_quest_ui = QUEST_UI_SCENE.instantiate()
+	_quest_ui.set_quest_system(_quest_system)
+	add_child(_quest_ui)
 	_cooking_ui = COOKING_UI_SCENE.instantiate()
 	add_child(_cooking_ui)
 	_cooking_ui.set_cooking_system(_cooking_system)
@@ -134,6 +139,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_interact()
 	elif event.is_action_pressed("inventory") and not (event is InputEventKey and event.is_echo()):
 		_toggle_inventory()
+	elif event.is_action_pressed("quest") and not (event is InputEventKey and event.is_echo()):
+		_toggle_quests()
 
 
 func _process(delta: float) -> void:
@@ -153,6 +160,7 @@ func _process(delta: float) -> void:
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
 		or _pause_menu.is_open()
+		or _quest_ui.is_open()
 	):
 		return
 
@@ -244,6 +252,18 @@ func _create_hud() -> void:
 	pause_button.custom_minimum_size = Vector2(68.0, 52.0)
 	pause_button.pressed.connect(_open_pause_menu)
 	interface.add_child(pause_button)
+
+	var quest_button := Button.new()
+	quest_button.text = "Quest"
+	quest_button.anchor_left = 1.0
+	quest_button.anchor_right = 1.0
+	quest_button.offset_left = -92.0
+	quest_button.offset_top = 76.0
+	quest_button.offset_right = -16.0
+	quest_button.offset_bottom = 128.0
+	quest_button.custom_minimum_size = Vector2(76.0, 52.0)
+	quest_button.pressed.connect(_toggle_quests)
+	interface.add_child(quest_button)
 
 	var controls := TouchControls.new()
 	controls.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -392,6 +412,7 @@ func _open_pause_menu() -> void:
 		or _cooking_ui.is_open()
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
+		or _quest_ui.is_open()
 	):
 		return
 	_pause_menu.open_menu()
@@ -450,9 +471,24 @@ func _toggle_inventory() -> void:
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
 		or _pause_menu.is_open()
+		or _quest_ui.is_open()
 	):
 		return
 	_inventory_ui.toggle_inventory()
+
+
+func _toggle_quests() -> void:
+	if (
+		_dialog_ui.is_open()
+		or _shop_ui.is_open()
+		or _inventory_ui.is_open()
+		or _cooking_ui.is_open()
+		or _gift_ui.is_open()
+		or _warung_ui.is_open()
+		or _pause_menu.is_open()
+	):
+		return
+	_quest_ui.toggle_quests()
 
 
 func _interact() -> void:
@@ -464,6 +500,7 @@ func _interact() -> void:
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
 		or _pause_menu.is_open()
+		or _quest_ui.is_open()
 	):
 		return
 	_audio_director.play_sfx("interact")

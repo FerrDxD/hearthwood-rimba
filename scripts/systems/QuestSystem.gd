@@ -50,6 +50,51 @@ func get_objective(npc_id: String) -> String:
 	return str(get_chapter(npc_id).get("objective", ""))
 
 
+func get_quest_name(npc_id: String) -> String:
+	var quest: Variant = _quests.get(npc_id, {})
+	if typeof(quest) != TYPE_DICTIONARY:
+		return str(npc_id).capitalize()
+	return str(quest.get("nama", str(npc_id).capitalize()))
+
+
+func get_quest_summary(npc_id: String) -> Dictionary:
+	var game_state = get_node("/root/GameState")
+	var chapter := get_chapter(npc_id)
+	return {
+		"id": npc_id,
+		"nama": get_quest_name(npc_id),
+		"hati": game_state.get_npc_heart_level(npc_id),
+		"chapter_index": get_chapter_index(npc_id),
+		"total_chapter": CHAPTER_COUNT,
+		"selesai": chapter.is_empty(),
+		"judul": str(chapter.get("judul", "")),
+		"objective": str(chapter.get("objective", "")),
+		"kebutuhan": get_requirement_text(npc_id),
+		"hadiah": get_reward_text(npc_id),
+	}
+
+
+func get_reward_text(npc_id: String) -> String:
+	var chapter := get_chapter(npc_id)
+	if chapter.is_empty():
+		return ""
+	var rewards: Dictionary = chapter.get("hadiah", {})
+	var parts := PackedStringArray()
+	if int(rewards.get("koin", 0)) > 0:
+		parts.append("%d koin" % int(rewards["koin"]))
+	if int(rewards.get("reputasi", 0)) > 0:
+		parts.append("reputasi +%d" % int(rewards["reputasi"]))
+	if rewards.has("item"):
+		var item_id := str(rewards["item"])
+		var item_name := str(
+			get_node("/root/GameState").get_item_definition(item_id).get("nama", item_id)
+		)
+		parts.append(item_name)
+	if rewards.has("fitur"):
+		parts.append("fitur %s" % str(rewards["fitur"]).replace("_", " "))
+	return ", ".join(parts)
+
+
 func get_requirement_text(npc_id: String) -> String:
 	var chapter := get_chapter(npc_id)
 	if chapter.is_empty():

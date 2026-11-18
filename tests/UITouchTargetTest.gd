@@ -8,6 +8,7 @@ const UI_SCENE_PATHS: Array[String] = [
 	"res://scenes/GiftUI.tscn",
 	"res://scenes/WarungUI.tscn",
 	"res://scenes/PauseMenu.tscn",
+	"res://scenes/QuestUI.tscn",
 ]
 
 var _ui_scenes: Array[Node] = []
@@ -55,6 +56,16 @@ func _run_tests() -> void:
 		quit(1)
 		return
 	dialog_ui.open_dialog("Rast", "Penebang kayu", "Ayo kita berbincang.")
+	var quest_ui := root.find_child("QuestUI", true, false) as HearthwoodQuestUI
+	if quest_ui == null:
+		push_error("Could not open the quest UI touch-target fixture.")
+		quit(1)
+		return
+	quest_ui.open_quests()
+	if not quest_ui.is_open():
+		push_error("The quest UI should open without quest data.")
+		quit(1)
+		return
 
 	var button_count := 0
 	for ui_scene in _ui_scenes:
