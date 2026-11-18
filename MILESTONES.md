@@ -1,4 +1,4 @@
-# MILESTONE.md — Urutan Pengerjaan Hearthwood: Warung Rimba (v1.0)
+# MILESTONE.md — Urutan Pengerjaan Hearthwood: Warung Rimba (v1.0 + 0.2.0)
 
 Dokumen ini adalah **peta jalan kerja (work sequence)** untuk mengembangkan versi awal (MVP) agar tidak melompat-lompat antar fitur. Semua keputusan didasarkan pada **PRD**, **ARCHITECT.md**, **DESIGN.md**, dan **AGENTS.md**.
 
@@ -13,10 +13,11 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 3. **Data-driven dari awal.** Dialog, NPC, resep, selera, dan simpan/muat disimpan sebagai JSON/Resource, bukan hardcode di skrip.
 4. **Setiap fase harus lulus checklist "Definition of Done" sebelum melanjutkan.**
 5. **Scope v1.0 = alur hutan → desa → izin tinggal → membangun warung.** Main quest Rast/Veral dan misteri asap ditunda.
+6. **Scope 0.2.0 = ekspansi quest, konten, dan sistem.** Melanjutkan dari fondasi v1.0 dengan main quest Rast/Veral hati 0-3, konten baru, dan penyelesaian build target.
 
 ---
 
-## Ringkasan 11 Fase
+## Ringkasan 11 Fase v1.0 + 10 Fase 0.2.0
 
 | Fase | Fokus | Dependensi |
 |------|-------|------------|
@@ -32,6 +33,17 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 | 9 | UI/UX & Aset | Fase 1–8 |
 | 10 | Alur Game Utama (Hutan → Desa → Izin Tinggal) | Fase 1–9 |
 | 11 | Polish, QA, Build & Rilis | Fase 0–10 |
+
+### 0.2.0 Expansion Phases (Baru setelah v1.0 selesai)
+
+| Fase | Fokus | Dependensi |
+|------|-------|------------|
+| 12 | Main Quest Rast & Veral (hati 0-3) | Fase 6 (Afeksi), Fase 7 (Warung) |
+| 13 | NPC Baru & Data JSON | Fase 2 (NPC scene) |
+| 14 | Resep Masakan Baru & Sistem Cuaca | Fase 5 (CookingSystem) |
+| 15 | Tier 4 Warung "Warung Besar" | Fase 7 (Progresi Warung) |
+| 16 | Quest Tracker & Quest Log UI | Fase 9 (UI/UX) |
+| 17 | Build Target & Release Completion (0.2.0) | Fase 11 (Polish) |
 
 ---
 
@@ -307,8 +319,135 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 - [ ] Game dapat di-build dan dijalankan di Android
 - [x] Tidak ada crash pada alur v1.0 yang tercakup tes otomatis
 - [ ] Siap dirilis setelah ekspor dan uji perangkat fisik lulus
+- [x] Semua state v1.0 tersimpan kompatibel (save/load, quest tracking, warung tier)
+- [x] Fondasi siap untuk fase 0.2.0 (waktu, NPC, cooking, affection, warung, save/load)
 
-**Status:** QA otomatis lulus, tetapi Fase 11 belum selesai dan game belum siap dirilis. Build target dan uji perangkat Android harus diulang setelah prasyarat di `RELEASE.md` tersedia.
+**Status:** QA otomatis lulus, Fase 11 v1.0 selesai. Fondasi v1.0 lengkap dan siap untuk ekspansi 0.2.0.
+
+---
+
+## Fase 12 — Main Quest Rast & Veral (hati 0–3)
+
+**Tujuan:** Main quest dua tokoh utama berjalan dari hati 0 sampai hati 3, dengan objective yang terlihat, penyerahan bahan, hadiah, dan clue misteri asap.
+
+**Tugas:**
+- [ ] `data/story/quests.json`: 4 bab per NPC (hati 0–3) berisi objective, dialog aktif, kebutuhan item/koin, dialog selesai, hadiah, dan petunjuk asap
+- [ ] `QuestSystem.gd`: memuat data, gerbang hati, validasi kebutuhan, penyerahan hadiah, dan penandaan quest selesai lewat `GameState.complete_quest`
+- [ ] State baru `bab_quest`, `petunjuk_asap`, `fitur_terbuka` disimpan di save dan kompatibel dengan save v1.0
+- [ ] HUD menampilkan objective warung dan objective quest Rast/Veral yang sedang berjalan
+- [ ] Interaksi Rast/Veral memakai dialog bab aktif dan menyerahkan bahan saat syarat terpenuhi; tombol layani/izin warung tetap berfungsi
+- [ ] Hadiah bab: koin, reputasi, alat pertahanan, fitur baru, dan 3 clue misteri asap
+- [ ] `tests/QuestSystemTest.gd`: gerbang hati, kebutuhan, hadiah, clue, integrasi dialog, dan round-trip save
+
+**Dependensi:** Fase 6, Fase 7, Fase 10.
+
+**Definition of Done:**
+- [ ] Rast dan Veral masing-masing punya 4 bab yang hanya bisa diserahkan pada hati yang sesuai
+- [ ] Penyerahan memakai bahan/koin, memberi hadiah, dan tidak bisa diulang
+- [ ] Tiga clue misteri asap terkumpul dari bab yang ditentukan
+- [ ] Save/load mempertahankan progres bab, clue, dan fitur terbuka
+
+---
+
+## Fase 13 — NPC Baru & Data JSON
+
+**Tujuan:** Empat NPC baru (Arin, Budi, Siti, Pak Udin) hidup di jadwalnya, punya dialog data-driven, dan bisa diberi masakan.
+
+**Tugas:**
+- [ ] `data/npcs/arin.json`, `budi.json`, `siti.json`, `pak_udin.json` dengan skema NPC yang sama (2 dialog, selera, hadiah hati 1–3)
+- [ ] `palet.aksesori` baru didukung `CharacterVisual.gd` (tangkong, tas, jaring, pipa)
+- [ ] Jadwal keempat NPC di `data/schedules.json` sesuai PRD bagian 6.2
+- [ ] NPC baru masuk daftar NPC bernama dunia dan bisa menerima hadiah/afeksi
+- [ ] `tests/NPCSystemTest.gd` diperluas untuk memuat, menjadwalkan, dan memberi hadiah ke NPC baru
+
+**Dependensi:** Fase 2, Fase 12.
+
+**Definition of Done:**
+- [ ] Keempat NPC muncul sesuai jam dan lokasi masing-masing
+- [ ] Dialog dan selera dimuat dari JSON tanpa hardcode
+- [ ] Pemberian masakan ke NPC baru memakai aturan afeksi yang sama
+
+---
+
+## Fase 14 — Resep Masakan Baru & Sistem Cuaca
+
+**Tujuan:** Enam resep baru terhubung ke bahan/quest, dan cuaca harian sederhana memengaruhi masakan serta respons NPC.
+
+**Tugas:**
+- [ ] Item dan 6 resep baru di `data/recipes/` sesuai PRD bagian 5.2 (Sup Kaldu Kayu, Nasi Kuning Rempah, Kue Coklat, Ikan Goreng Tegal, Sayur Tumis Pedas, Bubur Ayam Hutan)
+- [ ] Pembuka resep: quest Rast/Veral dan pembelian Giral; tidak ada resep yang mustahil terbuka
+- [ ] Cuaca harian Cerah/Hujan/Badai di `GameState` (berubah saat tidur, deterministik dari hari)
+- [ ] Pengaruh cuaca: pertumbuhan ulang bahan, zona mini-game, respons NPC, dan jam buka toko
+- [ ] Ikon cuaca di HUD dan data ramalan tidak termasuk (non-goal)
+- [ ] `tests/WeatherSystemTest.gd` dan perluasan `CookingSystemTest.gd`
+
+**Dependensi:** Fase 5, Fase 12.
+
+**Definition of Done:**
+- [ ] Enam resep bisa dibuka, dimasak, dan disukai NPC yang ditentukan
+- [ ] Cuaca berubah tiap hari dan hanya memberi efek yang tercantum di PRD
+- [ ] Save/load menyimpan cuaca hari itu
+
+---
+
+## Fase 15 — Tier 4 Warung "Warung Besar"
+
+**Tujuan:** Warung bisa naik ke tier 4 dengan alat baru, kapasitas 8 porsi, pelanggan quest, dan fitur gudang.
+
+**Tugas:**
+- [ ] `data/warung/tiers.json` tier 4: reputasi 40, 3000 koin + 2 kayu + 1 batu, alat `dapur_besar`, maks porsi 8, kapasitas 8
+- [ ] `GameState.MAX_WARUNG_TIER` menjadi 3 dan validasi save mengikuti
+- [ ] Pelanggan tier 4 memakai NPC quest (Rast/Veral/Arin) dan mendukung dialog izin Veral
+- [ ] Visual bangunan tier 4 dan alat `dapur_besar` di UI memasak
+- [ ] Save v1.0/v0.2.0 dengan tier 0–2 tetap valid
+- [ ] `tests/WarungSystemTest.gd` diperluas untuk tier 4
+
+**Dependensi:** Fase 7, Fase 12, Fase 14.
+
+**Definition of Done:**
+- [ ] Upgrade ke tier 4 memakai biaya dan syarat baru
+- [ ] Masak 8 porsi dan layani pelanggan tier 4 bekerja
+- [ ] Tidak ada save lama yang ditolak karena tier
+
+---
+
+## Fase 16 — Quest Tracker & Quest Log UI
+
+**Tujuan:** Pemain dapat membuka quest log untuk melihat progres hati, objective, hadiah berikutnya, dan clue misteri asap.
+
+**Tugas:**
+- [ ] `QuestUI.gd` + `QuestUI.tscn`: daftar quest Rast/Veral, hati, status bab, objective, hadiah berikutnya
+- [ ] Daftar clue misteri asap yang sudah terkumpul
+- [ ] Tombol `Quest` di HUD dan tombol `J` untuk membuka/menutup
+- [ ] UI menjadi modal: menahan input dunia selama terbuka
+- [ ] Tombol memenuhi minimum 44×44 dan tes `UITouchTargetTest.gd` diperluas
+
+**Dependensi:** Fase 12, Fase 16 memakai `QuestSystem`.
+
+**Definition of Done:**
+- [ ] Quest log menampilkan semua progres quest tanpa crash saat data kosong
+- [ ] Clue hanya tampil jika sudah terkumpul
+- [ ] Membuka quest log menahan input dan tombolnya layak disentuh
+
+---
+
+## Fase 17 — Build Target & Release Completion (0.2.0)
+
+**Tujuan:** Menghasilkan build Windows, Web, dan Android non-debug untuk rilis 0.2.0.
+
+**Tugas:**
+- [ ] Perbarui versi project menjadi 0.2.0
+- [ ] Ekspor Windows Desktop, Web, dan Android AAB bertanda tangan non-debug
+- [ ] Uji build Web dan desktop pada mesin bersih; uji save/load rilis
+- [ ] Uji perangkat Android kelas rendah jika perangkat tersedia
+- [ ] Perbarui `RELEASE.md` dengan hasil build, keterbatasan, dan checklist rilis
+
+**Dependensi:** Fase 12–16, prasyarat ekspor di `RELEASE.md`.
+
+**Definition of Done:**
+- [ ] Ketiga target build dihasilkan atau blocker dicatat eksplisit di `RELEASE.md`
+- [ ] Build yang dihasilkan bisa dimainkan dan memuat save
+- [ ] Versi project dan dokumentasi rilis sesuai 0.2.0
 
 ---
 
@@ -333,7 +472,19 @@ Fase 3 (Toko Pedagang)     Fase 5 (Memasak)
                             ↓
                       Fase 10 (Alur Game Utama)
                             ↓
-                      Fase 11 (Polish, QA, Build & Rilis)
+                      Fase 11 (Polish, QA, Build & Rilis v1.0)
+                            ↓
+                      Fase 12 (Main Quest Rast & Veral 0.2.0)
+                            ↓
+                      Fase 13 (NPC Baru & Data 0.2.0)
+                            ↓
+                      Fase 14 (Resep & Cuaca 0.2.0)
+                            ↓
+                      Fase 15 (Tier 4 Warung 0.2.0)
+                            ↓
+                      Fase 16 (Quest Tracker 0.2.0)
+                            ↓
+                      Fase 17 (Build & Release 0.2.0)
 ```
 
 ---
@@ -352,12 +503,22 @@ Fase 3 (Toko Pedagang)     Fase 5 (Memasak)
 
 ## Non-Goal v1.0 (Tidak Dikerjakan Sekarang)
 
-- Main quest Rast dan Veral (detail quest ditunda)
-- Misteri asap (ditunda)
 - Makhluk gaib atau ras fantasi lain
 - Konflik besar, perang, atau ancaman dunia
-- Penjelasan dimensi / asal isekai kepada tokoh lain
-- Fitur lanjutan setelah warteg penuh
+- Penjelasan dimensi / asal isekai secara eksplikasi
+- Fitur lanjutan setelah warteg penuh (telah ditambahkan tier 4 di 0.2.0)
+
+---
+
+## Non-Goal 0.2.0 (Bisa Dilanjutkan di 0.3.0)
+
+- Penjelasan final soal dimensi/isekai tokoh utama
+- Sistem ekonomi komplit di luar warung
+- Main quest Rast/Veral hati 4 (lanjut ke versi berikutnya)
+- Sistem cuaca yang kompleks (multi-faktor, prediksi)
+- Fitur multiplayer atau komunitas
+- Penjelasan lengkap misteri asap (jawaban definitive)
+- Sistem day/night cycle yang mempengaruhi seluruh sistem secara realistis (bukan hanya konteks)
 
 ---
 
