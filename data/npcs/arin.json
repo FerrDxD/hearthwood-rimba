@@ -1,0 +1,32 @@
+{
+  "nama": "Arin",
+  "peran": "Pemangku benteng hutan",
+  "sifat": "Kegelawar, menjaga area hutan dalam",
+  "suka": ["hutan", "jamur", "rempah"],
+  "tidak_suka": ["minyak"],
+  "ciri_khas": "Memakai baju pemangku dan membawa tangkong.",
+  "palet": {
+    "rambut": "#2F2F2F",
+    "baju": "#2F4F4F",
+    "celana": "#654321",
+    "aksesori": "tangkong"
+  },
+  "dialog": {
+    "dialog_1": "Berhenti di batas itu. Hutan dalam bukan taman desa. Kalau kau membawa masakan yang menghangatkan, aku boleh bicara lebih lama.",
+    "dialog_2": "Kau sudah tahu jalur aman. Bawa bahan hutan yang jarang, dan aku akan menganggapmu bukan orang kota."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Jalur aman hutan dalam dan tanda-tanda cuaca buruk."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Ikan Bakar Rempah"
+    },
+    "hati_3": {
+      "tipe": "info",
+      "isi": "Arin mempercayai jalur hutan dalam dan menjaga perjalananmu."
+    }
+  }
+}

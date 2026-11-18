@@ -1,0 +1,32 @@
+{
+  "nama": "Siti",
+  "peran": "Penyelam sungai",
+  "sifat": "Tenang, pemaham dalam, suka sunyi",
+  "suka": ["ikan", "sup"],
+  "tidak_suka": ["pedas"],
+  "ciri_khas": "Memakai masker perairan dan membawa jaring.",
+  "palet": {
+    "rambut": "#2F2F2F",
+    "baju": "#4682B4",
+    "celana": "#A9A9A9",
+    "aksesori": "jaring"
+  },
+  "dialog": {
+    "dialog_1": "Sungai bicara pelan. Aku Siti, yang menyelam untuk ikan. Kalau kau diam sebentar, kau akan mendengarnya juga.",
+    "dialog_2": "Ikan segar tidak butuh banyak bumbu. Kau tampaknya mulai mengerti itu."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Titik sungai yang ikannya paling banyak setelah hujan."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Ikan Bakar Rempah"
+    },
+    "hati_3": {
+      "tipe": "info",
+      "isi": "Siti menyimpan jalur sungai rahasia menuju sisi lain desa."
+    }
+  }
+}

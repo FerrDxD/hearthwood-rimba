@@ -32,5 +32,17 @@
   ],
   "veral": [
     { "mulai": 8, "selesai": 18, "posisi": [1390, 342], "zona": [68, 52] }
+  ],
+  "arin": [
+    { "mulai": 6, "selesai": 8, "posisi": [500, 300], "zona": [72, 52] }
+  ],
+  "budi": [
+    { "mulai": 8, "selesai": 20, "posisi": [1200, 400], "zona": [220, 90] }
+  ],
+  "siti": [
+    { "mulai": 8, "selesai": 11, "posisi": [150, 640], "zona": [110, 60] }
+  ],
+  "pak_udin": [
+    { "mulai": 15, "selesai": 17, "posisi": [1050, 420], "zona": [90, 60] }
   ]
 }

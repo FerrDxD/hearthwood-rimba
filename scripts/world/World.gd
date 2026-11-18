@@ -40,6 +40,10 @@ const NAMED_NPC_IDS: Array[String] = [
 	"kila",
 	"rast",
 	"veral",
+	"arin",
+	"budi",
+	"siti",
+	"pak_udin",
 ]
 
 var _ground: TileMapLayer

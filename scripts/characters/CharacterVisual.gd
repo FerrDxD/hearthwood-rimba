@@ -36,6 +36,26 @@ class AccessoryLayer extends Node2D:
 			"tali":
 				draw_rect(Rect2(7.0, 1.0, 3.0, 8.0), Color("#b19a70"))
 				draw_line(Vector2(8.0, 1.0), Vector2(11.0, 5.0), Color("#76513a"), 1.0)
+			"tangkong":
+				draw_line(Vector2(10.0, 11.0), Vector2(14.0, -17.0), Color("#76513a"), 2.0)
+				draw_rect(Rect2(12.0, -17.0, 5.0, 4.0), Color("#d2b48c"))
+				draw_rect(Rect2(13.0, -16.0, 2.0, 2.0), Color("#ffd26b"))
+			"tas":
+				draw_rect(Rect2(6.0, 2.0, 8.0, 8.0), Color("#8b5a3c"))
+				draw_line(Vector2(8.0, 2.0), Vector2(10.0, -3.0), Color("#654321"), 1.0)
+				draw_line(Vector2(12.0, 2.0), Vector2(10.0, -3.0), Color("#654321"), 1.0)
+			"jaring":
+				draw_line(Vector2(11.0, 10.0), Vector2(15.0, -12.0), Color("#76513a"), 2.0)
+				for mesh_line in 3:
+					draw_line(
+						Vector2(10.0 + mesh_line * 2.0, -2.0),
+						Vector2(16.0 + mesh_line, -10.0),
+						Color("#b9c6c6"),
+						1.0
+					)
+			"pipa":
+				draw_line(Vector2(10.0, 6.0), Vector2(15.0, 1.0), Color("#654321"), 2.0)
+				draw_rect(Rect2(14.0, 0.0, 3.0, 3.0), Color("#3a2c22"))
 
 
 var _hair_color: Color = Color("#8b4513")

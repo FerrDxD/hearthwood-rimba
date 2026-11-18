@@ -1,0 +1,32 @@
+{
+  "nama": "Budi",
+  "peran": "Pedagang kaki",
+  "sifat": "Ramah, selalu membawa berita",
+  "suka": ["menu_baru", "rempah"],
+  "tidak_suka": ["basi"],
+  "ciri_khas": "Memakai rok warna-warni dan membawa tas raksasa.",
+  "palet": {
+    "rambut": "#DAA520",
+    "baju": "#DB7093",
+    "celana": "#555555",
+    "aksesori": "tas"
+  },
+  "dialog": {
+    "dialog_1": "Halo, halo! Aku Budi, pedagang kaki. Keliling desa bawa barang dan berita. Kabarnya, warungmu mulai ramai, ya?",
+    "dialog_2": "Menu baru selalu jadi berita bagus. Kalau kau bawa masakan yang belum pernah kucoba, ceritanya akan cepat sampai ke telinga warga."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Berita desa: siapa sedang sibuk dan bahan apa yang langka pekan ini."
+    },
+    "hati_2": {
+      "tipe": "info",
+      "isi": "Budi menceritakan asal rempah eksklusif yang dijual Giral."
+    },
+    "hati_3": {
+      "tipe": "info",
+      "isi": "Budi menawarkan menjualkan cerita warungmu ke desa sebelah."
+    }
+  }
+}

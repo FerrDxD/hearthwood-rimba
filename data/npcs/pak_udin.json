@@ -1,0 +1,32 @@
+{
+  "nama": "Pak Udin",
+  "peran": "Perokok desa",
+  "sifat": "Santai, cerita panjang, sedikit pendiam",
+  "suka": ["rempah", "gurih"],
+  "tidak_suka": ["ringan"],
+  "ciri_khas": "Memakai rok kuno dan membawa pipa.",
+  "palet": {
+    "rambut": "#A9A9A9",
+    "baju": "#8B4513",
+    "celana": "#555555",
+    "aksesori": "pipa"
+  },
+  "dialog": {
+    "dialog_1": "Duduklah sebentar. Aku Udin. Orang bilang ceritaku panjang, tapi setidaknya tidak membosankan seperti pajak desa.",
+    "dialog_2": "Kau memasak dengan bumbu yang berani. Bagus. Makanan tanpa rasa itu seperti cerita tanpa akhir."
+  },
+  "hadiah": {
+    "hati_1": {
+      "tipe": "info",
+      "isi": "Kisah lama desa dan alasan gerbang utara ditutup."
+    },
+    "hati_2": {
+      "tipe": "resep",
+      "resep": "Sambal Tumisan Pedas"
+    },
+    "hati_3": {
+      "tipe": "info",
+      "isi": "Pak Udin menyebut kayu-kayu di gudang lama yang baunya tidak wajar."
+    }
+  }
+}
