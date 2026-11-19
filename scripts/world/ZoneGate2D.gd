@@ -25,5 +25,5 @@ func trigger_transition() -> bool:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if body is CharacterBody2D or body.name == "Player" or body.is_in_group("player"):
+	if body is CharacterBody2D and (body.name == "Player" or body.is_in_group("player") or body.get("is_player") == true):
 		trigger_transition()

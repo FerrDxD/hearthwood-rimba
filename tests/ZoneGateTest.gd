@@ -53,6 +53,15 @@ func _init() -> void:
 	assert(received["zone"] == "", "Non-player node should not trigger gate")
 	dummy_node.free()
 	
+	# NPC CharacterBody2D should not trigger
+	received["zone"] = ""
+	received["pos"] = Vector2.ZERO
+	var npc_body = CharacterBody2D.new()
+	npc_body.name = "Rast"
+	gate._on_body_entered(npc_body)
+	assert(received["zone"] == "", "NPC CharacterBody2D must not trigger gate")
+	npc_body.free()
+	
 	# Player body should trigger
 	var player_body = CharacterBody2D.new()
 	player_body.name = "Player"
