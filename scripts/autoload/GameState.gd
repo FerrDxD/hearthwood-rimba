@@ -6,6 +6,7 @@ signal inventory_changed
 signal state_changed
 signal warung_upgraded(new_tier: int)
 signal quest_completed(quest_id: String)
+signal deep_forest_unlocked_changed(unlocked: bool)
 
 const MAX_ENERGY: int = 100
 const STARTING_COINS: int = 100
@@ -48,6 +49,11 @@ var current_weather: String = "cerah"
 var npc_recently_returned_from_forest: Dictionary = {}
 var reputation: int = 0
 var warung_tier: int = 0
+var is_deep_forest_unlocked: bool = false:
+	set(value):
+		if is_deep_forest_unlocked != value:
+			is_deep_forest_unlocked = value
+			deep_forest_unlocked_changed.emit(is_deep_forest_unlocked)
 var _save_system: HearthwoodSaveSystem
 
 
@@ -121,6 +127,7 @@ func start_new_game(new_player_name: String) -> bool:
 	npc_recently_returned_from_forest.clear()
 	reputation = 0
 	warung_tier = 0
+	is_deep_forest_unlocked = false
 	energy_changed.emit(energy)
 	coins_changed.emit(coins)
 	inventory_changed.emit()
@@ -447,6 +454,7 @@ func _create_save_data(player_position: Vector2, scene_path: String) -> Dictiona
 		"riwayat_masakan_npc": npc_gift_history.duplicate(true),
 		"cuaca": current_weather,
 		"rast_kembali_dari_hutan": npc_recently_returned_from_forest.duplicate(true),
+		"is_deep_forest_unlocked": is_deep_forest_unlocked,
 	}
 
 
@@ -554,43 +562,55 @@ func _is_valid_optional_quest_state(data: Dictionary) -> bool:
 		data["fitur_terbuka"]
 	):
 		return false
+	if data.has("is_deep_forest_unlocked") and typeof(data["is_deep_forest_unlocked"]) != TYPE_BOOL:
+		return false
 	return true
 
 
 func _restore_save_data(data: Dictionary) -> void:
-	player_name = str(data["nama_pemain"])
-	current_day = int(data["hari"])
-	current_hour = int(data["jam"])
-	current_minute = int(data["menit"])
-	energy = int(data["energi"])
-	coins = int(data["koin"])
-	reputation = int(data["reputasi"])
-	warung_tier = int(data["tier_warung"])
+	_load_save_data(data)
+
+
+func _load_save_data(data: Dictionary) -> void:
+	player_name = str(data.get("nama_pemain", data.get("nama", player_name)))
+	current_day = int(data.get("hari", current_day))
+	current_hour = int(data.get("jam", current_hour))
+	current_minute = int(data.get("menit", current_minute))
+	energy = int(data.get("energi", energy))
+	coins = int(data.get("koin", coins))
+	reputation = int(data.get("reputasi", reputation))
+	warung_tier = int(data.get("tier_warung", warung_tier))
+	if data.has("posisi") and typeof(data["posisi"]) == TYPE_DICTIONARY:
+		var pos_dict: Dictionary = data["posisi"]
+		if pos_dict.has("x") and pos_dict.has("y"):
+			pending_player_position = Vector2(float(pos_dict["x"]), float(pos_dict["y"]))
 	inventory.clear()
-	for stack in data["inventori"]:
+	for stack in data.get("inventori", []):
 		inventory.append({
-			"id": str(stack["item"]),
-			"jumlah": int(stack["jumlah"]),
-			"tanggal_masak": int(stack["tanggal_masak"]),
-			"kualitas": int(stack["kualitas"]),
-			"hari_terakhir_diproses": int(stack["hari_terakhir_diproses"]),
+			"id": str(stack.get("item", "")),
+			"jumlah": int(stack.get("jumlah", 0)),
+			"tanggal_masak": int(stack.get("tanggal_masak", -1)),
+			"kualitas": int(stack.get("kualitas", 0)),
+			"hari_terakhir_diproses": int(
+				stack.get("hari_terakhir_diproses", stack.get("tanggal_masak", -1))
+			),
 		})
 	unlocked_recipes.clear()
-	for recipe_id in data["resep_terbuka"]:
+	for recipe_id in data.get("resep_terbuka", []):
 		unlocked_recipes.append(str(recipe_id))
-	npc_heart_levels = data["hati_npc"].duplicate(true)
-	affection_points = data["poin_afeksi"].duplicate(true)
+	npc_heart_levels = data.get("hati_npc", {}).duplicate(true)
+	affection_points = data.get("poin_afeksi", {}).duplicate(true)
 	business_permits.clear()
-	for permit in data["izin_usaha"]:
+	for permit in data.get("izin_usaha", []):
 		business_permits.append(int(permit))
 	items_received_from_npcs.clear()
-	for item_id in data["item_dihadikan"]:
+	for item_id in data.get("item_dihadikan", []):
 		items_received_from_npcs.append(str(item_id))
 	unlocked_quests.clear()
-	for quest_id in data["quest_terbuka"]:
+	for quest_id in data.get("quest_terbuka", []):
 		unlocked_quests.append(str(quest_id))
 	completed_quests.clear()
-	for quest_id in data["quest_selesai"]:
+	for quest_id in data.get("quest_selesai", []):
 		completed_quests.append(str(quest_id))
 	quest_chapters = data.get("bab_quest", {}).duplicate(true)
 	smoke_clues.clear()
@@ -599,16 +619,36 @@ func _restore_save_data(data: Dictionary) -> void:
 	unlocked_features.clear()
 	for feature_id in data.get("fitur_terbuka", []):
 		unlocked_features.append(str(feature_id))
-	npc_met = data["npc_ditemui"].duplicate(true)
+	npc_met = data.get("npc_ditemui", {}).duplicate(true)
 	collected_forage_today.clear()
-	for spawn_id in data["forage_terkumpul_hari_ini"]:
+	for spawn_id in data.get("forage_terkumpul_hari_ini", []):
 		collected_forage_today.append(str(spawn_id))
-	gifts_given_today = data["hadiah_hari_ini"].duplicate(true)
-	customers_served_today = data["pelanggan_hari_ini"].duplicate(true)
-	disliked_gift_streaks = data["streak_tidak_suka"].duplicate(true)
-	npc_gift_history = data["riwayat_masakan_npc"].duplicate(true)
-	current_weather = str(data["cuaca"])
-	npc_recently_returned_from_forest = data["rast_kembali_dari_hutan"].duplicate(true)
+	gifts_given_today = data.get("hadiah_hari_ini", {}).duplicate(true)
+	customers_served_today = data.get("pelanggan_hari_ini", {}).duplicate(true)
+	disliked_gift_streaks = data.get("streak_tidak_suka", {}).duplicate(true)
+	npc_gift_history = data.get("riwayat_masakan_npc", {}).duplicate(true)
+	current_weather = str(data.get("cuaca", current_weather))
+	npc_recently_returned_from_forest = data.get("rast_kembali_dari_hutan", {}).duplicate(true)
+
+	if data.has("is_deep_forest_unlocked"):
+		is_deep_forest_unlocked = bool(data["is_deep_forest_unlocked"])
+	else:
+		var unlocked := false
+		if data.has("quests") and typeof(data["quests"]) == TYPE_DICTIONARY:
+			var rast_quest: Variant = data["quests"].get("rast", {})
+			if typeof(rast_quest) == TYPE_DICTIONARY and int(rast_quest.get("heart_level", 0)) >= 2:
+				unlocked = true
+		if not unlocked and data.has("hati_npc") and typeof(data["hati_npc"]) == TYPE_DICTIONARY:
+			if int(data["hati_npc"].get("rast", 0)) >= 2:
+				unlocked = true
+		if not unlocked and data.has("bab_quest") and typeof(data["bab_quest"]) == TYPE_DICTIONARY:
+			if int(data["bab_quest"].get("rast", 0)) >= 2:
+				unlocked = true
+		if not unlocked and data.has("quest_selesai") and typeof(data["quest_selesai"]) == TYPE_ARRAY:
+			if "rast_quest_2" in data["quest_selesai"] or "rast_quest_3" in data["quest_selesai"]:
+				unlocked = true
+		is_deep_forest_unlocked = unlocked
+
 	energy_changed.emit(energy)
 	coins_changed.emit(coins)
 	inventory_changed.emit()
