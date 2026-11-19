@@ -7,8 +7,8 @@ const GIFT_UI_SCENE: PackedScene = preload("res://scenes/GiftUI.tscn")
 const WARUNG_SYSTEM_SCENE: PackedScene = preload("res://scenes/WarungSystem.tscn")
 const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
 const WORLD_SCENE: PackedScene = preload("res://scenes/tilemap/MainTileset.tscn")
-const WOOD_PICKUP_POSITION: Vector2 = Vector2(126.0, 574.0)
-const STONE_PICKUP_POSITION: Vector2 = Vector2(398.0, 512.0)
+const WOOD_PICKUP_POSITION: Vector2 = Vector2(160.0, 680.0)
+const STONE_PICKUP_POSITION: Vector2 = Vector2(-150.0, 1050.0)
 
 
 func _initialize() -> void:
