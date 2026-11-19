@@ -1,5 +1,26 @@
 # QA, Build, dan Rilis
 
+## Status 0.3.0 (19 November 2026)
+
+Versi project telah diperbarui ke **0.3.0**. Pemeriksaan otomatis Godot 4.7.2 lulus: project parse tanpa error dan seluruh unit test Godot hijau (exit code 0).
+
+### Isi Rilis 0.3.0
+
+- **Ekspansi Peta Multi-Zona Hutan**: 6 wilayah terhubung secara organik:
+  1. Wilayah 1: Suaka Pohon Raksasa (`zone_forest_sanctuary`)
+  2. Wilayah 2: Pos Penebang Kayu (`zone_forest_logging`)
+  3. Wilayah 3: Semak Belukar Lembab (`zone_forest_thicket`)
+  4. Wilayah 4: Lembah Akar Purba (`zone_forest_valley`)
+  5. Wilayah 5: Aliran Sungai Bebatuan (`zone_forest_river`)
+  6. Wilayah 6: Pintu Rimba (`zone_forest_gate`) dengan akses dua arah ke Desa (`village`).
+- **Komponen Transisi `ZoneGate2D`**: Mekanisme perpindahan antar-zona mulus dengan transisi fade out/in instan (0,2s), memposisikan pemain pada target spawn gate yang sesuai, dan waktu game tetap berjalan secara real-time alami tanpa jeda kaku.
+- **Isolasi NPC Ambient & Sinkronisasi Rast**: Pembatasan NPC ambient strictly di desa (0 ambient NPC di hutan) untuk mempertahankan suasana rimba alami yang tenang, serta jadwal kerja Rast di Wilayah 3 (06:00–16:00) dan di desa pada sisa hari.
+- **Redistribusi Foraging Tematik**: 12 titik foraging terdistribusi merata di seluruh zona hutan (buah liar, kayu ranting, herba hutan, batu kali, jamur lembab) dengan bonus panen jamur saat cuaca hujan di Wilayah 4.
+- **Gating Rintangan Pohon Tumbang Pasca-Prolog**: Batasan fisik pohon tumbang antara Wilayah 2 dan Wilayah 3 yang aktif pasca-prolog dan dapat dibuka otomatis melalui Quest Rast Hati 2 (*Menembus Hutan Dalam*).
+- **Banner Notifikasi `LocationToastUI`**: Banner transparan non-blocking yang mengambang elegan di bagian atas layar untuk menampilkan nama wilayah baru selama 2,5 detik saat pemain berpindah zona.
+- **Kompatibilitas Save/Load Penuh**: Backward compatibility dari save game v1.0 dan v0.2.0, serta persistensi dynamic state multi-zona (rintangan pohon tumbang, zona aktif terakhir, posisi pemain).
+- **Regresi Test Suite**: Seluruh unit test otomatis Godot hijau tanpa regresi.
+
 ## Status 0.2.0 (18 November 2026)
 
 Versi project sudah dinaikkan ke **0.2.0**. Pemeriksaan otomatis Godot 4.7.2 lulus: project parse tanpa error dan **14 tes Godot** hijau. Build belum dapat dihasilkan di lingkungan kerja ini; percobaan ekspor ketiga preset mencatat blocker berikut:
@@ -77,8 +98,8 @@ Pastikan ekspor Web berjalan di browser melalui HTTP server, bukan membuka berka
 
 ## Checklist sebelum rilis
 
-- [x] Versi project dan dokumentasi sesuai 0.2.0.
-- [x] Project parse bersih dan seluruh 14 tes otomatis lulus.
+- [x] Versi project dan dokumentasi sesuai 0.3.0.
+- [x] Project parse bersih dan seluruh unit test otomatis lulus.
 - [x] Blocker ekspor Windows/Web/Android dicatat eksplisit di dokumen ini.
 - [ ] Pasang export template standar Godot 4.7.2 dan hasilkan ketiga target di atas.
 - [ ] Tetapkan application ID, ikon launcher Android, keystore, dan metadata toko.
