@@ -28,6 +28,7 @@ const ZONE_NAMES: Dictionary = {
 	"forest_zone_5": "Lembah Akar Purba",
 	"forest_zone_6": "Suaka Pohon Raksasa",
 }
+const VILLAGE_AMBIENT_RECT: Rect2 = Rect2(580.0, 120.0, 950.0, 680.0)
 const TILESET_TEXTURE: Texture2D = preload("res://assets/sprites/tiles/main_tiles.png")
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
@@ -91,8 +92,13 @@ var _building_rects: Array[Rect2] = [
 
 
 func _init() -> void:
+	_random.seed = 713
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
+	if _named_npcs.is_empty():
+		_spawn_named_npcs()
+	if _ambient_npcs.is_empty():
+		_spawn_ambient_npcs()
 
 
 func _ready() -> void:
@@ -111,8 +117,10 @@ func _ready() -> void:
 	_paint_ground()
 	_place_trees()
 	_add_building_collisions()
-	_spawn_named_npcs()
-	_spawn_ambient_npcs()
+	if _named_npcs.is_empty():
+		_spawn_named_npcs()
+	if _ambient_npcs.is_empty():
+		_spawn_ambient_npcs()
 	_spawn_forage_items()
 	get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
 	get_node("/root/GameState").state_changed.connect(_on_state_changed)
@@ -351,6 +359,22 @@ func get_named_npc_count() -> int:
 	return _named_npcs.size()
 
 
+func get_named_npc(npc_id: String) -> HearthwoodNPC:
+	for npc in _named_npcs:
+		if is_instance_valid(npc) and npc.npc_id == npc_id:
+			return npc
+	return null
+
+
+func _update_npc_positions_for_hour(hour: int) -> void:
+	for npc in _named_npcs:
+		if is_instance_valid(npc):
+			if npc.has_method("refresh_schedule"):
+				npc.refresh_schedule(hour, 0)
+			elif npc.has_method("_refresh_schedule"):
+				npc.call("_refresh_schedule", hour, 0)
+
+
 func get_named_npc_name(npc_id: String) -> String:
 	for npc in _named_npcs:
 		if npc.npc_id == npc_id:
@@ -440,23 +464,18 @@ func _spawn_named_npcs() -> void:
 		)
 		add_child(npc)
 		_named_npcs.append(npc)
+	_update_npc_positions_for_hour(6)
 
 
 func _spawn_ambient_npcs() -> void:
 	for index in 32:
-		var spawn_position: Vector2
-		if index < 12:
-			spawn_position = Vector2(
-				_random.randf_range(92.0, FOREST_END_X - 24.0),
-				_random.randf_range(120.0, WORLD_SIZE.y - 100.0)
-			)
-		else:
-			spawn_position = Vector2(
-				_random.randf_range(820.0, 1500.0),
-				_random.randf_range(350.0, 650.0)
-			)
+		var spawn_position := Vector2(
+			_random.randf_range(VILLAGE_AMBIENT_RECT.position.x, VILLAGE_AMBIENT_RECT.end.x),
+			_random.randf_range(VILLAGE_AMBIENT_RECT.position.y, VILLAGE_AMBIENT_RECT.end.y)
+		)
 		var zone_size := Vector2(72.0, 52.0)
 		var movement_zone := Rect2(spawn_position - zone_size * 0.5, zone_size)
+		movement_zone.position.x = maxf(movement_zone.position.x, 560.0)
 		var npc := NPC_SCENE.instantiate() as HearthwoodNPC
 		npc.configure_ambient(index, spawn_position, movement_zone)
 		add_child(npc)
