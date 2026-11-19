@@ -13,6 +13,7 @@ const WARUNG_SYSTEM_SCENE: PackedScene = preload("res://scenes/WarungSystem.tscn
 const QUEST_SYSTEM_SCENE: PackedScene = preload("res://scenes/QuestSystem.tscn")
 const QUEST_UI_SCENE: PackedScene = preload("res://scenes/QuestUI.tscn")
 const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
+const LOCATION_TOAST_UI_SCENE: PackedScene = preload("res://scenes/LocationToastUI.tscn")
 const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
 const AUDIO_DIRECTOR_SCRIPT: Script = preload("res://scripts/systems/AudioDirector.gd")
@@ -53,10 +54,36 @@ var _warung_ui: HearthwoodWarungUI
 var _quest_system: HearthwoodQuestSystem
 var _quest_ui: HearthwoodQuestUI
 var _pause_menu: HearthwoodPauseMenu
+var _location_toast: HearthwoodLocationToastUI
 var _audio_director: HearthwoodAudioDirector
 var _current_shopkeeper: HearthwoodShopNPC
 var _prologue_data: Dictionary = {}
 var _hint_feedback_time_remaining: float = 0.0
+
+
+func _init() -> void:
+	_setup_location_toast()
+
+
+func _setup_location_toast() -> void:
+	var ui := get_node_or_null("UI") as CanvasLayer
+	if ui == null:
+		ui = CanvasLayer.new()
+		ui.name = "UI"
+		add_child(ui)
+	if ui.get_node_or_null("LocationToastUI") == null:
+		_location_toast = LOCATION_TOAST_UI_SCENE.instantiate()
+		_location_toast.name = "LocationToastUI"
+		ui.add_child(_location_toast)
+	else:
+		_location_toast = ui.get_node("LocationToastUI") as HearthwoodLocationToastUI
+
+
+func _start_gameplay() -> void:
+	if _location_toast != null and _world != null:
+		var initial_zone_name := _world.get_zone_name(_world.current_zone_id)
+		if not initial_zone_name.is_empty():
+			_location_toast.show_location(initial_zone_name)
 
 
 func _ready() -> void:
@@ -126,6 +153,7 @@ func _ready() -> void:
 	_pause_menu.main_menu_requested.connect(_on_main_menu_requested)
 	_connect_signals()
 	_update_hud()
+	_start_gameplay()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -198,11 +226,21 @@ func _connect_signals() -> void:
 	time_system.day_changed.connect(_on_day_changed)
 	time_system.minute_changed.connect(_on_minute_changed)
 	time_system.sleep_started.connect(_on_sleep_started)
+	if _world != null and _world.has_signal("zone_changed"):
+		_world.zone_changed.connect(_on_world_zone_changed)
+
+
+func _on_world_zone_changed(_zone_id: String, zone_name: String) -> void:
+	if _location_toast != null:
+		_location_toast.show_location(zone_name)
 
 
 func _create_hud() -> void:
-	var canvas := CanvasLayer.new()
-	add_child(canvas)
+	var canvas := get_node_or_null("UI") as CanvasLayer
+	if canvas == null:
+		canvas = CanvasLayer.new()
+		canvas.name = "UI"
+		add_child(canvas)
 
 	var interface := Control.new()
 	interface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -272,6 +310,8 @@ func _create_hud() -> void:
 	controls.inventory_pressed.connect(_toggle_inventory)
 
 	_hint_label.text = "WASD / panah untuk bergerak  |  E untuk berinteraksi"
+	if _location_toast != null and _location_toast.get_parent() == canvas:
+		canvas.move_child(_location_toast, -1)
 
 
 func _update_hud(_value: int = 0, _minute: int = 0) -> void:
