@@ -252,7 +252,7 @@ func _setup_zones_and_gates() -> void:
 	_create_gate("forest_zone_3", "forest_zone_1", Vector2(280.0, 950.0), Vector2(280.0, 990.0), Vector2(128.0, 16.0))
 
 	# Forest Zone 1 <-> Forest Zone 4
-	_create_gate("forest_zone_1", "forest_zone_4", Vector2(500.0, 970.0), Vector2(840.0, -20.0), Vector2(64.0, 16.0))
+	_create_gate("forest_zone_1", "forest_zone_4", Vector2(500.0, 970.0), Vector2(840.0, -40.0), Vector2(64.0, 16.0))
 	_create_gate("forest_zone_4", "forest_zone_1", Vector2(840.0, -10.0), Vector2(500.0, 1000.0), Vector2(64.0, 16.0))
 
 	# Forest Zone 2 <-> Forest Zone 5

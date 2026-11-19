@@ -80,6 +80,10 @@ func _setup_location_toast() -> void:
 
 
 func _start_gameplay() -> void:
+	if _world != null and is_instance_valid(_player):
+		var initial_zone_id := _world.get_zone_for_position(_player.position)
+		if not initial_zone_id.is_empty():
+			_world.current_zone_id = initial_zone_id
 	if _location_toast != null and _world != null:
 		var initial_zone_name := _world.get_zone_name(_world.current_zone_id)
 		if not initial_zone_name.is_empty():
@@ -427,6 +431,10 @@ func _on_manual_load_requested() -> void:
 		_pause_menu.show_status(str(result.get("pesan", "Game tidak dapat dimuat.")))
 		return
 	_player.global_position = result["posisi"]
+	if _world != null:
+		var loaded_zone := _world.get_zone_for_position(_player.global_position)
+		if not loaded_zone.is_empty():
+			_world.current_zone_id = loaded_zone
 	get_node("/root/TimeSystem").sync_from_game_state()
 	_update_hud()
 	_pause_menu.show_status(str(result.get("pesan", "Game berhasil dimuat.")))

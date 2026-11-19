@@ -35,7 +35,7 @@ func close_quests() -> void:
 
 
 func is_open() -> bool:
-	return _interface.visible
+	return is_instance_valid(_interface) and _interface.visible
 
 
 func _create_interface() -> void:
