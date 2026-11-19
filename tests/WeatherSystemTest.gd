@@ -6,8 +6,8 @@ const AFFECTION_SYSTEM_SCENE: PackedScene = preload("res://scenes/AffectionSyste
 const WORLD_SCENE: PackedScene = preload("res://scenes/tilemap/MainTileset.tscn")
 const MAIN_SCENE_PATH: String = "res://scenes/Main.tscn"
 const TEST_SAVE_PATH: String = "user://phase14-weather-test.json"
-const FORAGE_POSITION: Vector2 = Vector2(104.0, 218.0)
-const RAIN_FORAGE_POSITION: Vector2 = Vector2(300.0, 700.0)
+const FORAGE_POSITION: Vector2 = Vector2(104.0, 1178.0)
+const RAIN_FORAGE_POSITION: Vector2 = Vector2(900.0, -200.0)
 
 
 func _initialize() -> void:

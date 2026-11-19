@@ -2,7 +2,7 @@ extends SceneTree
 
 const MAIN_SCENE_PATH: String = "res://scenes/Main.tscn"
 const TEST_SAVE_PATH: String = "user://phase10_flow_test.json"
-const FOREST_VEGETABLE_POSITION: Vector2 = Vector2(104.0, 218.0)
+const FOREST_VEGETABLE_POSITION: Vector2 = Vector2(104.0, 1178.0)
 const COOKING_STATION_POSITION: Vector2 = Vector2(1210.0, 478.0)
 const VERAL_POSITION: Vector2 = Vector2(1390.0, 342.0)
 const HOME_POSITION: Vector2 = Vector2(1320.0, 476.0)

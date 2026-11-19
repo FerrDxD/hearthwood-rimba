@@ -120,14 +120,14 @@ func _run_tests() -> void:
 	var world := WORLD_SCENE.instantiate() as HearthwoodWorld
 	root.add_child(world)
 	await process_frame
-	if world.get_closest_item_pickup(Vector2(104.0, 218.0), 2.0) != null:
+	if world.get_closest_item_pickup(Vector2(104.0, 1178.0), 2.0) != null:
 		push_error("A collected forage spot should stay empty after loading a save.")
 		quit(1)
 		return
 	game_state.collected_forage_today.clear()
 	time_system.sync_from_game_state()
 	await process_frame
-	if world.get_closest_item_pickup(Vector2(104.0, 218.0), 2.0) == null:
+	if world.get_closest_item_pickup(Vector2(104.0, 1178.0), 2.0) == null:
 		push_error("Synchronizing a loaded day should refresh the forage world.")
 		quit(1)
 		return

@@ -34,23 +34,23 @@ const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://scenes/ItemPickup.tscn")
 const FORAGE_SPAWN_POINTS: Array[Dictionary] = [
-	{"spawn_id": "sayur_liar_1", "id": "sayur_liar", "position": Vector2(104.0, 218.0)},
-	{"spawn_id": "sayur_liar_2", "id": "sayur_liar", "position": Vector2(360.0, 666.0)},
-	{"spawn_id": "ikan_sungai_1", "id": "ikan_sungai", "position": Vector2(158.0, 720.0)},
-	{"spawn_id": "daun_hutan_1", "id": "daun_hutan", "position": Vector2(478.0, 166.0)},
-	{"spawn_id": "daun_hutan_2", "id": "daun_hutan", "position": Vector2(426.0, 738.0)},
-	{"spawn_id": "buah_liar_1", "id": "buah_liar", "position": Vector2(290.0, 178.0)},
-	{"spawn_id": "buah_liar_2", "id": "buah_liar", "position": Vector2(498.0, 590.0)},
-	{"spawn_id": "akar_rempah_1", "id": "akar_rempah", "position": Vector2(184.0, 328.0)},
-	{"spawn_id": "jamur_hutan_1", "id": "jamur_hutan", "position": Vector2(344.0, 272.0)},
-	{"spawn_id": "jamur_hutan_2", "id": "jamur_hutan", "position": Vector2(254.0, 632.0)},
-	{"spawn_id": "kayu_1", "id": "kayu", "position": Vector2(126.0, 574.0)},
-	{"spawn_id": "batu_1", "id": "batu", "position": Vector2(398.0, 512.0)},
+	{"spawn_id": "sayur_liar_1", "id": "sayur_liar", "position": Vector2(104.0, 1178.0)},
+	{"spawn_id": "daun_hutan_1", "id": "daun_hutan", "position": Vector2(420.0, 1120.0)},
+	{"spawn_id": "ikan_sungai_1", "id": "ikan_sungai", "position": Vector2(-280.0, 1200.0)},
+	{"spawn_id": "batu_1", "id": "batu", "position": Vector2(-150.0, 1050.0)},
+	{"spawn_id": "kayu_1", "id": "kayu", "position": Vector2(160.0, 680.0)},
+	{"spawn_id": "sayur_liar_2", "id": "sayur_liar", "position": Vector2(380.0, 720.0)},
+	{"spawn_id": "jamur_hutan_1", "id": "jamur_hutan", "position": Vector2(750.0, -250.0)},
+	{"spawn_id": "buah_liar_1", "id": "buah_liar", "position": Vector2(850.0, -320.0)},
+	{"spawn_id": "daun_hutan_2", "id": "daun_hutan", "position": Vector2(680.0, -180.0)},
+	{"spawn_id": "akar_rempah_1", "id": "akar_rempah", "position": Vector2(-320.0, 680.0)},
+	{"spawn_id": "jamur_hutan_2", "id": "jamur_hutan", "position": Vector2(-180.0, 750.0)},
+	{"spawn_id": "buah_liar_2", "id": "buah_liar", "position": Vector2(350.0, 220.0)},
 ]
 const RAIN_FORAGE_SPAWN: Dictionary = {
 	"spawn_id": "hujan_jamur_1",
 	"id": "jamur_hutan",
-	"position": Vector2(300.0, 700.0),
+	"position": Vector2(900.0, -200.0),
 }
 const NAMED_NPC_IDS: Array[String] = [
 	"giral",

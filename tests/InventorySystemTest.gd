@@ -53,7 +53,7 @@ func _run_tests() -> void:
 	var world := WORLD_SCENE.instantiate() as HearthwoodWorld
 	root.add_child(world)
 	await process_frame
-	var pickup := world.get_closest_item_pickup(Vector2(104.0, 218.0), 2.0)
+	var pickup := world.get_closest_item_pickup(Vector2(104.0, 1178.0), 2.0)
 	if pickup == null or not world.collect_item_pickup(pickup):
 		push_error("The player should be able to collect nearby forage.")
 		quit(1)
@@ -62,14 +62,14 @@ func _run_tests() -> void:
 		push_error("Collecting forage should add it to the inventory.")
 		quit(1)
 		return
-	if world.get_closest_item_pickup(Vector2(104.0, 218.0), 2.0) != null:
+	if world.get_closest_item_pickup(Vector2(104.0, 1178.0), 2.0) != null:
 		push_error("Collected forage should no longer be available that day.")
 		quit(1)
 		return
 
 	time_system.sleep()
 	await process_frame
-	if world.get_closest_item_pickup(Vector2(104.0, 218.0), 2.0) == null:
+	if world.get_closest_item_pickup(Vector2(104.0, 1178.0), 2.0) == null:
 		push_error("Forage should respawn after the player sleeps.")
 		quit(1)
 		return
