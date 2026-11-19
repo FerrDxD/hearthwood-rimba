@@ -8,6 +8,15 @@ const CHAPTER_COUNT: int = 4
 const NPC_DATA_DIRECTORY: String = "res://data/npcs"
 
 var _quests: Dictionary = {}
+var _game_state: Node = null
+
+
+func _get_game_state() -> Node:
+	if _game_state != null:
+		return _game_state
+	if is_inside_tree() and has_node("/root/GameState"):
+		return get_node("/root/GameState")
+	return null
 
 
 func _ready() -> void:
@@ -23,7 +32,9 @@ func get_quest_ids() -> Array[String]:
 
 
 func get_chapter_index(npc_id: String) -> int:
-	var game_state = get_node("/root/GameState")
+	var game_state = _get_game_state()
+	if game_state == null:
+		return 0
 	return clampi(int(game_state.quest_chapters.get(npc_id, 0)), 0, CHAPTER_COUNT)
 
 
@@ -186,6 +197,8 @@ func turn_in(npc_id: String) -> Dictionary:
 
 	var quest_id := "%s_quest_%d" % [npc_id, int(chapter.get("hati", 0)) + 1]
 	game_state.complete_quest(quest_id)
+	if npc_id == "rast" and (int(chapter.get("hati", 0)) >= 2 or chapter_index >= 2):
+		game_state.is_deep_forest_unlocked = true
 	game_state.state_changed.emit()
 	quest_progressed.emit(npc_id, chapter_index + 1)
 
@@ -209,6 +222,19 @@ func get_smoke_clues() -> Array[String]:
 	for clue in game_state.smoke_clues:
 		clues.append(str(clue))
 	return clues
+
+
+func complete_chapter(npc_id: String, chapter_index: int) -> void:
+	var game_state = _get_game_state()
+	if game_state == null:
+		return
+	game_state.quest_chapters[npc_id] = chapter_index + 1
+	var quest_id := "%s_quest_%d" % [npc_id, chapter_index + 1]
+	game_state.complete_quest(quest_id)
+	if npc_id == "rast" and chapter_index >= 2:
+		game_state.is_deep_forest_unlocked = true
+	game_state.state_changed.emit()
+	quest_progressed.emit(npc_id, chapter_index + 1)
 
 
 func _get_display_name(npc_id: String) -> String:

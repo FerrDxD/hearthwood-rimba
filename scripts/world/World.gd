@@ -71,13 +71,28 @@ const NAMED_NPC_IDS: Array[String] = [
 ]
 
 signal zone_changed(zone_id: String, zone_name: String)
+signal gate_blocked_attempted(gate: ZoneGate2D, dialog_key: String)
+
+const DEFAULT_BLOCKED_DIALOGS: Dictionary = {
+	"fallen_tree_blocked": "Batang pohon besar tumbang menutup jalan kembali ke pohon raksasa itu... Jalurnya buntu.",
+	"fallen_tree_barrier": "Batang pohon besar tumbang menutup jalan kembali ke pohon raksasa itu... Jalurnya buntu.",
+}
 
 var current_zone_id: String = "village"
 var _zone_gates: Array[ZoneGate2D] = []
 var _fade_layer: CanvasLayer
 var _fade_rect: ColorRect
 var _is_transitioning: bool = false
-var _game_state: Node = null
+var _game_state: Node = null:
+	set(value):
+		if _game_state != null and _game_state.has_signal("deep_forest_unlocked_changed"):
+			if _game_state.deep_forest_unlocked_changed.is_connected(_on_deep_forest_unlocked_changed):
+				_game_state.deep_forest_unlocked_changed.disconnect(_on_deep_forest_unlocked_changed)
+		_game_state = value
+		if _game_state != null and _game_state.has_signal("deep_forest_unlocked_changed"):
+			if not _game_state.deep_forest_unlocked_changed.is_connected(_on_deep_forest_unlocked_changed):
+				_game_state.deep_forest_unlocked_changed.connect(_on_deep_forest_unlocked_changed)
+		_update_fallen_tree_barriers()
 var _ground: TileMapLayer
 var _random := RandomNumberGenerator.new()
 var _tree_positions: Array[Vector2] = []
@@ -95,6 +110,7 @@ func _init() -> void:
 	_random.seed = 713
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
+	_update_fallen_tree_barriers()
 	if _named_npcs.is_empty():
 		_spawn_named_npcs()
 	if _ambient_npcs.is_empty():
@@ -107,8 +123,9 @@ func _ready() -> void:
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
 	if _game_state == null and has_node("/root/GameState"):
-		_game_state = get_node("/root/GameState")
-	_update_fallen_tree_barriers()
+		self._game_state = get_node("/root/GameState")
+	else:
+		_update_fallen_tree_barriers()
 	_ground = TileMapLayer.new()
 	_ground.name = "ground"
 	_ground.z_index = -1
@@ -280,24 +297,71 @@ func _create_gate(
 	gate.add_child(col)
 
 	gate.gate_triggered.connect(_on_gate_triggered)
+	gate.blocked_attempted.connect(_on_gate_blocked_attempted)
 	_zone_gates.append(gate)
 	add_child(gate)
 	return gate
 
 
-func _update_fallen_tree_barriers() -> void:
-	var is_unlocked := false
+func _on_gate_blocked_attempted(gate: ZoneGate2D, dialog_key: String) -> void:
+	gate_blocked_attempted.emit(gate, dialog_key)
+	_show_blocked_feedback(dialog_key)
+
+
+func _get_is_deep_forest_unlocked() -> bool:
 	if _game_state != null and "is_deep_forest_unlocked" in _game_state:
-		is_unlocked = _game_state.is_deep_forest_unlocked
-	elif has_node("/root/GameState"):
+		return bool(_game_state.is_deep_forest_unlocked)
+	if is_inside_tree() and has_node("/root/GameState"):
 		var gs = get_node("/root/GameState")
 		if "is_deep_forest_unlocked" in gs:
-			is_unlocked = gs.is_deep_forest_unlocked
+			return bool(gs.is_deep_forest_unlocked)
+	return false
 
-	for gate in _zone_gates:
-		if gate.target_zone_id == "forest_zone_6" or gate.target_zone_id == "forest_zone_5":
-			gate.is_blocked = not is_unlocked
-			gate.blocked_dialog_key = "fallen_tree_barrier"
+
+func _on_deep_forest_unlocked_changed(_unlocked: bool) -> void:
+	_update_fallen_tree_barriers()
+
+
+func _update_fallen_tree_barriers() -> void:
+	var unlocked: bool = _get_is_deep_forest_unlocked()
+	var barrier_pairs = [
+		["forest_zone_3", "forest_zone_6"],
+		["forest_zone_3", "forest_zone_5"],
+		["forest_zone_2", "forest_zone_5"],
+	]
+	for pair in barrier_pairs:
+		var gate := get_zone_gate(pair[0], pair[1])
+		if gate != null:
+			gate.is_blocked = not unlocked
+			gate.blocked_dialog_key = "fallen_tree_blocked"
+
+
+func get_blocked_dialog_text(dialog_key: String) -> String:
+	if FileAccess.file_exists("res://data/dialogs/barriers.json"):
+		var f := FileAccess.open("res://data/dialogs/barriers.json", FileAccess.READ)
+		if f != null:
+			var parsed: Variant = JSON.parse_string(f.get_as_text())
+			if typeof(parsed) == TYPE_DICTIONARY and parsed.has(dialog_key):
+				return str(parsed[dialog_key])
+	return DEFAULT_BLOCKED_DIALOGS.get(dialog_key, "Jalan ini terhalang rintangan.")
+
+
+func _show_blocked_feedback(dialog_key: String) -> void:
+	var text := get_blocked_dialog_text(dialog_key)
+	if not is_inside_tree():
+		return
+	var main = get_parent()
+	if main != null:
+		var dui = main.get_node_or_null("DialogUI")
+		if dui != null and dui.has_method("open_dialog"):
+			dui.open_dialog("", "", text)
+			return
+		if "_dialog_ui" in main and main._dialog_ui != null:
+			main._dialog_ui.open_dialog("", "", text)
+			return
+	var root_dui = get_tree().root.find_child("DialogUI", true, false)
+	if root_dui != null and root_dui.has_method("open_dialog"):
+		root_dui.open_dialog("", "", text)
 
 
 func is_near_bed(player_position: Vector2) -> bool:
