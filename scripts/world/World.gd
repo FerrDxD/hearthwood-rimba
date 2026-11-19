@@ -10,6 +10,24 @@ const BED_POSITION: Vector2 = Vector2(1320.0, 476.0)
 const BED_INTERACTION_RADIUS: float = 76.0
 const COOKING_STATION_POSITION: Vector2 = Vector2(1210.0, 478.0)
 const COOKING_STATION_INTERACTION_RADIUS: float = 64.0
+const ZONE_RECTS: Dictionary = {
+	"village": Rect2(560.0, 0.0, 1040.0, 880.0),
+	"forest_zone_1": Rect2(0.0, 960.0, 560.0, 480.0),
+	"forest_zone_2": Rect2(-560.0, 960.0, 560.0, 480.0),
+	"forest_zone_3": Rect2(0.0, 480.0, 560.0, 480.0),
+	"forest_zone_4": Rect2(560.0, -480.0, 560.0, 480.0),
+	"forest_zone_5": Rect2(-560.0, 480.0, 560.0, 480.0),
+	"forest_zone_6": Rect2(0.0, 0.0, 560.0, 480.0),
+}
+const ZONE_NAMES: Dictionary = {
+	"village": "Desa Hearthwood",
+	"forest_zone_1": "Pintu Rimba",
+	"forest_zone_2": "Aliran Sungai Bebatuan",
+	"forest_zone_3": "Pos Penebang Kayu",
+	"forest_zone_4": "Semak Belukar Lembab",
+	"forest_zone_5": "Lembah Akar Purba",
+	"forest_zone_6": "Suaka Pohon Raksasa",
+}
 const TILESET_TEXTURE: Texture2D = preload("res://assets/sprites/tiles/main_tiles.png")
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
@@ -51,6 +69,14 @@ const NAMED_NPC_IDS: Array[String] = [
 	"pak_udin",
 ]
 
+signal zone_changed(zone_id: String, zone_name: String)
+
+var current_zone_id: String = "village"
+var _zone_gates: Array[ZoneGate2D] = []
+var _fade_layer: CanvasLayer
+var _fade_rect: ColorRect
+var _is_transitioning: bool = false
+var _game_state: Node = null
 var _ground: TileMapLayer
 var _random := RandomNumberGenerator.new()
 var _tree_positions: Array[Vector2] = []
@@ -64,8 +90,19 @@ var _building_rects: Array[Rect2] = [
 ]
 
 
+func _init() -> void:
+	if _zone_gates.is_empty():
+		_setup_zones_and_gates()
+
+
 func _ready() -> void:
 	_random.seed = 713
+	_setup_fade_layer()
+	if _zone_gates.is_empty():
+		_setup_zones_and_gates()
+	if _game_state == null and has_node("/root/GameState"):
+		_game_state = get_node("/root/GameState")
+	_update_fallen_tree_barriers()
 	_ground = TileMapLayer.new()
 	_ground.name = "ground"
 	_ground.z_index = -1
@@ -80,6 +117,179 @@ func _ready() -> void:
 	get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
 	get_node("/root/GameState").state_changed.connect(_on_state_changed)
 	queue_redraw()
+
+
+func get_zone_rect(zone_id: String) -> Rect2:
+	return ZONE_RECTS.get(zone_id, Rect2())
+
+
+func get_zone_name(zone_id: String) -> String:
+	return ZONE_NAMES.get(zone_id, "")
+
+
+func get_zone_for_position(pos: Vector2) -> String:
+	for zid in ZONE_RECTS:
+		var rect: Rect2 = ZONE_RECTS[zid]
+		if rect.has_point(pos):
+			return zid
+	return ""
+
+
+func get_zone_gate(source_zone_id: String, target_zone_id: String) -> ZoneGate2D:
+	for gate in _zone_gates:
+		if is_instance_valid(gate) and gate.source_zone_id == source_zone_id and gate.target_zone_id == target_zone_id:
+			return gate
+	return null
+
+
+func change_zone(zone_id: String, target_pos: Vector2, animated: bool = true) -> void:
+	if _is_transitioning:
+		return
+	if animated and is_inside_tree() and _fade_rect != null:
+		_is_transitioning = true
+		var tween := create_tween()
+		tween.tween_property(_fade_rect, "modulate:a", 1.0, 0.2)
+		tween.tween_callback(func():
+			_apply_zone_change(zone_id, target_pos)
+		)
+		tween.tween_property(_fade_rect, "modulate:a", 0.0, 0.2)
+		tween.tween_callback(func():
+			_is_transitioning = false
+		)
+	else:
+		_apply_zone_change(zone_id, target_pos)
+
+
+func _apply_zone_change(zone_id: String, target_pos: Vector2) -> void:
+	current_zone_id = zone_id
+	var player := _find_player()
+	if is_instance_valid(player):
+		player.global_position = target_pos
+		var zone_rect := get_zone_rect(zone_id)
+		if "world_bounds" in player:
+			player.world_bounds = zone_rect
+		var camera: Camera2D = player.get_node_or_null("camera2d")
+		if camera == null:
+			camera = player.get_node_or_null("Camera2D")
+		if camera != null:
+			camera.limit_left = int(zone_rect.position.x)
+			camera.limit_top = int(zone_rect.position.y)
+			camera.limit_right = int(zone_rect.end.x)
+			camera.limit_bottom = int(zone_rect.end.y)
+	zone_changed.emit(zone_id, get_zone_name(zone_id))
+
+
+func _on_gate_triggered(target_zone_id: String, target_spawn_pos: Vector2) -> void:
+	change_zone(target_zone_id, target_spawn_pos, true)
+
+
+func _find_player() -> Node2D:
+	if not is_inside_tree():
+		return null
+	var players := get_tree().get_nodes_in_group("player")
+	if not players.is_empty():
+		return players[0] as Node2D
+	if get_parent() != null:
+		var p := get_parent().get_node_or_null("Player") as Node2D
+		if p != null:
+			return p
+	return get_tree().root.find_child("Player", true, false) as Node2D
+
+
+func _setup_fade_layer() -> void:
+	if _fade_layer != null:
+		return
+	_fade_layer = CanvasLayer.new()
+	_fade_layer.layer = 100
+	_fade_rect = ColorRect.new()
+	_fade_rect.color = Color.BLACK
+	_fade_rect.modulate.a = 0.0
+	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_fade_layer.add_child(_fade_rect)
+	add_child(_fade_layer)
+
+
+func _setup_zones_and_gates() -> void:
+	if not _zone_gates.is_empty():
+		return
+
+	# Village <-> Forest Zone 1
+	_create_gate("village", "forest_zone_1", Vector2(565.0, 440.0), Vector2(530.0, 1200.0), Vector2(16.0, 128.0))
+	_create_gate("forest_zone_1", "village", Vector2(550.0, 1200.0), Vector2(590.0, 440.0), Vector2(16.0, 128.0))
+
+	# Forest Zone 1 <-> Forest Zone 2
+	_create_gate("forest_zone_1", "forest_zone_2", Vector2(10.0, 1200.0), Vector2(-30.0, 1200.0), Vector2(16.0, 128.0))
+	_create_gate("forest_zone_2", "forest_zone_1", Vector2(-10.0, 1200.0), Vector2(30.0, 1200.0), Vector2(16.0, 128.0))
+
+	# Forest Zone 1 <-> Forest Zone 3
+	_create_gate("forest_zone_1", "forest_zone_3", Vector2(280.0, 970.0), Vector2(280.0, 930.0), Vector2(128.0, 16.0))
+	_create_gate("forest_zone_3", "forest_zone_1", Vector2(280.0, 950.0), Vector2(280.0, 990.0), Vector2(128.0, 16.0))
+
+	# Forest Zone 1 <-> Forest Zone 4
+	_create_gate("forest_zone_1", "forest_zone_4", Vector2(500.0, 970.0), Vector2(840.0, -20.0), Vector2(64.0, 16.0))
+	_create_gate("forest_zone_4", "forest_zone_1", Vector2(840.0, -10.0), Vector2(500.0, 1000.0), Vector2(64.0, 16.0))
+
+	# Forest Zone 2 <-> Forest Zone 5
+	_create_gate("forest_zone_2", "forest_zone_5", Vector2(-280.0, 970.0), Vector2(-280.0, 930.0), Vector2(128.0, 16.0))
+	_create_gate("forest_zone_5", "forest_zone_2", Vector2(-280.0, 950.0), Vector2(-280.0, 990.0), Vector2(128.0, 16.0))
+
+	# Forest Zone 3 <-> Forest Zone 5
+	_create_gate("forest_zone_3", "forest_zone_5", Vector2(10.0, 720.0), Vector2(-30.0, 720.0), Vector2(16.0, 128.0))
+	_create_gate("forest_zone_5", "forest_zone_3", Vector2(-10.0, 720.0), Vector2(30.0, 720.0), Vector2(16.0, 128.0))
+
+	# Forest Zone 3 <-> Forest Zone 4
+	_create_gate("forest_zone_3", "forest_zone_4", Vector2(550.0, 600.0), Vector2(600.0, -240.0), Vector2(16.0, 128.0))
+	_create_gate("forest_zone_4", "forest_zone_3", Vector2(580.0, -240.0), Vector2(530.0, 600.0), Vector2(16.0, 128.0))
+
+	# Forest Zone 3 <-> Forest Zone 6
+	_create_gate("forest_zone_3", "forest_zone_6", Vector2(280.0, 490.0), Vector2(280.0, 450.0), Vector2(128.0, 16.0))
+	_create_gate("forest_zone_6", "forest_zone_3", Vector2(280.0, 470.0), Vector2(280.0, 510.0), Vector2(128.0, 16.0))
+
+	# Forest Zone 5 <-> Forest Zone 6
+	_create_gate("forest_zone_5", "forest_zone_6", Vector2(-50.0, 490.0), Vector2(50.0, 450.0), Vector2(64.0, 16.0))
+	_create_gate("forest_zone_6", "forest_zone_5", Vector2(50.0, 470.0), Vector2(-50.0, 510.0), Vector2(64.0, 16.0))
+
+
+func _create_gate(
+	source_id: String,
+	target_id: String,
+	gate_pos: Vector2,
+	spawn_pos: Vector2,
+	shape_size: Vector2 = Vector2(32.0, 32.0)
+) -> ZoneGate2D:
+	var gate := ZoneGate2D.new()
+	gate.name = "Gate_%s_to_%s" % [source_id, target_id]
+	gate.source_zone_id = source_id
+	gate.target_zone_id = target_id
+	gate.target_spawn_position = spawn_pos
+	gate.position = gate_pos
+
+	var col := CollisionShape2D.new()
+	var rect_shape := RectangleShape2D.new()
+	rect_shape.size = shape_size
+	col.shape = rect_shape
+	gate.add_child(col)
+
+	gate.gate_triggered.connect(_on_gate_triggered)
+	_zone_gates.append(gate)
+	add_child(gate)
+	return gate
+
+
+func _update_fallen_tree_barriers() -> void:
+	var is_unlocked := false
+	if _game_state != null and "is_deep_forest_unlocked" in _game_state:
+		is_unlocked = _game_state.is_deep_forest_unlocked
+	elif has_node("/root/GameState"):
+		var gs = get_node("/root/GameState")
+		if "is_deep_forest_unlocked" in gs:
+			is_unlocked = gs.is_deep_forest_unlocked
+
+	for gate in _zone_gates:
+		if gate.target_zone_id == "forest_zone_6" or gate.target_zone_id == "forest_zone_5":
+			gate.is_blocked = not is_unlocked
+			gate.blocked_dialog_key = "fallen_tree_barrier"
 
 
 func is_near_bed(player_position: Vector2) -> bool:
