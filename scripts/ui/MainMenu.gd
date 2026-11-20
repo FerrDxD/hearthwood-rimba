@@ -6,6 +6,8 @@ const GAME_SCENE_PATH: String = "res://scenes/Main.tscn"
 const SETTINGS_PATH: String = "user://settings.cfg"
 const AUDIO_DIRECTOR_SCRIPT: Script = preload("res://scripts/systems/AudioDirector.gd")
 const DEFAULT_SAVE_FILE_PATH: String = "user://savegame.json"
+const PROLOGUE_SEQUENCE_SCENE: PackedScene = preload("res://scenes/ui/PrologueSequence.tscn")
+const PROLOGUE_SEQUENCE_SCRIPT: Script = preload("res://scripts/ui/PrologueSequence.gd")
 
 # Latar Belakang Rimba & Pohon Conifer Geometris Taktil (FigCraft v0.5.2)
 class MenuLandscape extends Control:
@@ -80,6 +82,7 @@ class MenuLandscape extends Control:
 
 
 var _save_file_path: String = DEFAULT_SAVE_FILE_PATH
+var enable_prologue: bool = true
 var _interface: Control
 var _continue_button: Button
 var _load_button: Button
@@ -108,6 +111,8 @@ func configure_save_file_path(path: String) -> void:
 		push_error("Main menu save path cannot be empty.")
 		return
 	_save_file_path = path
+	if _save_file_path != DEFAULT_SAVE_FILE_PATH:
+		enable_prologue = false
 	if is_node_ready():
 		_refresh_save_slot()
 
@@ -424,6 +429,13 @@ func _start_new_game() -> void:
 	if not game_state.start_new_game(_name_input.text):
 		_status_label.text = "Masukkan nama pengelana sebelum memulai."
 		return
+	if enable_prologue:
+		var prologue = PROLOGUE_SEQUENCE_SCENE.instantiate()
+		if prologue != null:
+			add_child(prologue)
+			prologue.sequence_completed.connect(_enter_game)
+			prologue.start_sequence(_name_input.text)
+			return
 	_enter_game()
 
 
