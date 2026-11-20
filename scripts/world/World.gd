@@ -110,17 +110,27 @@ var _rustling_bushes: Array[HearthwoodRustlingBush] = []
 var _ambient_particles: Dictionary = {}
 var _zone_props: Dictionary = {}
 var _landmarks: Dictionary = {}
+var _village_data: Dictionary = {}
 var _obstacle_rects: Array[Rect2] = []
 var _building_rects: Array[Rect2] = [
-	Rect2(970.0, 246.0, 92.0, 72.0),
-	Rect2(1102.0, 246.0, 92.0, 72.0),
-	Rect2(1268.0, 380.0, 104.0, 76.0),
+	Rect2(1330.0, 240.0, 130.0, 84.0), # Town Hall
+	Rect2(970.0, 246.0, 92.0, 72.0),   # Giral Store
+	Rect2(1102.0, 246.0, 92.0, 72.0),  # Talia Store
+	Rect2(1268.0, 380.0, 104.0, 76.0), # Warung Makan Pemain
+	Rect2(680.0, 640.0, 100.0, 76.0),  # Lumbung Padi Komunal
+	Rect2(820.0, 640.0, 76.0, 64.0),   # Cottage Casha
+	Rect2(930.0, 640.0, 80.0, 64.0),   # Cottage Jev & Gil
+	Rect2(1040.0, 640.0, 76.0, 64.0),  # Cottage Pak Udin
+	Rect2(1150.0, 640.0, 76.0, 64.0),  # Cottage Budi
+	Rect2(1260.0, 640.0, 76.0, 64.0),  # Cottage Siti
+	Rect2(1370.0, 640.0, 76.0, 64.0),  # Cottage Arin
 ]
 
 
 func _init() -> void:
 	_random.seed = 713
 	_load_forest_zones_data()
+	_load_village_zones_data()
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
 	_update_fallen_tree_barriers()
@@ -143,6 +153,8 @@ func _ready() -> void:
 	_setup_fade_layer()
 	if _landmarks.is_empty() or _zone_props.is_empty():
 		_load_forest_zones_data()
+	if _village_data.is_empty():
+		_load_village_zones_data()
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
 	if _game_state == null and has_node("/root/GameState"):
@@ -601,12 +613,89 @@ func _load_forest_zones_data() -> void:
 	}
 
 
+func _load_village_zones_data() -> void:
+	if not _village_data.is_empty():
+		return
+	var path := "res://data/world/village_zones.json"
+	if FileAccess.file_exists(path):
+		var file := FileAccess.open(path, FileAccess.READ)
+		if file != null:
+			var parsed: Variant = JSON.parse_string(file.get_as_text())
+			if typeof(parsed) == TYPE_DICTIONARY:
+				_village_data = parsed
+				return
+	_village_data = {
+		"districts": {
+			"market_district": {"id": "market_district", "bounds": [850.0, 180.0, 350.0, 360.0]},
+			"civic_district": {"id": "civic_district", "bounds": [1260.0, 180.0, 320.0, 220.0]},
+			"tavern_district": {"id": "tavern_district", "bounds": [1150.0, 360.0, 380.0, 280.0]},
+			"residential_district": {"id": "residential_district", "bounds": [600.0, 540.0, 850.0, 300.0]},
+		},
+		"buildings": {
+			"town_hall": {"id": "town_hall", "position": [1330.0, 240.0], "size": [130.0, 84.0]},
+			"giral_store": {"id": "giral_store", "position": [970.0, 246.0], "size": [92.0, 72.0]},
+			"talia_store": {"id": "talia_store", "position": [1102.0, 246.0], "size": [92.0, 72.0]},
+			"player_warung": {"id": "player_warung", "position": [1268.0, 380.0], "size": [104.0, 76.0]},
+			"village_granary": {"id": "village_granary", "position": [680.0, 640.0], "size": [100.0, 76.0]},
+			"residential_cottages": [
+				{"id": "cottage_casha", "name": "Pondok Tenun Casha", "position": [820.0, 640.0], "size": [76.0, 64.0]},
+				{"id": "cottage_jev_gil", "name": "Pondok Bersama Jev & Gil", "position": [930.0, 640.0], "size": [80.0, 64.0]},
+				{"id": "cottage_pak_udin", "name": "Pondok Nelayan Pak Udin", "position": [1040.0, 640.0], "size": [76.0, 64.0]},
+				{"id": "cottage_budi", "name": "Pondok Petani Budi", "position": [1150.0, 640.0], "size": [76.0, 64.0]},
+				{"id": "cottage_siti", "name": "Pondok Peramu Siti", "position": [1260.0, 640.0], "size": [76.0, 64.0]},
+				{"id": "cottage_arin", "name": "Pondok Pengrajin Arin", "position": [1370.0, 640.0], "size": [76.0, 64.0]},
+			]
+		}
+	}
+
+
 func get_zone_landmarks(zone_id: String) -> Array:
 	return _landmarks.get(zone_id, [])
 
 
 func get_all_landmarks() -> Dictionary:
 	return _landmarks
+
+
+func get_village_buildings() -> Array[Dictionary]:
+	if _village_data.is_empty():
+		_load_village_zones_data()
+	var list: Array[Dictionary] = []
+	for b_id in ["town_hall", "giral_store", "talia_store", "player_warung", "village_granary", "residential_cottages"]:
+		var b := get_village_building(b_id)
+		if not b.is_empty():
+			list.append(b)
+	return list
+
+
+func get_village_building(id: String) -> Dictionary:
+	if _village_data.is_empty():
+		_load_village_zones_data()
+	if not _village_data.has("buildings"):
+		return {}
+	var b_dict: Dictionary = _village_data.get("buildings", {})
+	if b_dict.has(id):
+		var val = b_dict[id]
+		if typeof(val) == TYPE_DICTIONARY:
+			return val
+		elif typeof(val) == TYPE_ARRAY and id == "residential_cottages":
+			return {
+				"id": "residential_cottages",
+				"name": "Pondok Pemukiman Warga",
+				"cottages": val
+			}
+	# Also allow querying individual cottage by id (e.g. cottage_casha)
+	if b_dict.has("residential_cottages") and typeof(b_dict["residential_cottages"]) == TYPE_ARRAY:
+		for c in b_dict["residential_cottages"]:
+			if typeof(c) == TYPE_DICTIONARY and c.get("id") == id:
+				return c
+	return {}
+
+
+func get_village_districts() -> Dictionary:
+	if _village_data.is_empty():
+		_load_village_zones_data()
+	return _village_data.get("districts", {})
 
 
 func get_zone_gates() -> Array[ZoneGate2D]:
@@ -1163,8 +1252,7 @@ func _draw() -> void:
 			Color("#75934f")
 		)
 
-	for index in _building_rects.size():
-		_draw_building(_building_rects[index], index == _building_rects.size() - 1)
+	_draw_village_landmarks()
 
 	draw_line(
 		COOKING_STATION_POSITION + Vector2(-14.0, 12.0),
@@ -1411,10 +1499,393 @@ func _draw_great_tree() -> void:
 	)
 
 
+func _get_warung_tier() -> int:
+	if has_node("/root/GameState"):
+		var gs = get_node("/root/GameState")
+		if "warung_tier" in gs:
+			return int(gs.warung_tier)
+	if _game_state != null and "warung_tier" in _game_state:
+		return int(_game_state.warung_tier)
+	return 0
+
+
+func _draw_village_landmarks() -> void:
+	_draw_village_plaza_and_paths()
+	_draw_village_granary()
+	_draw_residential_cottages()
+	_draw_giral_store()
+	_draw_talia_store()
+	_draw_town_hall()
+	_draw_player_warung()
+
+
+func _draw_village_plaza_and_paths() -> void:
+	# Main East-West thoroughfare connecting forest gate to village center
+	draw_rect(Rect2(560.0, 428.0, 400.0, 24.0), Color("#705335"))
+	draw_rect(Rect2(560.0, 432.0, 400.0, 16.0), Color("#8b7355"))
+	draw_rect(Rect2(570.0, 435.0, 380.0, 10.0), Color("#a89f91"))
+
+	# East thoroughfare towards Warung and Civic district
+	draw_rect(Rect2(1200.0, 428.0, 180.0, 24.0), Color("#705335"))
+	draw_rect(Rect2(1200.0, 432.0, 180.0, 16.0), Color("#8b7355"))
+	draw_rect(Rect2(1210.0, 435.0, 160.0, 10.0), Color("#a89f91"))
+
+	# North spur to Market District (Giral & Talia)
+	draw_rect(Rect2(1034.0, 318.0, 36.0, 80.0), Color("#705335"))
+	draw_rect(Rect2(1038.0, 318.0, 28.0, 80.0), Color("#8b7355"))
+
+	# South spur to Residential District and Granary
+	draw_rect(Rect2(1034.0, 516.0, 36.0, 126.0), Color("#705335"))
+	draw_rect(Rect2(1038.0, 516.0, 28.0, 126.0), Color("#8b7355"))
+
+	# Central Plaza paving around (1050, 460)
+	# Soft earth underlay
+	draw_rect(Rect2(946.0, 396.0, 268.0, 132.0), Color("#5c4630"))
+	# Flagstone stone plaza body
+	draw_rect(Rect2(950.0, 400.0, 260.0, 124.0), Color("#8f9692"))
+	draw_rect(Rect2(956.0, 406.0, 248.0, 112.0), Color("#9ca89e"))
+
+	# Individual rounded cobbles and flagstone grid details
+	for px in range(960, 1200, 24):
+		for py in range(410, 510, 20):
+			var stone_color := Color("#a89f91") if (px + py) % 48 == 0 else Color("#7d8c82")
+			draw_rect(Rect2(float(px), float(py), 20.0, 16.0), stone_color)
+			draw_rect(Rect2(float(px) + 1.0, float(py) + 1.0, 18.0, 14.0), Color("#8f9692"))
+
+	# Subtle highlight cobble specks near well (1050, 460) and board (1130, 460)
+	for off in [Vector2(-30.0, -15.0), Vector2(25.0, -20.0), Vector2(-20.0, 25.0), Vector2(40.0, 18.0), Vector2(70.0, -10.0), Vector2(90.0, 20.0)]:
+		draw_circle(Vector2(1050.0, 460.0) + off, 3.5, Color("#c2b280"))
+		draw_circle(Vector2(1050.0, 460.0) + off, 2.0, Color("#d2b48c"))
+
+
+func _draw_town_hall() -> void:
+	var base_pos := Vector2(1330.0, 240.0)
+	var size := Vector2(130.0, 84.0)
+
+	# Stone plinth foundation & wide welcoming steps
+	draw_rect(Rect2(base_pos.x - 6.0, base_pos.y + size.y - 8.0, size.x + 12.0, 8.0), Color("#6b736e"))
+	draw_rect(Rect2(base_pos.x - 2.0, base_pos.y + size.y - 12.0, size.x + 4.0, 4.0), Color("#8f9692"))
+
+	# Sturdy sandstone walls
+	draw_rect(Rect2(base_pos.x, base_pos.y + 12.0, size.x, size.y - 20.0), Color("#d2b48c"))
+
+	# Timber framing corner posts
+	draw_rect(Rect2(base_pos.x, base_pos.y + 12.0, 8.0, size.y - 20.0), Color("#5a3d28"))
+	draw_rect(Rect2(base_pos.x + size.x - 8.0, base_pos.y + 12.0, 8.0, size.y - 20.0), Color("#5a3d28"))
+
+	# Grand gabled roof
+	draw_rect(Rect2(base_pos.x - 8.0, base_pos.y - 4.0, size.x + 16.0, 22.0), Color("#5c3a1e"))
+	draw_rect(Rect2(base_pos.x - 4.0, base_pos.y - 10.0, size.x + 8.0, 10.0), Color("#4a2e1b"))
+	draw_line(Vector2(base_pos.x - 8.0, base_pos.y - 10.0), Vector2(base_pos.x + size.x + 8.0, base_pos.y - 10.0), Color("#8b5a3c"), 2.0)
+
+	# Decorative half-timbered gable pediment in center
+	var gable_pts: PackedVector2Array = [
+		Vector2(base_pos.x + 40.0, base_pos.y + 12.0),
+		Vector2(base_pos.x + size.x * 0.5, base_pos.y - 18.0),
+		Vector2(base_pos.x + size.x - 40.0, base_pos.y + 12.0)
+	]
+	draw_colored_polygon(gable_pts, Color("#f5f5dc"))
+	draw_line(gable_pts[0], gable_pts[1], Color("#5a3d28"), 3.0)
+	draw_line(gable_pts[1], gable_pts[2], Color("#5a3d28"), 3.0)
+	draw_line(gable_pts[0], gable_pts[2], Color("#5a3d28"), 2.0)
+	draw_line(Vector2(base_pos.x + size.x * 0.5, base_pos.y - 18.0), Vector2(base_pos.x + size.x * 0.5, base_pos.y + 12.0), Color("#5a3d28"), 2.0)
+
+	# Timber pillared porch
+	draw_rect(Rect2(base_pos.x + 2.0, base_pos.y + 36.0, size.x - 4.0, 6.0), Color("#76513a"))
+	for px in [base_pos.x + 6.0, base_pos.x + 38.0, base_pos.x + size.x - 44.0, base_pos.x + size.x - 12.0]:
+		draw_rect(Rect2(px, base_pos.y + 42.0, 6.0, size.y - 54.0), Color("#5a3d28"))
+		draw_rect(Rect2(px + 1.0, base_pos.y + 42.0, 4.0, size.y - 54.0), Color("#76513a"))
+
+	# Arched double doors in center
+	draw_rect(Rect2(base_pos.x + 52.0, base_pos.y + 44.0, 26.0, 28.0), Color("#4a2e1b"))
+	draw_circle(Vector2(base_pos.x + 65.0, base_pos.y + 44.0), 13.0, Color("#3a2012"))
+	draw_line(Vector2(base_pos.x + 65.0, base_pos.y + 35.0), Vector2(base_pos.x + 65.0, base_pos.y + 72.0), Color("#333333"), 1.5)
+	draw_circle(Vector2(base_pos.x + 62.0, base_pos.y + 58.0), 2.0, Color("#ffd26b"))
+	draw_circle(Vector2(base_pos.x + 68.0, base_pos.y + 58.0), 2.0, Color("#ffd26b"))
+
+	# Arched leaded windows
+	for wx in [base_pos.x + 18.0, base_pos.x + size.x - 34.0]:
+		draw_rect(Rect2(wx, base_pos.y + 44.0, 16.0, 18.0), Color("#87ceeb"))
+		draw_circle(Vector2(wx + 8.0, base_pos.y + 44.0), 8.0, Color("#87ceeb"))
+		draw_line(Vector2(wx + 8.0, base_pos.y + 36.0), Vector2(wx + 8.0, base_pos.y + 62.0), Color("#555555"), 1.0)
+		draw_line(Vector2(wx, base_pos.y + 52.0), Vector2(wx + 16.0, base_pos.y + 52.0), Color("#555555"), 1.0)
+		draw_rect(Rect2(wx - 2.0, base_pos.y + 62.0, 20.0, 3.0), Color("#5a3d28"))
+
+	# Hearthwood Green Banner with Golden Spoon
+	draw_rect(Rect2(base_pos.x + 55.0, base_pos.y + 14.0, 20.0, 22.0), Color("#8fbc8f"))
+	draw_rect(Rect2(base_pos.x + 55.0, base_pos.y + 34.0, 20.0, 2.0), Color("#cd853f"))
+	# Golden spoon crest
+	draw_line(Vector2(base_pos.x + 65.0, base_pos.y + 18.0), Vector2(base_pos.x + 65.0, base_pos.y + 30.0), Color("#cd853f"), 2.0)
+	draw_circle(Vector2(base_pos.x + 65.0, base_pos.y + 19.0), 3.0, Color("#ffd26b"))
+
+	# Rooftop cupola / belfry
+	draw_rect(Rect2(base_pos.x + 57.0, base_pos.y - 28.0, 16.0, 14.0), Color("#76513a"))
+	draw_circle(Vector2(base_pos.x + 65.0, base_pos.y - 21.0), 3.0, Color("#ffd26b"))
+	var cupola_pts: PackedVector2Array = [
+		Vector2(base_pos.x + 54.0, base_pos.y - 28.0),
+		Vector2(base_pos.x + 65.0, base_pos.y - 38.0),
+		Vector2(base_pos.x + 76.0, base_pos.y - 28.0)
+	]
+	draw_colored_polygon(cupola_pts, Color("#5c3a1e"))
+
+	# Flower planters on porch sides
+	draw_rect(Rect2(base_pos.x + 4.0, base_pos.y + size.y - 12.0, 22.0, 6.0), Color("#5a3d28"))
+	draw_rect(Rect2(base_pos.x + size.x - 26.0, base_pos.y + size.y - 12.0, 22.0, 6.0), Color("#5a3d28"))
+	for fx in [base_pos.x + 8.0, base_pos.x + 14.0, base_pos.x + 20.0, base_pos.x + size.x - 22.0, base_pos.x + size.x - 16.0]:
+		draw_circle(Vector2(fx, base_pos.y + size.y - 14.0), 2.5, Color("#db7093"))
+		draw_circle(Vector2(fx + 2.0, base_pos.y + size.y - 15.0), 1.5, Color("#ffd26b"))
+
+
+func _draw_giral_store() -> void:
+	var base_pos := Vector2(970.0, 246.0)
+	var size := Vector2(92.0, 72.0)
+
+	# Main wall
+	draw_rect(Rect2(base_pos.x, base_pos.y + 14.0, size.x, size.y - 14.0), Color("#d2b48c"))
+	draw_rect(Rect2(base_pos.x, base_pos.y + 14.0, 6.0, size.y - 14.0), Color("#76513a"))
+	draw_rect(Rect2(base_pos.x + size.x - 6.0, base_pos.y + 14.0, 6.0, size.y - 14.0), Color("#76513a"))
+
+	# Roof
+	draw_rect(Rect2(base_pos.x - 6.0, base_pos.y - 4.0, size.x + 12.0, 18.0), Color("#5c3a1e"))
+	draw_rect(Rect2(base_pos.x - 2.0, base_pos.y - 8.0, size.x + 4.0, 6.0), Color("#4a2e1b"))
+	draw_line(Vector2(base_pos.x - 6.0, base_pos.y - 8.0), Vector2(base_pos.x + size.x + 6.0, base_pos.y - 8.0), Color("#8b5a3c"), 2.0)
+
+	# Striped canopy awning (#B8482D & #F5F5DC)
+	var awning_rect := Rect2(base_pos.x - 2.0, base_pos.y + 14.0, size.x + 4.0, 16.0)
+	var stripe_width := 12.0
+	var num_stripes := int(ceil(awning_rect.size.x / stripe_width))
+	for i in num_stripes:
+		var sx := awning_rect.position.x + float(i) * stripe_width
+		var sw := minf(stripe_width, awning_rect.end.x - sx)
+		var scolor := Color("#b8482d") if i % 2 == 0 else Color("#f5f5dc")
+		draw_rect(Rect2(sx, awning_rect.position.y, sw, awning_rect.size.y), scolor)
+	# Scalloped fringe
+	draw_line(Vector2(awning_rect.position.x, awning_rect.end.y), Vector2(awning_rect.end.x, awning_rect.end.y), Color("#f5f5dc"), 2.0)
+
+	# Shop entrance door
+	draw_rect(Rect2(base_pos.x + size.x - 26.0, base_pos.y + 36.0, 18.0, 36.0), Color("#4a2e1b"))
+	draw_circle(Vector2(base_pos.x + size.x - 22.0, base_pos.y + 54.0), 2.0, Color("#ffd26b"))
+
+	# Display counter
+	draw_rect(Rect2(base_pos.x + 8.0, base_pos.y + 42.0, 48.0, 14.0), Color("#76513a"))
+	draw_rect(Rect2(base_pos.x + 10.0, base_pos.y + 40.0, 44.0, 3.0), Color("#8b5a3c"))
+
+	# Commodity crates & sacks
+	# Vegetable crate
+	draw_rect(Rect2(base_pos.x + 8.0, base_pos.y + 58.0, 14.0, 12.0), Color("#a67c52"))
+	draw_circle(Vector2(base_pos.x + 13.0, base_pos.y + 62.0), 3.0, Color("#4e7943"))
+	draw_circle(Vector2(base_pos.x + 17.0, base_pos.y + 64.0), 2.5, Color("#75934f"))
+	# Berry crate
+	draw_rect(Rect2(base_pos.x + 24.0, base_pos.y + 59.0, 14.0, 11.0), Color("#8a5e38"))
+	draw_circle(Vector2(base_pos.x + 29.0, base_pos.y + 63.0), 2.5, Color("#e74c3c"))
+	draw_circle(Vector2(base_pos.x + 33.0, base_pos.y + 64.0), 2.0, Color("#db7093"))
+	# Grain/Salt sack
+	draw_circle(Vector2(base_pos.x + 44.0, base_pos.y + 65.0), 6.0, Color("#e5d2ad"))
+	draw_circle(Vector2(base_pos.x + 44.0, base_pos.y + 60.0), 2.0, Color("#8b5a2b"))
+
+	# Hanging wooden shop sign
+	draw_rect(Rect2(base_pos.x + 8.0, base_pos.y + 4.0, 18.0, 8.0), Color("#cd853f"))
+	draw_circle(Vector2(base_pos.x + 17.0, base_pos.y + 8.0), 2.0, Color("#4e7943"))
+
+
+func _draw_talia_store() -> void:
+	var base_pos := Vector2(1102.0, 246.0)
+	var size := Vector2(92.0, 72.0)
+
+	# Workshop ashlar stone wall
+	draw_rect(Rect2(base_pos.x, base_pos.y + 14.0, size.x, size.y - 14.0), Color("#8f9692"))
+
+	# Stone chimney with soot
+	draw_rect(Rect2(base_pos.x + size.x - 14.0, base_pos.y - 12.0, 12.0, 26.0), Color("#6b736e"))
+	draw_rect(Rect2(base_pos.x + size.x - 15.0, base_pos.y - 14.0, 14.0, 3.0), Color("#333333"))
+
+	# Roof
+	draw_rect(Rect2(base_pos.x - 6.0, base_pos.y - 4.0, size.x + 12.0, 18.0), Color("#5c3a1e"))
+	draw_rect(Rect2(base_pos.x - 2.0, base_pos.y - 8.0, size.x + 4.0, 6.0), Color("#4a2e1b"))
+	draw_line(Vector2(base_pos.x - 6.0, base_pos.y - 8.0), Vector2(base_pos.x + size.x + 6.0, base_pos.y - 8.0), Color("#8b5a3c"), 2.0)
+
+	# Workshop overhang with knee braces
+	draw_rect(Rect2(base_pos.x - 2.0, base_pos.y + 14.0, size.x + 4.0, 14.0), Color("#5a3d28"))
+	draw_line(Vector2(base_pos.x + 2.0, base_pos.y + 28.0), Vector2(base_pos.x + 12.0, base_pos.y + 14.0), Color("#3a2012"), 2.0)
+	draw_line(Vector2(base_pos.x + size.x - 4.0, base_pos.y + 28.0), Vector2(base_pos.x + size.x - 14.0, base_pos.y + 14.0), Color("#3a2012"), 2.0)
+
+	# Workshop entrance door
+	draw_rect(Rect2(base_pos.x + 12.0, base_pos.y + 36.0, 20.0, 36.0), Color("#3a2012"))
+	draw_circle(Vector2(base_pos.x + 28.0, base_pos.y + 54.0), 2.0, Color("#333333"))
+
+	# Glowing forge window
+	draw_rect(Rect2(base_pos.x + 38.0, base_pos.y + 38.0, 18.0, 16.0), Color("#d35400"))
+	draw_line(Vector2(base_pos.x + 47.0, base_pos.y + 38.0), Vector2(base_pos.x + 47.0, base_pos.y + 54.0), Color("#333333"), 1.5)
+	draw_line(Vector2(base_pos.x + 38.0, base_pos.y + 46.0), Vector2(base_pos.x + 56.0, base_pos.y + 46.0), Color("#333333"), 1.5)
+
+	# Heavy Iron Anvil Prop on tree stump
+	var stump_pos := Vector2(base_pos.x + size.x - 24.0, base_pos.y + 54.0)
+	draw_rect(Rect2(stump_pos.x - 6.0, stump_pos.y, 14.0, 16.0), Color("#5a3d28"))
+	draw_rect(Rect2(stump_pos.x - 8.0, stump_pos.y - 6.0, 18.0, 6.0), Color("#333333"))
+	# Anvil horn
+	draw_line(Vector2(stump_pos.x - 8.0, stump_pos.y - 3.0), Vector2(stump_pos.x - 12.0, stump_pos.y - 2.0), Color("#4a4a4a"), 2.5)
+	# Anvil face highlight
+	draw_rect(Rect2(stump_pos.x - 6.0, stump_pos.y - 7.0, 14.0, 2.0), Color("#666666"))
+
+	# Hanging smithing tools beneath the overhang
+	draw_line(Vector2(base_pos.x + 8.0, base_pos.y + 24.0), Vector2(base_pos.x + 32.0, base_pos.y + 24.0), Color("#333333"), 2.0)
+	# Hammer
+	draw_line(Vector2(base_pos.x + 14.0, base_pos.y + 25.0), Vector2(base_pos.x + 14.0, base_pos.y + 32.0), Color("#8b5a2b"), 1.5)
+	draw_rect(Rect2(base_pos.x + 12.0, base_pos.y + 31.0, 4.0, 3.0), Color("#555555"))
+	# Tongs
+	draw_line(Vector2(base_pos.x + 24.0, base_pos.y + 25.0), Vector2(base_pos.x + 22.0, base_pos.y + 33.0), Color("#555555"), 1.5)
+	draw_line(Vector2(base_pos.x + 24.0, base_pos.y + 25.0), Vector2(base_pos.x + 26.0, base_pos.y + 33.0), Color("#555555"), 1.5)
+
+
+func _draw_village_granary() -> void:
+	var base_pos := Vector2(680.0, 640.0)
+	var size := Vector2(100.0, 76.0)
+
+	# Raised stilts / timber pilings
+	for sx in [base_pos.x + 8.0, base_pos.x + 34.0, base_pos.x + size.x - 38.0, base_pos.x + size.x - 12.0]:
+		draw_rect(Rect2(sx, base_pos.y + 54.0, 6.0, 22.0), Color("#5a3d28"))
+		# Anti-rodent stone disc atop stilt
+		draw_rect(Rect2(sx - 3.0, base_pos.y + 52.0, 12.0, 3.0), Color("#7d8c82"))
+
+	# Wooden access ladder
+	draw_rect(Rect2(base_pos.x + 44.0, base_pos.y + 54.0, 12.0, 22.0), Color("#76513a"))
+	for ly in [base_pos.y + 58.0, base_pos.y + 64.0, base_pos.y + 70.0]:
+		draw_line(Vector2(base_pos.x + 44.0, ly), Vector2(base_pos.x + 56.0, ly), Color("#4a2e1b"), 1.5)
+
+	# Granary floor platform
+	draw_rect(Rect2(base_pos.x - 2.0, base_pos.y + 48.0, size.x + 4.0, 6.0), Color("#5a3d28"))
+
+	# Granary body: ventilated timber slats (#8A5E38 & #76513a)
+	draw_rect(Rect2(base_pos.x, base_pos.y + 12.0, size.x, 38.0), Color("#8a5e38"))
+	for sy in [base_pos.y + 18.0, base_pos.y + 24.0, base_pos.y + 30.0, base_pos.y + 36.0, base_pos.y + 42.0]:
+		draw_line(Vector2(base_pos.x, sy), Vector2(base_pos.x + size.x, sy), Color("#5a3d28"), 1.5)
+
+	# Center wooden granary door
+	draw_rect(Rect2(base_pos.x + 42.0, base_pos.y + 20.0, 16.0, 28.0), Color("#4a2e1b"))
+	draw_rect(Rect2(base_pos.x + 48.0, base_pos.y + 32.0, 4.0, 4.0), Color("#d6ba68"))
+
+	# Distinctive thatched roof (#A67C52)
+	draw_rect(Rect2(base_pos.x - 6.0, base_pos.y - 6.0, size.x + 12.0, 20.0), Color("#a67c52"))
+	draw_rect(Rect2(base_pos.x - 2.0, base_pos.y - 10.0, size.x + 4.0, 6.0), Color("#c29b62"))
+	draw_line(Vector2(base_pos.x - 6.0, base_pos.y - 10.0), Vector2(base_pos.x + size.x + 6.0, base_pos.y - 10.0), Color("#8b5a2b"), 3.0)
+
+	# Grain sacks & barrel near the stilts
+	draw_rect(Rect2(base_pos.x + 16.0, base_pos.y + 62.0, 10.0, 14.0), Color("#76513a"))
+	draw_line(Vector2(base_pos.x + 16.0, base_pos.y + 66.0), Vector2(base_pos.x + 26.0, base_pos.y + 66.0), Color("#333333"), 1.0)
+	draw_line(Vector2(base_pos.x + 16.0, base_pos.y + 72.0), Vector2(base_pos.x + 26.0, base_pos.y + 72.0), Color("#333333"), 1.0)
+	draw_circle(Vector2(base_pos.x + 76.0, base_pos.y + 68.0), 5.0, Color("#e5d2ad"))
+	draw_circle(Vector2(base_pos.x + 82.0, base_pos.y + 70.0), 4.5, Color("#d6ba68"))
+
+
+func _draw_residential_cottages() -> void:
+	var cottages_data := [
+		{"pos": Vector2(820.0, 640.0), "size": Vector2(76.0, 64.0), "wall": Color("#f5f5dc"), "accent": Color("#db7093")},
+		{"pos": Vector2(930.0, 640.0), "size": Vector2(80.0, 64.0), "wall": Color("#d2b48c"), "accent": Color("#6b736e")},
+		{"pos": Vector2(1040.0, 640.0), "size": Vector2(76.0, 64.0), "wall": Color("#cba77b"), "accent": Color("#4e7943")},
+		{"pos": Vector2(1150.0, 640.0), "size": Vector2(76.0, 64.0), "wall": Color("#d2b48c"), "accent": Color("#75934f")},
+		{"pos": Vector2(1260.0, 640.0), "size": Vector2(76.0, 64.0), "wall": Color("#d2b48c"), "accent": Color("#8fbc8f")},
+		{"pos": Vector2(1370.0, 640.0), "size": Vector2(76.0, 64.0), "wall": Color("#cba77b"), "accent": Color("#cd853f")},
+	]
+
+	# Rustic wooden fences connecting the cottage plots
+	var fence_segments := [
+		[780.0, 820.0],
+		[896.0, 930.0],
+		[1010.0, 1040.0],
+		[1116.0, 1150.0],
+		[1226.0, 1260.0],
+		[1336.0, 1370.0],
+	]
+	for seg in fence_segments:
+		var x1: float = seg[0]
+		var x2: float = seg[1]
+		var fy := 686.0
+		# Horizontal rails
+		draw_line(Vector2(x1, fy), Vector2(x2, fy), Color("#76513a"), 2.0)
+		draw_line(Vector2(x1, fy + 6.0), Vector2(x2, fy + 6.0), Color("#76513a"), 2.0)
+		# Posts
+		for px in range(int(x1), int(x2) + 1, 14):
+			draw_rect(Rect2(float(px) - 1.5, fy - 4.0, 3.0, 14.0), Color("#5a3d28"))
+
+	# Draw each residential cottage
+	for c in cottages_data:
+		var cpos: Vector2 = c["pos"]
+		var csize: Vector2 = c["size"]
+		var wall_color: Color = c["wall"]
+		var accent: Color = c["accent"]
+
+		# Stone foundation
+		draw_rect(Rect2(cpos.x, cpos.y + csize.y - 4.0, csize.x, 4.0), Color("#6b736e"))
+
+		# Wall body
+		draw_rect(Rect2(cpos.x, cpos.y + 12.0, csize.x, csize.y - 16.0), wall_color)
+		# Corner posts
+		draw_rect(Rect2(cpos.x, cpos.y + 12.0, 4.0, csize.y - 16.0), Color("#5a3d28"))
+		draw_rect(Rect2(cpos.x + csize.x - 4.0, cpos.y + 12.0, 4.0, csize.y - 16.0), Color("#5a3d28"))
+
+		# Roof
+		draw_rect(Rect2(cpos.x - 4.0, cpos.y - 4.0, csize.x + 8.0, 18.0), Color("#5c3a1e"))
+		draw_rect(Rect2(cpos.x - 1.0, cpos.y - 7.0, csize.x + 2.0, 5.0), Color("#4a2e1b"))
+		draw_line(Vector2(cpos.x - 4.0, cpos.y - 7.0), Vector2(cpos.x + csize.x + 4.0, cpos.y - 7.0), Color("#8b5a3c"), 1.5)
+
+		# Entrance door
+		draw_rect(Rect2(cpos.x + csize.x * 0.5 - 7.0, cpos.y + csize.y - 26.0, 14.0, 22.0), Color("#4a2e1b"))
+		draw_circle(Vector2(cpos.x + csize.x * 0.5 + 3.0, cpos.y + csize.y - 15.0), 1.5, Color("#ffd26b"))
+
+		# Warm glowing window
+		draw_rect(Rect2(cpos.x + 10.0, cpos.y + 26.0, 12.0, 12.0), Color("#ffd26b"))
+		draw_line(Vector2(cpos.x + 16.0, cpos.y + 26.0), Vector2(cpos.x + 16.0, cpos.y + 38.0), Color("#5a3d28"), 1.0)
+		draw_line(Vector2(cpos.x + 10.0, cpos.y + 32.0), Vector2(cpos.x + 22.0, cpos.y + 32.0), Color("#5a3d28"), 1.0)
+
+		# Garden bed in front
+		draw_rect(Rect2(cpos.x + 6.0, cpos.y + csize.y, 22.0, 6.0), Color("#4a2e1b"))
+		draw_circle(Vector2(cpos.x + 11.0, cpos.y + csize.y + 2.0), 2.0, accent)
+		draw_circle(Vector2(cpos.x + 17.0, cpos.y + csize.y + 2.0), 2.0, Color("#4e7943"))
+		draw_circle(Vector2(cpos.x + 23.0, cpos.y + csize.y + 2.0), 2.0, accent)
+
+
+func _draw_player_warung() -> void:
+	var base_pos := Vector2(1268.0, 380.0)
+	var size := Vector2(104.0, 76.0)
+	var tier := _get_warung_tier()
+
+	var wall_color := Color("#d2b48c")
+	match tier:
+		1:
+			wall_color = Color("#cba77b")
+		2:
+			wall_color = Color("#e0c99d")
+		3:
+			wall_color = Color("#f0dcae")
+
+	# Base roof & walls
+	draw_rect(Rect2(base_pos.x - 7.0, base_pos.y - 16.0, size.x + 14.0, 30.0), Color("#76513a"))
+	draw_rect(Rect2(base_pos.x, base_pos.y, size.x, size.y), wall_color)
+	draw_rect(Rect2(base_pos.x - 7.0, base_pos.y - 18.0, size.x + 14.0, 13.0), Color("#8b5a3c"))
+
+	# Door
+	draw_rect(Rect2(base_pos.x + size.x * 0.5 - 8.0, base_pos.y + size.y - 25.0, 16.0, 25.0), Color("#654321"))
+
+	# Hearthwood green signboard
+	draw_rect(Rect2(base_pos.x + 8.0, base_pos.y - 5.0, 20.0, 11.0), Color("#8fbc8f"))
+
+	# Tier upgrades
+	if tier >= 1:
+		draw_rect(Rect2(base_pos.x - 18.0, base_pos.y + size.y - 7.0, 26.0, 6.0), Color("#76513a"))
+		draw_rect(Rect2(base_pos.x + size.x - 8.0, base_pos.y + size.y - 7.0, 26.0, 6.0), Color("#76513a"))
+	if tier >= 2:
+		draw_rect(Rect2(base_pos.x + 14.0, base_pos.y + 18.0, 15.0, 15.0), Color("#87ceeb"))
+		draw_rect(Rect2(base_pos.x + size.x - 29.0, base_pos.y + 18.0, 15.0, 15.0), Color("#87ceeb"))
+	if tier >= 3:
+		draw_rect(Rect2(base_pos.x - 14.0, base_pos.y - 24.0, 34.0, 8.0), Color("#b8860b"))
+		draw_rect(Rect2(base_pos.x + size.x - 20.0, base_pos.y - 24.0, 34.0, 8.0), Color("#b8860b"))
+
+
 func _draw_building(building: Rect2, is_warung: bool = false) -> void:
 	var wall_color := Color("#d2b48c")
+	var tier := _get_warung_tier()
 	if is_warung:
-		match int(get_node("/root/GameState").warung_tier):
+		match tier:
 			1:
 				wall_color = Color("#cba77b")
 			2:
@@ -1438,7 +1909,6 @@ func _draw_building(building: Rect2, is_warung: bool = false) -> void:
 		Color("#654321")
 	)
 	if is_warung:
-		var tier: int = get_node("/root/GameState").warung_tier
 		draw_rect(
 			Rect2(building.position.x + 8.0, building.position.y - 5.0, 20.0, 11.0),
 			Color("#8fbc8f")
