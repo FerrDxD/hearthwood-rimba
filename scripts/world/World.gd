@@ -130,6 +130,7 @@ var _village_well: VILLAGE_WELL_SCRIPT = null
 var _notice_board: NOTICE_BOARD_SCRIPT = null
 var _warung_tables: Array = []
 var _warung_bell: Node2D = null
+var _last_synced_day: int = -1
 var _ambient_particles: Dictionary = {}
 var _zone_props: Dictionary = {}
 var _landmarks: Dictionary = {}
@@ -212,6 +213,7 @@ func _ready() -> void:
 			time_system.hour_changed.connect(_on_hour_changed)
 	if has_node("/root/GameState"):
 		var game_state: Node = get_node("/root/GameState")
+		_last_synced_day = int(game_state.current_day)
 		game_state.state_changed.connect(_on_state_changed)
 		if "current_hour" in game_state:
 			_update_ambient_npc_clustering(int(game_state.current_hour))
@@ -977,7 +979,7 @@ func _setup_warung_dining() -> void:
 	if _warung_bell == null:
 		var bell := WarungBell.new()
 		bell.name = "WarungBell"
-		bell.position = Vector2(1170.0, 470.0)
+		bell.position = Vector2(1100.0, 470.0)
 		add_child(bell)
 		_warung_bell = bell
 
@@ -1436,6 +1438,7 @@ func _spawn_forage_items() -> void:
 
 
 func _on_day_changed(_day: int = 1) -> void:
+	_last_synced_day = _day
 	var gs := _get_active_game_state()
 	if gs != null and "interacted_props_today" in gs:
 		gs.interacted_props_today.clear()
@@ -1454,6 +1457,14 @@ func _on_day_changed(_day: int = 1) -> void:
 
 
 func _on_state_changed() -> void:
+	var gs := _get_active_game_state()
+	if gs != null and "current_day" in gs:
+		var cur_day: int = int(gs.current_day)
+		if _last_synced_day != -1 and cur_day != _last_synced_day:
+			_last_synced_day = cur_day
+			_on_day_changed(cur_day)
+			return
+		_last_synced_day = cur_day
 	_sync_interactive_props_state()
 	queue_redraw()
 

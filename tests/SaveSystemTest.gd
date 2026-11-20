@@ -41,6 +41,7 @@ func _run_tests() -> void:
 	game_state.affection_points["vea"] = 58
 	game_state.gifts_given_today["gil"] = true
 	game_state.customers_served_today["vea"] = true
+	game_state.customers_served_today["talia"] = true
 	game_state.disliked_gift_streaks["rave"] = 2
 	game_state.npc_gift_history["vea"] = ["sup_sayur_bening"]
 	game_state.current_weather = "dingin"
@@ -73,6 +74,11 @@ func _run_tests() -> void:
 		int(saved_data.get("hari", 0)) != 4
 		or int(saved_data.get("jam", 0)) != 24
 		or str(saved_data.get("nama_pemain", "")) != "Sari"
+		or int(saved_data.get("koin", 0)) != 777
+		or int(saved_data.get("reputasi", 0)) != 17
+		or int(saved_data.get("tier_warung", 0)) != 2
+		or not saved_data.get("pelanggan_hari_ini", {}).has("vea")
+		or not saved_data.get("pelanggan_hari_ini", {}).has("talia")
 		or str(saved_data.get("inventori", [])[1].get("item", "")) != "sup_sayur_bening"
 		or int(saved_data.get("inventori", [])[1].get("hari_terakhir_diproses", 0)) != 4
 		or saved_data.get("interacted_props_today", []) != ["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2", "village_well"]
@@ -108,6 +114,7 @@ func _run_tests() -> void:
 		or int(game_state.affection_points.get("vea", 0)) != 58
 		or not game_state.gifts_given_today.has("gil")
 		or not game_state.customers_served_today.has("vea")
+		or not game_state.customers_served_today.has("talia")
 		or int(game_state.disliked_gift_streaks.get("rave", 0)) != 2
 		or not game_state.npc_gift_history["vea"].has("sup_sayur_bening")
 		or game_state.current_weather != "dingin"
@@ -156,10 +163,39 @@ func _run_tests() -> void:
 		push_error("Village well should reset to interactable after a new day.")
 		quit(1)
 		return
+	var tables: Array = world.get_warung_tables()
+	if tables.size() < 2:
+		push_error("World should provide at least two dining tables for warung operations.")
+		quit(1)
+		return
+	var table_1 = tables[0]
+	var table_2 = tables[1]
+	table_1.seat_customer("vea", "sup_sayur_bening")
+	table_2.seat_customer("talia", "sup_sayur_bening")
+	table_2.serve_food("sup_sayur_bening", 2)
+	table_2.finish_eating()
+	if table_1.is_available() or table_2.is_available():
+		push_error("Tables should be occupied and dirty before sleeping.")
+		quit(1)
+		return
+
 	game_state.interacted_props_today.append("village_well")
+	game_state.customers_served_today["vea"] = true
 	game_state.sleep(8, 0.8)
 	if game_state.interacted_props_today.has("village_well"):
 		push_error("Sleeping should reset interacted_props_today including village_well.")
+		quit(1)
+		return
+	if not table_1.is_available() or table_1.current_state != table_1.TableState.EMPTY:
+		push_error("Sleeping (GameState.sleep()) should reset occupied table to empty.")
+		quit(1)
+		return
+	if not table_2.is_available() or table_2.current_state != table_2.TableState.EMPTY:
+		push_error("Sleeping (GameState.sleep()) should reset dirty table to empty.")
+		quit(1)
+		return
+	if not game_state.customers_served_today.is_empty():
+		push_error("Sleeping should reset customers_served_today.")
 		quit(1)
 		return
 

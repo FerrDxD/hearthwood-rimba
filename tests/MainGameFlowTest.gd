@@ -237,6 +237,77 @@ func _run_tests() -> void:
 		return
 	warung_ui.close_upgrade()
 
+	# Test evening dine-in service rush at upgraded Tier 1 Warung
+	game_state.current_hour = 17
+	game_state.current_minute = 0
+	time_system.sync_from_game_state()
+	await process_frame
+	if not game_state.add_item("sup_sayur_bening", 2, 1, 2):
+		push_error("Could not add cooked soup for dine-in service test.")
+		quit(1)
+		return
+
+	var warung_bell: Node2D = world.get_warung_bell()
+	if warung_bell == null:
+		push_error("Warung bell was not found in the world.")
+		quit(1)
+		return
+	player.global_position = warung_bell.global_position
+	main.call("_interact")
+	if not warung_system.is_service_active():
+		push_error("Interacting with warung bell during dinner hours should open service rush.")
+		quit(1)
+		return
+
+	var dining_tables: Array = world.get_warung_tables()
+	var occupied_table = null
+	for t in dining_tables:
+		if t != null and not t.is_available():
+			occupied_table = t
+			break
+	if occupied_table == null:
+		push_error("A customer should be seated when opening the warung.")
+		quit(1)
+		return
+
+	# Walk to occupied table and serve the dish
+	player.global_position = occupied_table.global_position
+	var prev_soup_count: int = game_state.get_item_count("sup_sayur_bening")
+	main.call("_interact")
+	if game_state.get_item_count("sup_sayur_bening") != prev_soup_count - 1:
+		push_error("Serving order via table interaction should consume dish from inventory.")
+		quit(1)
+		return
+	if occupied_table.current_state != occupied_table.TableState.EATING:
+		push_error("Table should transition to EATING after serving.")
+		quit(1)
+		return
+
+	# Simulate eating finish and clean table
+	occupied_table.finish_eating()
+	if occupied_table.current_state != occupied_table.TableState.DIRTY:
+		push_error("Table should become DIRTY after customer finishes eating.")
+		quit(1)
+		return
+
+	var prev_coins: int = game_state.coins
+	main.call("_interact") # clean table
+	if occupied_table.current_state == occupied_table.TableState.DIRTY or game_state.coins <= prev_coins:
+		push_error("Interacting with dirty table should clean it and collect payment coins.")
+		quit(1)
+		return
+
+	# Close warung session via bell and close report
+	player.global_position = warung_bell.global_position
+	main.call("_interact")
+	if warung_system.is_service_active():
+		push_error("Interacting with warung bell during active service should close it.")
+		quit(1)
+		return
+	var report_ui = main.get_warung_report_ui()
+	if report_ui != null and report_ui.has_method("close_report"):
+		report_ui.close_report()
+
 	var save_result: Dictionary = game_state.save_game(
 		player.global_position,
 		MAIN_SCENE_PATH,
