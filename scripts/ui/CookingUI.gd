@@ -1,6 +1,8 @@
 extends CanvasLayer
 class_name HearthwoodCookingUI
 
+const HearthwoodThemeHelper := preload("res://scripts/ui/UIThemeHelper.gd")
+
 class TimingTrack extends Control:
 	const GREEN_ZONE_BY_WEATHER: Dictionary = {
 		"cerah": 0.16,
@@ -129,25 +131,24 @@ func _create_interface() -> void:
 	panel.anchor_bottom = 0.94
 	_interface.add_child(panel)
 
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("#f5f5dc")
-	panel_style.border_color = Color("#8fbc8f")
-	panel_style.set_border_width_all(3)
-	panel_style.set_corner_radius_all(8)
-	panel_style.content_margin_left = 18.0
-	panel_style.content_margin_top = 14.0
-	panel_style.content_margin_right = 18.0
-	panel_style.content_margin_bottom = 14.0
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.add_theme_stylebox_override(
+		"panel",
+		HearthwoodThemeHelper.create_parchment_panel_style(
+			HearthwoodThemeHelper.COLOR_CREAM,
+			HearthwoodThemeHelper.COLOR_BROWN,
+			8,
+			3
+		)
+	)
 
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 8)
 	panel.add_child(layout)
 
 	var title := Label.new()
-	title.text = "Dapur Api Unggun"
-	title.add_theme_font_size_override("font_size", 22)
-	title.add_theme_color_override("font_color", Color("#5d422c"))
+	title.text = "🍳 DAPUR MEMASAK RIMBA"
+	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_color_override("font_color", Color("#4a2e18"))
 	layout.add_child(title)
 
 	var recipe_caption := Label.new()
@@ -216,6 +217,7 @@ func _create_interface() -> void:
 	_timing_button = Button.new()
 	_timing_button.text = "Mulai timing"
 	_timing_button.custom_minimum_size = Vector2(144.0, 48.0)
+	HearthwoodThemeHelper.apply_3d_button(_timing_button, "secondary", 48.0, 13)
 	_timing_button.pressed.connect(_on_timing_pressed)
 	footer.add_child(_timing_button)
 
@@ -225,13 +227,15 @@ func _create_interface() -> void:
 
 	var cook_button := Button.new()
 	cook_button.text = "Masak"
-	cook_button.custom_minimum_size = Vector2(112.0, 48.0)
+	cook_button.custom_minimum_size = Vector2(130.0, 48.0)
+	HearthwoodThemeHelper.apply_3d_button(cook_button, "hero", 48.0, 14)
 	cook_button.pressed.connect(_on_cook_pressed)
 	footer.add_child(cook_button)
 
 	var close_button := Button.new()
 	close_button.text = "Batal"
 	close_button.custom_minimum_size = Vector2(112.0, 48.0)
+	HearthwoodThemeHelper.apply_3d_button(close_button, "secondary", 48.0, 13)
 	close_button.pressed.connect(close_cooking)
 	footer.add_child(close_button)
 
