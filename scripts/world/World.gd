@@ -38,6 +38,8 @@ const FRUIT_TREE_SCRIPT: Script = preload("res://scripts/world/FruitTree.gd")
 const FRESH_SPRING_SCRIPT: Script = preload("res://scripts/world/FreshSpring.gd")
 const INSPECTABLE_HOLLOW_SCRIPT: Script = preload("res://scripts/world/InspectableHollow.gd")
 const RUSTLING_BUSH_SCRIPT: Script = preload("res://scripts/world/RustlingBush.gd")
+const VILLAGE_WELL_SCRIPT: Script = preload("res://scripts/world/VillageWell.gd")
+const NOTICE_BOARD_SCRIPT: Script = preload("res://scripts/world/NoticeBoard.gd")
 const FORAGE_SPAWN_POINTS: Array[Dictionary] = [
 	{"spawn_id": "sayur_liar_1", "id": "sayur_liar", "position": Vector2(104.0, 1178.0)},
 	{"spawn_id": "daun_hutan_1", "id": "daun_hutan", "position": Vector2(420.0, 1120.0)},
@@ -107,6 +109,8 @@ var _ambient_npcs: Array[HearthwoodNPC] = []
 var _item_pickups: Array[HearthwoodItemPickup] = []
 var _interactive_props: Array[HearthwoodInteractiveProp] = []
 var _rustling_bushes: Array[HearthwoodRustlingBush] = []
+var _village_well: VILLAGE_WELL_SCRIPT = null
+var _notice_board: NOTICE_BOARD_SCRIPT = null
 var _ambient_particles: Dictionary = {}
 var _zone_props: Dictionary = {}
 var _landmarks: Dictionary = {}
@@ -142,8 +146,7 @@ func _init() -> void:
 		_spawn_named_npcs()
 	if _ambient_npcs.is_empty():
 		_spawn_ambient_npcs()
-	if _interactive_props.is_empty() and _rustling_bushes.is_empty():
-		_spawn_forest_props()
+	_setup_interactive_props()
 	if _ambient_particles.is_empty():
 		_setup_ambient_particles()
 
@@ -177,8 +180,7 @@ func _ready() -> void:
 	if _ambient_npcs.is_empty():
 		_spawn_ambient_npcs()
 	_spawn_forage_items()
-	if _interactive_props.is_empty() and _rustling_bushes.is_empty():
-		_spawn_forest_props()
+	_setup_interactive_props()
 	if _ambient_particles.is_empty():
 		_setup_ambient_particles()
 	if has_node("/root/TimeSystem"):
@@ -645,6 +647,24 @@ func _load_village_zones_data() -> void:
 				{"id": "cottage_siti", "name": "Pondok Peramu Siti", "position": [1260.0, 640.0], "size": [76.0, 64.0]},
 				{"id": "cottage_arin", "name": "Pondok Pengrajin Arin", "position": [1370.0, 640.0], "size": [76.0, 64.0]},
 			]
+		},
+		"props": {
+			"village_well": {
+				"id": "village_well",
+				"name": "Sumur Desa Tua",
+				"type": "village_well",
+				"position": [1050.0, 460.0],
+				"interaction_radius": 48.0,
+				"energy_restore": 5,
+				"give_item_id": "air_bersih"
+			},
+			"notice_board": {
+				"id": "notice_board",
+				"name": "Papan Pengumuman Desa",
+				"type": "notice_board",
+				"position": [1130.0, 460.0],
+				"interaction_radius": 48.0
+			}
 		}
 	}
 
@@ -717,6 +737,28 @@ func get_interactive_prop(id: String) -> HearthwoodInteractiveProp:
 	return null
 
 
+func get_village_well() -> VILLAGE_WELL_SCRIPT:
+	if _village_well == null:
+		for prop in _interactive_props:
+			if is_instance_valid(prop) and prop.prop_id == "village_well" and prop is VILLAGE_WELL_SCRIPT:
+				_village_well = prop
+				break
+	if _village_well == null:
+		_spawn_village_props()
+	return _village_well
+
+
+func get_notice_board() -> NOTICE_BOARD_SCRIPT:
+	if _notice_board == null:
+		for prop in _interactive_props:
+			if is_instance_valid(prop) and prop.prop_id == "notice_board" and prop is NOTICE_BOARD_SCRIPT:
+				_notice_board = prop
+				break
+	if _notice_board == null:
+		_spawn_village_props()
+	return _notice_board
+
+
 func get_rustling_bushes() -> Array[HearthwoodRustlingBush]:
 	return _rustling_bushes
 
@@ -744,13 +786,14 @@ func interact_with_prop(prop: HearthwoodInteractiveProp, player: Node2D = null) 
 
 
 func _register_interactive_prop(prop: HearthwoodInteractiveProp) -> void:
-	_interactive_props.append(prop)
+	if not _interactive_props.has(prop):
+		_interactive_props.append(prop)
 	prop.interacted.connect(func(res: Dictionary): _on_prop_interacted(prop, res))
 	_sync_interactive_prop_state(prop)
 
 
-func _on_prop_interacted(prop: HearthwoodInteractiveProp, res: Dictionary) -> void:
-	if res.get("success", false) and is_instance_valid(prop) and not prop.prop_id.is_empty():
+func _on_prop_interacted(prop: HearthwoodInteractiveProp, res: Dictionary = {}) -> void:
+	if (res.is_empty() or res.get("success", false)) and is_instance_valid(prop) and not prop.prop_id.is_empty():
 		_mark_prop_in_game_state(prop.prop_id)
 
 
@@ -804,8 +847,64 @@ func get_ambient_particles() -> Dictionary:
 	return _ambient_particles
 
 
+func _setup_interactive_props() -> void:
+	if _rustling_bushes.is_empty():
+		_spawn_forest_props()
+	_spawn_village_props()
+
+
+func _spawn_village_props() -> void:
+	if _village_well != null and _notice_board != null:
+		return
+	if _village_data.is_empty():
+		_load_village_zones_data()
+
+	var props_dict: Dictionary = _village_data.get("props", {})
+
+	if _village_well == null:
+		var well_data: Dictionary = props_dict.get("village_well", {})
+		var well_pos := Vector2(1050.0, 460.0)
+		if well_data.has("position"):
+			var p = well_data["position"]
+			if typeof(p) == TYPE_VECTOR2:
+				well_pos = p
+			elif typeof(p) == TYPE_ARRAY and p.size() >= 2:
+				well_pos = Vector2(float(p[0]), float(p[1]))
+
+		var well: VILLAGE_WELL_SCRIPT = VILLAGE_WELL_SCRIPT.new()
+		well.name = "VillageWell"
+		well.prop_id = str(well_data.get("id", "village_well"))
+		well.position = well_pos
+		well.interaction_radius = float(well_data.get("interaction_radius", 48.0))
+		well.energy_restore = int(well_data.get("energy_restore", 5))
+		if well_data.has("give_item_id"):
+			well.water_item_id = str(well_data["give_item_id"])
+		add_child(well)
+		_village_well = well
+		_register_interactive_prop(well)
+
+	if _notice_board == null:
+		var board_data: Dictionary = props_dict.get("notice_board", {})
+		var board_pos := Vector2(1130.0, 460.0)
+		if board_data.has("position"):
+			var p = board_data["position"]
+			if typeof(p) == TYPE_VECTOR2:
+				board_pos = p
+			elif typeof(p) == TYPE_ARRAY and p.size() >= 2:
+				board_pos = Vector2(float(p[0]), float(p[1]))
+
+		var board: NOTICE_BOARD_SCRIPT = NOTICE_BOARD_SCRIPT.new()
+		board.name = "NoticeBoard"
+		board.prop_id = str(board_data.get("id", "notice_board"))
+		board.position = board_pos
+		board.interaction_radius = float(board_data.get("interaction_radius", 48.0))
+		add_child(board)
+		_notice_board = board
+		_register_interactive_prop(board)
+
+
 func _spawn_forest_props() -> void:
-	if not _interactive_props.is_empty() or not _rustling_bushes.is_empty():
+	if not _rustling_bushes.is_empty():
 		return
 	if _zone_props.is_empty():
 		_load_forest_zones_data()
@@ -1149,6 +1248,10 @@ func _on_day_changed(_day: int = 1) -> void:
 	for prop in _interactive_props:
 		if is_instance_valid(prop):
 			prop.reset_daily()
+	if is_instance_valid(_village_well) and not _interactive_props.has(_village_well):
+		_village_well.reset_daily()
+	if is_instance_valid(_notice_board) and not _interactive_props.has(_notice_board):
+		_notice_board.reset_daily()
 
 
 func _on_state_changed() -> void:
