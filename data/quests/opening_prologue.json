@@ -1,0 +1,33 @@
+{
+  "monologues": [
+    {
+      "id": "intro_1",
+      "text": "Namaku {player_name}. Di duniaku dulu, aku mengelola warteg kecil yang ramai di sudut kota...",
+      "audio_hint": "city_fade"
+    },
+    {
+      "id": "intro_2",
+      "text": "Hari itu, saat sedang mengecek karung beras dan stok bumbu di gudang belakang... bau asap pekat tiba-tiba menyengat hidung.",
+      "audio_hint": "smoke_choke"
+    },
+    {
+      "id": "intro_3",
+      "text": "Pintu depan terkunci rapat. Tak ada jendela, tak ada celah ventilasi. Nafasku sesak, pandanganku perlahan menggelap ditelan kepulan asap...",
+      "audio_hint": "silence"
+    },
+    {
+      "id": "intro_4",
+      "text": "Apakah ini akhir dari segalanya...?",
+      "audio_hint": "forest_wind"
+    },
+    {
+      "id": "intro_5",
+      "text": "Namun... perlahan kurasakan belaian angin sejuk. Aroma tanah basah, harum lumut, dan dedaunan liar...",
+      "audio_hint": "forest_birds"
+    }
+  ],
+  "awakening": {
+    "text": "Aku mengerjapkan mata... Di atas kepalaku, kanopi pohon purba raksasa menjulang megah menembus langit.",
+    "question": "Di mana ini...?! Ini jelas bukan gudang wartegku..."
+  }
+}
