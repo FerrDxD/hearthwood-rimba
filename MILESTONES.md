@@ -498,6 +498,45 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ---
 
+## Versi 0.5.2 — Rebuild & Polish Main Menu (Impeccable & UI-UX Pro Max)
+
+**Tujuan:** Membangun ulang (rebuild) layar **Main Menu (960×540)** pada halaman `🏠 Main Menu` dari nol setelah sebelumnya tertimpa duplikasi Pause Menu, menerapkan standar keahlian tertinggi dari gabungan skill **Impeccable** (craft floor, tactile depth, hierarki ketat) dan **UI-UX Pro Max** (Android touch targets, 8dp rhythm, anti-emoji icons, kontras tinggi).
+
+- [x] **Pembersihan Kanvas Halaman 640 (`🏠 Main Menu`):** Menghapus duplikasi `Screen/PauseMenu` (id 663) dan frame placeholder lama agar kanvas bersih total.
+- [x] **Latar Suasana Rimba & Langit Malam (Atmospheric Forest):**
+  - Siluet pohon cemara conifer multi-tingkat (`#0C180B`, `#112310`, `#172F16`, `#1D3B1C`) dengan batang kayu gelap di kiri dan kanan kanvas.
+  - Lapisan kabut bawah tipis (`#1E3A1A` 40%) dan pendaran cahaya lentera kedai di latar tengah (`#CD853F` 10%).
+  - Partikel kunang-kunang / percikan bara api malam (`#F5C58A` & `#CD853F`) melayang di antara pepohonan.
+- [x] **Plang Kedai Kayu Taktil (Tavern Signboard Frame):**
+  - Papan kayu tua bertekstur alur serat vertikal (`#361E10`, border besi keliling `#1B0E07` 3.5px, bayangan jatuh lembut y: 10 blur: 24).
+  - 4 Pelat siku kuningan dengan rivet baut perunggu di keempat sudut (TL, TR, BL, BR).
+  - Garis lis dalam berpahat halus (`#5A3319` 1.5px).
+- [x] **Hierarki Tipografi & Crest Merek:**
+  - Badge genre atas: `WARTEG MEDIEVAL` (emas `#CD853F`, latar gelap `#22120A`).
+  - Judul utama: `HEARTHWOOD` (32px Bold, cream `#F5F5DC`).
+  - Sub-judul: `WARUNG RIMBA` (15px Bold, amber gold `#E5A858`, tracking 2.5px).
+  - Tagline: `~ Kehangatan Dapur di Tepian Rimba ~` (11px Regular, cream hangat `#D4C5A9`).
+  - Pembatas ornamen belah ketupat kuningan di tengah garis kayu.
+- [x] **Kartu Slot Simpan Aktif (Recessed Save Slot Card):**
+  - Panel ceruk kayu gelap (`#25140A`) dengan aksen bar vertikal hijau sage (`#8FBC8F`).
+  - Badge status: `● SLOT 1 AKTIF` dan penanda waktu simpan `Tersimpan: Hari 7 (18:30)`.
+  - Detail kemajuan pemain: `Varian · Warung Tier 2 · 1.250 Koin` (teks krem tebal, kontras tinggi).
+- [x] **5 Tombol Aksi 3D Beveled (Android Touch Target Compliant ≥ 44dp):**
+  - `LANJUTKAN PERMAINAN` (Primary Hero CTA, emas `#CD853F`, stroke highlight `#F5C58A`, bayangan bibir 3D 4px, highlight atas `#FFE0B0`).
+  - `Permainan Baru` (Secondary CTA, kayu pelana `#7D4218`, stroke highlight `#A85E28`, bayangan bibir 3D 3px, highlight atas `#D4884E`).
+  - `Muat Game Lain` (Secondary CTA, kayu pelana `#7D4218`, stroke highlight `#A85E28`, bayangan bibir 3D 3px, highlight atas `#D4884E`).
+  - `Pengaturan & Audio` (Secondary CTA, kayu pelana `#7D4218`, stroke highlight `#A85E28`, bayangan bibir 3D 3px, highlight atas `#D4884E`).
+  - `Keluar Permainan` (Exit/Danger CTA ramah Android & Desktop, terakota `#B8482D`, stroke highlight `#DC6E55`, bayangan bibir 3D 3px, highlight atas `#F0947E`).
+- [x] **Kepatuhan Penuh Standard Kualitas (Craft Floor & Pro Rules):**
+  - 100% bebas dari emoji struktural (semua elemen dekoratif menggunakan bentuk geometri SVG/vektor dan tipografi terstruktur).
+  - Rasio kontras teks memenuhi syarat WCAG AAA/AA (semua teks > 4.5:1 terhadap latar belakangnya).
+  - Menjaga integritas palet warna `DESIGN.md` tanpa deviasi warna.
+- [x] **Penyimpanan Berkas & Artefak:**
+  - File FigCraft tersimpan di `design/Hearthwood_UI_Kit_v0.5.2.figcraft`.
+  - Export preview beresolusi tinggi di `design/MainMenu_v0.5.2.png`.
+
+---
+
 ## Tabel Dependensi Antar Fase
 
 ```
