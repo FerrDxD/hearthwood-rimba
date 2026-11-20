@@ -56,6 +56,7 @@ const INSPECTABLE_HOLLOW_SCRIPT: Script = preload("res://scripts/world/Inspectab
 const RUSTLING_BUSH_SCRIPT: Script = preload("res://scripts/world/RustlingBush.gd")
 const VILLAGE_WELL_SCRIPT: Script = preload("res://scripts/world/VillageWell.gd")
 const NOTICE_BOARD_SCRIPT: Script = preload("res://scripts/world/NoticeBoard.gd")
+const WARUNG_TABLE_SCRIPT: Script = preload("res://scripts/world/WarungTable.gd")
 const FORAGE_SPAWN_POINTS: Array[Dictionary] = [
 	{"spawn_id": "sayur_liar_1", "id": "sayur_liar", "position": Vector2(104.0, 1178.0)},
 	{"spawn_id": "daun_hutan_1", "id": "daun_hutan", "position": Vector2(420.0, 1120.0)},
@@ -127,6 +128,8 @@ var _interactive_props: Array[HearthwoodInteractiveProp] = []
 var _rustling_bushes: Array[HearthwoodRustlingBush] = []
 var _village_well: VILLAGE_WELL_SCRIPT = null
 var _notice_board: NOTICE_BOARD_SCRIPT = null
+var _warung_tables: Array = []
+var _warung_bell: Node2D = null
 var _ambient_particles: Dictionary = {}
 var _zone_props: Dictionary = {}
 var _landmarks: Dictionary = {}
@@ -166,6 +169,7 @@ func _init() -> void:
 	_setup_interactive_props()
 	if _ambient_particles.is_empty():
 		_setup_ambient_particles()
+	_setup_warung_dining()
 
 
 func _ready() -> void:
@@ -200,6 +204,7 @@ func _ready() -> void:
 	_setup_interactive_props()
 	if _ambient_particles.is_empty():
 		_setup_ambient_particles()
+	_setup_warung_dining()
 	if has_node("/root/TimeSystem"):
 		var time_system: Node = get_node("/root/TimeSystem")
 		time_system.day_changed.connect(_on_day_changed)
@@ -844,6 +849,18 @@ func get_notice_board() -> NOTICE_BOARD_SCRIPT:
 	return _notice_board
 
 
+func get_warung_tables() -> Array:
+	if _warung_tables.is_empty():
+		_setup_warung_dining()
+	return _warung_tables
+
+
+func get_warung_bell() -> Node2D:
+	if _warung_bell == null:
+		_setup_warung_dining()
+	return _warung_bell
+
+
 func get_rustling_bushes() -> Array[HearthwoodRustlingBush]:
 	return _rustling_bushes
 
@@ -936,6 +953,33 @@ func _setup_interactive_props() -> void:
 	if _rustling_bushes.is_empty():
 		_spawn_forest_props()
 	_spawn_village_props()
+
+
+func _setup_warung_dining() -> void:
+	if not _warung_tables.is_empty() and _warung_bell != null:
+		return
+
+	if _warung_tables.is_empty():
+		var table1 = WARUNG_TABLE_SCRIPT.new()
+		table1.name = "WarungTable_1"
+		table1.table_id = "warung_table_1"
+		table1.position = Vector2(1150.0, 520.0)
+		add_child(table1)
+		_warung_tables.append(table1)
+
+		var table2 = WARUNG_TABLE_SCRIPT.new()
+		table2.name = "WarungTable_2"
+		table2.table_id = "warung_table_2"
+		table2.position = Vector2(1270.0, 520.0)
+		add_child(table2)
+		_warung_tables.append(table2)
+
+	if _warung_bell == null:
+		var bell := WarungBell.new()
+		bell.name = "WarungBell"
+		bell.position = Vector2(1170.0, 470.0)
+		add_child(bell)
+		_warung_bell = bell
 
 
 func _spawn_village_props() -> void:
@@ -1403,6 +1447,10 @@ func _on_day_changed(_day: int = 1) -> void:
 		_village_well.reset_daily()
 	if is_instance_valid(_notice_board) and not _interactive_props.has(_notice_board):
 		_notice_board.reset_daily()
+	for table in _warung_tables:
+		if is_instance_valid(table):
+			if table.current_state != table.TableState.EMPTY:
+				table.clear_table()
 
 
 func _on_state_changed() -> void:
@@ -2194,3 +2242,89 @@ func _draw_building(building: Rect2, is_warung: bool = false) -> void:
 				Rect2(building.end.x - 20.0, building.position.y - 24.0, 34.0, 8.0),
 				Color("#b8860b")
 			)
+
+
+class WarungBell extends Area2D:
+	signal bell_rung()
+
+	var prop_id: String = "warung_bell"
+	var interaction_radius: float = 44.0
+
+	func _init() -> void:
+		_setup_collision()
+
+	func _ready() -> void:
+		_setup_collision()
+		queue_redraw()
+
+	func _setup_collision() -> void:
+		var col := get_node_or_null("CollisionShape2D") as CollisionShape2D
+		if col == null:
+			col = CollisionShape2D.new()
+			col.name = "CollisionShape2D"
+			var circle := CircleShape2D.new()
+			circle.radius = interaction_radius
+			col.shape = circle
+			add_child(col)
+		elif col.shape is CircleShape2D:
+			(col.shape as CircleShape2D).radius = interaction_radius
+
+	func ring() -> void:
+		bell_rung.emit()
+		queue_redraw()
+
+	func interact(_player: Node2D = null) -> Dictionary:
+		ring()
+		return {
+			"success": true,
+			"message": "Lonceng operasional warung berdentang merdu!",
+			"data": {"action": "ring_bell"}
+		}
+
+	func _draw() -> void:
+		# 1. Soft ground shadow
+		draw_rect(Rect2(-8.0, 10.0, 18.0, 6.0), Color(0.08, 0.05, 0.02, 0.25), true)
+
+		# 2. Wooden mount post & bracket
+		var post_col := Color("#5A3716")
+		var post_border := Color("#3B220B")
+		var arm_col := Color("#6B4226")
+		# Vertical timber post
+		draw_rect(Rect2(-3.0, -12.0, 6.0, 24.0), post_col, true)
+		draw_rect(Rect2(-3.0, -12.0, 6.0, 24.0), post_border, false, 1.0)
+		# Horizontal beam extending to the right to hang the bell
+		draw_rect(Rect2(-2.0, -12.0, 15.0, 5.0), arm_col, true)
+		draw_rect(Rect2(-2.0, -12.0, 15.0, 5.0), post_border, false, 1.0)
+		# Diagonal brace
+		draw_line(Vector2(-1.0, -5.0), Vector2(8.0, -11.0), Color("#452A11"), 1.5)
+
+		# 3. Small rustic wooden sign hanging to the left ("WARUNG")
+		var sign_rect := Rect2(-17.0, -5.0, 14.0, 10.0)
+		draw_rect(sign_rect, Color("#7B4E26"), true)
+		draw_rect(sign_rect, Color("#3E240E"), false, 1.0)
+		# Hanging wires from beam to sign
+		draw_line(Vector2(-13.0, -12.0), Vector2(-13.0, -5.0), Color("#888888"), 1.0)
+		draw_line(Vector2(-5.0, -12.0), Vector2(-5.0, -5.0), Color("#888888"), 1.0)
+		# Tiny fork/spoon rune in cream
+		draw_line(Vector2(-10.0, -2.0), Vector2(-10.0, 2.0), Color("#F4ECD8"), 1.0)
+		draw_line(Vector2(-11.0, -2.0), Vector2(-9.0, -2.0), Color("#F4ECD8"), 1.0)
+
+		# 4. Brass bell
+		# Eyelet link
+		draw_circle(Vector2(10.0, -7.0), 2.0, Color("#A08020"))
+		# Bell body flare (trapezoid-like polygon)
+		var bell_poly := PackedVector2Array([
+			Vector2(7.5, -5.0),
+			Vector2(12.5, -5.0),
+			Vector2(14.5, 3.0),
+			Vector2(5.5, 3.0)
+		])
+		draw_colored_polygon(bell_poly, Color("#D4AF37"))
+		# Bell rim lip
+		draw_rect(Rect2(5.0, 3.0, 10.0, 2.5), Color("#B8860B"), true)
+		# Bell gleam highlight
+		draw_line(Vector2(8.0, -4.0), Vector2(7.0, 2.0), Color("#FFF8D0"), 1.2)
+		# Clapper & braided rope
+		draw_circle(Vector2(10.0, 5.5), 1.8, Color("#8B6508"))
+		draw_line(Vector2(10.0, 6.5), Vector2(10.0, 13.0), Color("#C8B898"), 1.2)
+		draw_circle(Vector2(10.0, 13.0), 1.5, Color("#6B4226"))
