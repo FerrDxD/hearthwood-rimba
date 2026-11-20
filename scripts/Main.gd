@@ -16,6 +16,7 @@ const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
 const LOCATION_TOAST_UI_SCENE: PackedScene = preload("res://scenes/LocationToastUI.tscn")
 const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
+const HearthwoodThemeHelper := preload("res://scripts/ui/UIThemeHelper.gd")
 const AUDIO_DIRECTOR_SCRIPT: Script = preload("res://scripts/systems/AudioDirector.gd")
 const PROLOGUE_DATA_PATH: String = "res://data/story/prologue.json"
 const PROLOGUE_FIND_RAST: String = "prologue_find_rast"
@@ -252,35 +253,63 @@ func _create_hud() -> void:
 
 	var status_panel := PanelContainer.new()
 	status_panel.position = Vector2(16.0, 16.0)
+	var panel_style := HearthwoodThemeHelper.create_tavern_panel_style()
+	panel_style.content_margin_left = 14.0
+	panel_style.content_margin_top = 10.0
+	panel_style.content_margin_right = 14.0
+	panel_style.content_margin_bottom = 10.0
+	status_panel.add_theme_stylebox_override("panel", panel_style)
 	interface.add_child(status_panel)
 	var status_layout := VBoxContainer.new()
+	status_layout.add_theme_constant_override("separation", 5)
 	status_panel.add_child(status_layout)
 
 	_clock_label = Label.new()
-	_clock_label.add_theme_font_size_override("font_size", 20)
+	_clock_label.add_theme_font_size_override("font_size", 18)
+	_clock_label.add_theme_color_override("font_color", Color("#FFF9E7"))
+	_clock_label.add_theme_color_override("font_shadow_color", Color("#1B120C"))
+	_clock_label.add_theme_constant_override("shadow_offset_x", 1)
+	_clock_label.add_theme_constant_override("shadow_offset_y", 1)
 	status_layout.add_child(_clock_label)
 
 	_energy_label = Label.new()
+	_energy_label.add_theme_font_size_override("font_size", 13)
+	_energy_label.add_theme_color_override("font_color", Color("#EFE5CE"))
 	status_layout.add_child(_energy_label)
 
 	_energy_bar = ProgressBar.new()
-	_energy_bar.custom_minimum_size = Vector2(180.0, 18.0)
+	_energy_bar.custom_minimum_size = Vector2(180.0, 16.0)
 	_energy_bar.max_value = 100.0
 	_energy_bar.show_percentage = false
+	var bar_bg := HearthwoodThemeHelper.create_sunken_slot_style()
+	var bar_fill := StyleBoxFlat.new()
+	bar_fill.bg_color = HearthwoodThemeHelper.COLOR_SAGE
+	bar_fill.border_color = HearthwoodThemeHelper.COLOR_SAGE_DARK
+	bar_fill.set_border_width_all(1)
+	bar_fill.set_corner_radius_all(3)
+	_energy_bar.add_theme_stylebox_override("background", bar_bg)
+	_energy_bar.add_theme_stylebox_override("fill", bar_fill)
 	status_layout.add_child(_energy_bar)
 
 	_coins_label = Label.new()
+	_coins_label.add_theme_font_size_override("font_size", 14)
+	_coins_label.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_GOLD_AMBER)
 	status_layout.add_child(_coins_label)
 
 	_objective_label = Label.new()
 	_objective_label.custom_minimum_size = Vector2(280.0, 0.0)
 	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_objective_label.add_theme_font_size_override("font_size", 14)
+	_objective_label.add_theme_font_size_override("font_size", 13)
+	_objective_label.add_theme_color_override("font_color", Color("#FFF9E7"))
 	status_layout.add_child(_objective_label)
 
 	_hint_label = Label.new()
 	_hint_label.position = Vector2(16.0, 210.0)
-	_hint_label.add_theme_font_size_override("font_size", 15)
+	_hint_label.add_theme_font_size_override("font_size", 14)
+	_hint_label.add_theme_color_override("font_color", Color("#FFF9E7"))
+	_hint_label.add_theme_color_override("font_shadow_color", Color("#1B120C"))
+	_hint_label.add_theme_constant_override("shadow_offset_x", 1)
+	_hint_label.add_theme_constant_override("shadow_offset_y", 1)
 	interface.add_child(_hint_label)
 
 	var pause_button := Button.new()
@@ -292,6 +321,7 @@ func _create_hud() -> void:
 	pause_button.offset_right = -16.0
 	pause_button.offset_bottom = 68.0
 	pause_button.custom_minimum_size = Vector2(68.0, 52.0)
+	HearthwoodThemeHelper.apply_3d_button(pause_button, "secondary", 52.0)
 	pause_button.pressed.connect(_open_pause_menu)
 	interface.add_child(pause_button)
 
@@ -304,6 +334,7 @@ func _create_hud() -> void:
 	quest_button.offset_right = -16.0
 	quest_button.offset_bottom = 128.0
 	quest_button.custom_minimum_size = Vector2(76.0, 52.0)
+	HearthwoodThemeHelper.apply_3d_button(quest_button, "hero", 52.0)
 	quest_button.pressed.connect(_toggle_quests)
 	interface.add_child(quest_button)
 
@@ -346,6 +377,17 @@ func _update_audio_context() -> void:
 func _update_energy(value: int) -> void:
 	_energy_label.text = "Energi: %d / %d" % [value, 100]
 	_energy_bar.value = value
+	if is_instance_valid(_energy_bar):
+		var bar_fill := StyleBoxFlat.new()
+		if value <= 25:
+			bar_fill.bg_color = HearthwoodThemeHelper.COLOR_TERRACOTTA
+			bar_fill.border_color = HearthwoodThemeHelper.COLOR_TERRACOTTA_LIP
+		else:
+			bar_fill.bg_color = HearthwoodThemeHelper.COLOR_SAGE
+			bar_fill.border_color = HearthwoodThemeHelper.COLOR_SAGE_DARK
+		bar_fill.set_border_width_all(1)
+		bar_fill.set_corner_radius_all(3)
+		_energy_bar.add_theme_stylebox_override("fill", bar_fill)
 
 
 func _update_coins(value: int) -> void:

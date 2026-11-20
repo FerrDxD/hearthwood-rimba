@@ -37,38 +37,44 @@ func _gui_input(event: InputEvent) -> void:
 
 
 func _draw() -> void:
-	draw_circle(_stick_center, JOYSTICK_RADIUS, Color(0.14, 0.17, 0.14, 0.36))
-	draw_circle(_stick_center, JOYSTICK_RADIUS - 3.0, Color(0.89, 0.84, 0.68, 0.35))
-	draw_circle(
-		_stick_center + _stick_vector * (JOYSTICK_RADIUS - 18.0),
-		20.0,
-		Color(0.47, 0.40, 0.27, 0.76)
-	)
-	draw_circle(_button_center, BUTTON_RADIUS, Color(0.56, 0.32, 0.19, 0.72))
-	draw_circle(_button_center, BUTTON_RADIUS - 4.0, Color(0.78, 0.58, 0.36, 0.86))
+	# Virtual Joystick Base: dark saddle wood rim with semi-transparent inner track
+	draw_circle(_stick_center, JOYSTICK_RADIUS, Color(0.14, 0.09, 0.06, 0.65))
+	draw_circle(_stick_center, JOYSTICK_RADIUS - 3.0, Color(0.24, 0.16, 0.11, 0.45))
+	
+	# Tactile Knob: golden brass knob with depth shadow
+	var knob_pos := _stick_center + _stick_vector * (JOYSTICK_RADIUS - 18.0)
+	draw_circle(knob_pos + Vector2(0.0, 2.0), 20.0, Color(0.11, 0.07, 0.04, 0.65))
+	draw_circle(knob_pos, 20.0, Color(0.83, 0.64, 0.45, 0.90))
+	draw_circle(knob_pos, 16.0, Color(0.94, 0.75, 0.35, 0.85))
+
+	# Action Button ("E"): terracotta beveled button with shadow
+	draw_circle(_button_center + Vector2(0.0, 3.0), BUTTON_RADIUS, Color(0.11, 0.07, 0.04, 0.55))
+	draw_circle(_button_center, BUTTON_RADIUS, Color(0.36, 0.23, 0.16, 0.92))
+	draw_circle(_button_center, BUTTON_RADIUS - 4.0, Color(0.78, 0.29, 0.19, 0.92))
+	draw_circle(_button_center + Vector2(0.0, -2.0), BUTTON_RADIUS - 8.0, Color(0.85, 0.38, 0.27, 0.50))
 	draw_string(
 		ThemeDB.fallback_font,
-		_button_center + Vector2(-14.0, 6.0),
+		_button_center + Vector2(-7.0, 7.0),
 		"E",
 		HORIZONTAL_ALIGNMENT_LEFT,
 		-1.0,
-		20,
-		Color("#fff9e7")
+		22,
+		Color("#FFF9E7")
 	)
-	draw_circle(_inventory_center, INVENTORY_RADIUS, Color(0.56, 0.32, 0.19, 0.72))
-	draw_circle(
-		_inventory_center,
-		INVENTORY_RADIUS - 4.0,
-		Color(0.78, 0.58, 0.36, 0.86)
-	)
+
+	# Inventory Button ("I"): saddle wood beveled button with shadow
+	draw_circle(_inventory_center + Vector2(0.0, 2.5), INVENTORY_RADIUS, Color(0.11, 0.07, 0.04, 0.55))
+	draw_circle(_inventory_center, INVENTORY_RADIUS, Color(0.36, 0.23, 0.16, 0.92))
+	draw_circle(_inventory_center, INVENTORY_RADIUS - 4.0, Color(0.48, 0.31, 0.22, 0.92))
+	draw_circle(_inventory_center + Vector2(0.0, -2.0), INVENTORY_RADIUS - 7.0, Color(0.58, 0.39, 0.28, 0.50))
 	draw_string(
 		ThemeDB.fallback_font,
-		_inventory_center + Vector2(-7.0, 6.0),
+		_inventory_center + Vector2(-4.0, 7.0),
 		"I",
 		HORIZONTAL_ALIGNMENT_LEFT,
 		-1.0,
 		20,
-		Color("#fff9e7")
+		Color("#FFF9E7")
 	)
 
 
