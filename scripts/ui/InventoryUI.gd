@@ -1,6 +1,8 @@
 extends CanvasLayer
 class_name HearthwoodInventoryUI
 
+const HearthwoodThemeHelper := preload("res://scripts/ui/UIThemeHelper.gd")
+
 var _interface: Control
 var _items_grid: GridContainer
 var _empty_label: Label
@@ -36,40 +38,51 @@ func _create_interface() -> void:
 
 	var shade := ColorRect.new()
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	shade.color = Color(0.08, 0.1, 0.08, 0.52)
+	shade.color = Color(0.04, 0.07, 0.04, 0.65)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_interface.add_child(shade)
 
 	var panel := PanelContainer.new()
 	panel.anchor_left = 0.1
-	panel.anchor_top = 0.08
+	panel.anchor_top = 0.06
 	panel.anchor_right = 0.9
-	panel.anchor_bottom = 0.92
+	panel.anchor_bottom = 0.94
 	_interface.add_child(panel)
 
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("#f5f5dc")
-	panel_style.border_color = Color("#8fbc8f")
-	panel_style.set_border_width_all(3)
-	panel_style.set_corner_radius_all(8)
-	panel_style.content_margin_left = 18.0
-	panel_style.content_margin_top = 14.0
-	panel_style.content_margin_right = 18.0
-	panel_style.content_margin_bottom = 14.0
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.add_theme_stylebox_override(
+		"panel",
+		HearthwoodThemeHelper.create_parchment_panel_style(
+			HearthwoodThemeHelper.COLOR_CREAM,
+			HearthwoodThemeHelper.COLOR_BROWN,
+			8,
+			3
+		)
+	)
 
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 10)
 	panel.add_child(layout)
 
+	var title_box := HBoxContainer.new()
+	layout.add_child(title_box)
+
 	var title := Label.new()
-	title.text = "Inventori"
-	title.add_theme_font_size_override("font_size", 22)
-	title.add_theme_color_override("font_color", Color("#5d422c"))
-	layout.add_child(title)
+	title.text = "📖 BUKU CATATAN — INVENTORI"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_color_override("font_color", Color("#4a2e18"))
+	title_box.add_child(title)
+
+	var capacity_badge := Label.new()
+	capacity_badge.text = "Kapasitas: 20 Slot"
+	capacity_badge.add_theme_font_size_override("font_size", 11)
+	capacity_badge.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_SADDLE_WOOD)
+	capacity_badge.add_theme_stylebox_override("normal", HearthwoodThemeHelper.create_brass_badge_style())
+	title_box.add_child(capacity_badge)
 
 	_empty_label = Label.new()
-	_empty_label.text = "Belum ada barang. Jelajahi hutan untuk mengumpulkan bahan."
+	_empty_label.text = "Belum ada barang di kantong. Jelajahi rimba untuk mengumpulkan bahan segar."
+	_empty_label.add_theme_color_override("font_color", Color("#6e4d35"))
 	_empty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(_empty_label)
 
@@ -89,8 +102,9 @@ func _create_interface() -> void:
 	layout.add_child(footer)
 
 	var close_button := Button.new()
-	close_button.text = "Batal"
-	close_button.custom_minimum_size = Vector2(112.0, 48.0)
+	close_button.text = "Tutup Catatan"
+	close_button.custom_minimum_size = Vector2(130.0, 48.0)
+	HearthwoodThemeHelper.apply_3d_button(close_button, "secondary", 48.0, 13)
 	close_button.pressed.connect(close_inventory)
 	footer.add_child(close_button)
 
@@ -121,16 +135,14 @@ func _create_item_card(
 ) -> PanelContainer:
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(250.0, 88.0)
-	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color("#fff9e7")
-	card_style.border_color = Color("#d2b48c")
-	card_style.set_border_width_all(1)
-	card_style.set_corner_radius_all(5)
-	card_style.content_margin_left = 10.0
-	card_style.content_margin_top = 8.0
-	card_style.content_margin_right = 10.0
-	card_style.content_margin_bottom = 8.0
-	card.add_theme_stylebox_override("panel", card_style)
+	card.add_theme_stylebox_override(
+		"panel",
+		HearthwoodThemeHelper.create_sunken_slot_style(
+			Color("#fffcf5"),
+			Color("#c4a47c"),
+			6
+		)
+	)
 
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 3)
@@ -140,16 +152,28 @@ func _create_item_card(
 	item_header.add_theme_constant_override("separation", 8)
 	layout.add_child(item_header)
 
+	var slot_frame := PanelContainer.new()
+	slot_frame.custom_minimum_size = Vector2(28.0, 28.0)
+	slot_frame.add_theme_stylebox_override(
+		"panel",
+		HearthwoodThemeHelper.create_sunken_slot_style(
+			HearthwoodThemeHelper.COLOR_SLOT_RECESSED,
+			Color("#502c12"),
+			4
+		)
+	)
+	item_header.add_child(slot_frame)
+
 	var item_icon := ColorRect.new()
-	item_icon.custom_minimum_size = Vector2(18.0, 18.0)
+	item_icon.custom_minimum_size = Vector2(16.0, 16.0)
 	item_icon.color = Color(str(definition.get("warna", "#9a7950")))
-	item_header.add_child(item_icon)
+	slot_frame.add_child(item_icon)
 
 	var item_label := Label.new()
 	item_label.text = "%s  ×%d" % [str(definition["nama"]), int(stack.get("jumlah", 0))]
 	item_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	item_label.add_theme_font_size_override("font_size", 17)
-	item_label.add_theme_color_override("font_color", Color("#5d422c"))
+	item_label.add_theme_font_size_override("font_size", 16)
+	item_label.add_theme_color_override("font_color", Color("#4a2e18"))
 	item_header.add_child(item_label)
 
 	if str(definition.get("kategori", "")) == "masakan":
@@ -157,18 +181,23 @@ func _create_item_card(
 		var energy: int = game_state.get_item_energy(str(stack["id"]), quality)
 		var quality_label := Label.new()
 		quality_label.text = "Kualitas: %d bintang  ·  Energi +%d" % [quality, energy]
+		quality_label.add_theme_font_size_override("font_size", 12)
+		quality_label.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_BROWN)
 		layout.add_child(quality_label)
 
 		var cooked_on_day := int(stack.get("tanggal_masak", 0))
 		var cooked_date_label := Label.new()
-		cooked_date_label.text = "Dimasak hari %d" % cooked_on_day
 		var shelf_life := int(definition.get("masa_simpan_hari", 3))
 		var age := maxi(0, game_state.current_day - cooked_on_day)
-		cooked_date_label.text += "  ·  Tersisa %d hari" % maxi(0, shelf_life - age)
+		cooked_date_label.text = "Dimasak hari %d  ·  Tersisa %d hari" % [cooked_on_day, maxi(0, shelf_life - age)]
+		cooked_date_label.add_theme_font_size_override("font_size", 11)
+		cooked_date_label.add_theme_color_override("font_color", Color("#8b5a3c"))
 		layout.add_child(cooked_date_label)
 	else:
 		var category_label := Label.new()
-		category_label.text = str(definition.get("kategori", "barang")).capitalize()
+		category_label.text = str(definition.get("kategori", "bahan rimba")).capitalize()
+		category_label.add_theme_font_size_override("font_size", 12)
+		category_label.add_theme_color_override("font_color", Color("#6e4d35"))
 		layout.add_child(category_label)
 
 	return card
