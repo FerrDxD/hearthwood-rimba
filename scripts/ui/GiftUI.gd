@@ -1,6 +1,8 @@
 extends CanvasLayer
 class_name HearthwoodGiftUI
 
+const HearthwoodThemeHelper := preload("res://scripts/ui/UIThemeHelper.gd")
+
 var _interface: Control
 var _title_label: Label
 var _instructions_label: Label
@@ -69,48 +71,51 @@ func _create_interface() -> void:
 
 	var shade := ColorRect.new()
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	shade.color = Color(0.08, 0.1, 0.08, 0.52)
+	shade.color = Color(0.04, 0.07, 0.04, 0.65)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_interface.add_child(shade)
 
 	var panel := PanelContainer.new()
-	panel.anchor_left = 0.1
+	panel.anchor_left = 0.12
 	panel.anchor_top = 0.08
-	panel.anchor_right = 0.9
+	panel.anchor_right = 0.88
 	panel.anchor_bottom = 0.92
 	_interface.add_child(panel)
 
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("#f5f5dc")
-	panel_style.border_color = Color("#8fbc8f")
-	panel_style.set_border_width_all(3)
-	panel_style.set_corner_radius_all(8)
-	panel_style.content_margin_left = 18.0
-	panel_style.content_margin_top = 14.0
-	panel_style.content_margin_right = 18.0
-	panel_style.content_margin_bottom = 14.0
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.add_theme_stylebox_override(
+		"panel",
+		HearthwoodThemeHelper.create_parchment_panel_style(
+			HearthwoodThemeHelper.COLOR_CREAM,
+			HearthwoodThemeHelper.COLOR_BROWN,
+			8,
+			3
+		)
+	)
 
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 10)
 	panel.add_child(layout)
 
 	_title_label = Label.new()
-	_title_label.add_theme_font_size_override("font_size", 22)
-	_title_label.add_theme_color_override("font_color", Color("#5d422c"))
+	_title_label.add_theme_font_size_override("font_size", 20)
+	_title_label.add_theme_color_override("font_color", Color("#4a2e18"))
 	layout.add_child(_title_label)
 
 	_instructions_label = Label.new()
 	_instructions_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_instructions_label.add_theme_font_size_override("font_size", 13)
+	_instructions_label.add_theme_color_override("font_color", Color("#6e4d35"))
 	layout.add_child(_instructions_label)
 
 	_status_label = Label.new()
 	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status_label.add_theme_color_override("font_color", Color("#5d422c"))
+	_status_label.add_theme_font_size_override("font_size", 12)
+	_status_label.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_BROWN)
 	layout.add_child(_status_label)
 
 	_empty_label = Label.new()
-	_empty_label.text = "Belum ada masakan. Masak dulu di api unggun."
+	_empty_label.text = "Belum ada masakan di inventori. Masak dulu di perapian rimba."
+	_empty_label.add_theme_color_override("font_color", Color("#8b5a3c"))
 	_empty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(_empty_label)
 
@@ -129,7 +134,8 @@ func _create_interface() -> void:
 
 	var close_button := Button.new()
 	close_button.text = "Batal"
-	close_button.custom_minimum_size = Vector2(112.0, 52.0)
+	close_button.custom_minimum_size = Vector2(112.0, 48.0)
+	HearthwoodThemeHelper.apply_3d_button(close_button, "secondary", 48.0, 13)
 	close_button.pressed.connect(close_gifts)
 	footer.add_child(close_button)
 
@@ -142,8 +148,8 @@ func _refresh_food_list() -> void:
 
 	var game_state = get_node("/root/GameState")
 	var heart_level: int = game_state.get_npc_heart_level(_npc_id)
-	_title_label.text = "%s ke %s — hati %d" % [
-		"Layani pelanggan" if _is_customer_service else "Beri masakan",
+	_title_label.text = "%s ke %s — Hati %d" % [
+		"Layani Pelanggan" if _is_customer_service else "Beri Masakan",
 		_npc_name,
 		heart_level,
 	]
@@ -171,14 +177,15 @@ func _create_food_button(
 	var quality := int(stack.get("kualitas", 0))
 	var cooked_on_day := int(stack.get("tanggal_masak", 0))
 	var button := Button.new()
-	button.text = "%s  ×%d  ·  %d bintang  ·  dimasak hari %d" % [
+	button.text = "%s  ×%d  ·  %d Bintang  ·  Dimasak Hari %d" % [
 		str(definition.get("nama", item_id)),
 		int(stack.get("jumlah", 0)),
 		quality,
 		cooked_on_day,
 	]
-	button.custom_minimum_size = Vector2(0.0, 52.0)
+	button.custom_minimum_size = Vector2(0.0, 48.0)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	HearthwoodThemeHelper.apply_3d_button(button, "hero" if not already_gifted else "muted", 48.0, 13)
 	button.disabled = (
 		already_gifted
 		or _affection_system == null
