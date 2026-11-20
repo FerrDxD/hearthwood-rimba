@@ -99,6 +99,8 @@ var _tree_positions: Array[Vector2] = []
 var _named_npcs: Array[HearthwoodNPC] = []
 var _ambient_npcs: Array[HearthwoodNPC] = []
 var _item_pickups: Array[HearthwoodItemPickup] = []
+var _landmarks: Dictionary = {}
+var _obstacle_rects: Array[Rect2] = []
 var _building_rects: Array[Rect2] = [
 	Rect2(970.0, 246.0, 92.0, 72.0),
 	Rect2(1102.0, 246.0, 92.0, 72.0),
@@ -108,9 +110,14 @@ var _building_rects: Array[Rect2] = [
 
 func _init() -> void:
 	_random.seed = 713
+	_load_forest_zones_data()
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
 	_update_fallen_tree_barriers()
+	if _obstacle_rects.is_empty():
+		_build_forest_landmarks()
+		_place_zone_trees()
+		_add_building_collisions()
 	if _named_npcs.is_empty():
 		_spawn_named_npcs()
 	if _ambient_npcs.is_empty():
@@ -120,6 +127,8 @@ func _init() -> void:
 func _ready() -> void:
 	_random.seed = 713
 	_setup_fade_layer()
+	if _landmarks.is_empty():
+		_load_forest_zones_data()
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
 	if _game_state == null and has_node("/root/GameState"):
@@ -132,15 +141,19 @@ func _ready() -> void:
 	add_child(_ground)
 	_create_tileset()
 	_paint_ground()
-	_place_trees()
-	_add_building_collisions()
+	if _obstacle_rects.is_empty():
+		_build_forest_landmarks()
+		_place_zone_trees()
+		_add_building_collisions()
 	if _named_npcs.is_empty():
 		_spawn_named_npcs()
 	if _ambient_npcs.is_empty():
 		_spawn_ambient_npcs()
 	_spawn_forage_items()
-	get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
-	get_node("/root/GameState").state_changed.connect(_on_state_changed)
+	if has_node("/root/TimeSystem"):
+		get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
+	if has_node("/root/GameState"):
+		get_node("/root/GameState").state_changed.connect(_on_state_changed)
 	queue_redraw()
 
 
@@ -479,25 +492,197 @@ func _paint_ground() -> void:
 			_ground.set_cell(Vector2i(x, y), 0, Vector2i(tile_index, 0))
 
 
+func _load_forest_zones_data() -> void:
+	if not _landmarks.is_empty():
+		return
+	var path := "res://data/world/forest_zones.json"
+	if FileAccess.file_exists(path):
+		var file := FileAccess.open(path, FileAccess.READ)
+		if file != null:
+			var parsed: Variant = JSON.parse_string(file.get_as_text())
+			if typeof(parsed) == TYPE_DICTIONARY:
+				for zid in parsed:
+					var zdict: Dictionary = parsed[zid]
+					_landmarks[zid] = zdict.get("landmarks", [])
+				return
+	_landmarks = {
+		"forest_zone_1": [
+			{"id": "wooden_boundary_arch", "name": "Gapura Kayu Perbatasan", "type": "boundary_arch", "position": [520.0, 1200.0], "size": [32.0, 64.0]},
+			{"id": "gravel_pathways", "name": "Jalan Setapak Kerikil", "type": "pathway", "position": [280.0, 1200.0], "size": [160.0, 24.0]},
+			{"id": "forest_signpost_z1", "name": "Papan Penunjuk Arah Rimba", "type": "signpost", "position": [460.0, 1170.0], "size": [24.0, 24.0]},
+		],
+		"forest_zone_2": [
+			{"id": "rocky_riverbed", "name": "Aliran Sungai Bebatuan", "type": "river", "position": [-280.0, 1200.0], "size": [320.0, 72.0]},
+			{"id": "stepping_stones_crossing", "name": "Batu Loncatan Sungai", "type": "stepping_stones", "position": [-280.0, 1200.0], "size": [64.0, 48.0]},
+			{"id": "weathered_wood_bridge", "name": "Jembatan Kayu Lapuk", "type": "bridge", "position": [-140.0, 1200.0], "size": [48.0, 32.0]},
+			{"id": "wet_sand_bank", "name": "Tepian Pasir Basah", "type": "sand_bank", "position": [-420.0, 1260.0], "size": [96.0, 48.0]},
+		],
+		"forest_zone_3": [
+			{"id": "rast_canvas_camp", "name": "Tenda Kanvas Rast", "type": "camp_tent", "position": [200.0, 620.0], "size": [64.0, 48.0]},
+			{"id": "warm_stone_campfire", "name": "Perapian Batu Hangat", "type": "campfire", "position": [260.0, 640.0], "size": [24.0, 24.0]},
+			{"id": "timber_log_pile", "name": "Tumpukan Kayu Gelondongan", "type": "log_pile", "position": [140.0, 720.0], "size": [64.0, 36.0]},
+			{"id": "ancient_woodcutter_stump", "name": "Tunggul Penebang Tua", "type": "woodcutter_stump", "position": [340.0, 650.0], "size": [32.0, 32.0]},
+		],
+		"forest_zone_4": [
+			{"id": "mossy_marsh_pond", "name": "Rawa Kecil Berlumut", "type": "marsh_pond", "position": [780.0, -220.0], "size": [112.0, 64.0]},
+			{"id": "dense_canopy_thicket", "name": "Rerimbunan Semak Lembab", "type": "canopy_thicket", "position": [920.0, -340.0], "size": [128.0, 96.0]},
+			{"id": "abundant_berry_grove", "name": "Gerombolan Pohon Beri Rimba", "type": "berry_grove", "position": [860.0, -280.0], "size": [48.0, 48.0]},
+		],
+		"forest_zone_5": [
+			{"id": "ancient_root_archways", "name": "Lorong Lengkung Akar Purba", "type": "root_archway", "position": [-260.0, 670.0], "size": [96.0, 72.0]},
+			{"id": "mossy_fossil_boulder", "name": "Fosil Batu Lumut Purba", "type": "fossil_boulder", "position": [-420.0, 720.0], "size": [64.0, 54.0]},
+			{"id": "ancient_root_cleft", "name": "Celah Berongga Akar Purba", "type": "root_cleft", "position": [-310.0, 600.0], "size": [36.0, 36.0]},
+		],
+		"forest_zone_6": [
+			{"id": "great_sanctuary_tree", "name": "Pohon Raksasa Purba", "type": "great_tree", "position": [210.0, 260.0], "size": [112.0, 128.0]},
+			{"id": "ancient_inscribed_altar", "name": "Altar Batu Bertulis Misterius", "type": "altar", "position": [300.0, 310.0], "size": [48.0, 32.0]},
+			{"id": "sanctuary_lantern_pedestal", "name": "Lentera Pilar Suaka", "type": "lantern_pedestal", "position": [140.0, 310.0], "size": [24.0, 24.0]},
+		],
+	}
+
+
+func get_zone_landmarks(zone_id: String) -> Array:
+	return _landmarks.get(zone_id, [])
+
+
+func get_all_landmarks() -> Dictionary:
+	return _landmarks
+
+
+func get_zone_gates() -> Array[ZoneGate2D]:
+	return _zone_gates
+
+
+func get_obstacle_rects() -> Array[Rect2]:
+	return _obstacle_rects
+
+
+func _build_forest_landmarks() -> void:
+	# Zona 1: Gapura pillars (leaving wide central walkway open) & wooden signpost
+	_add_obstacle(Rect2(500.0, 1120.0, 14.0, 24.0))
+	_add_obstacle(Rect2(500.0, 1256.0, 14.0, 24.0))
+	_add_obstacle(Rect2(456.0, 1166.0, 8.0, 8.0))
+
+	# Zona 2: River boulders (leaving stepping stones and bridge open)
+	_add_obstacle(Rect2(-360.0, 1160.0, 24.0, 20.0))
+	_add_obstacle(Rect2(-190.0, 1220.0, 24.0, 20.0))
+
+	# Zona 3: Rast's camp tent, firepit, log pile, woodcutter stump
+	_add_obstacle(Rect2(174.0, 604.0, 52.0, 32.0))
+	_add_obstacle(Rect2(253.0, 633.0, 14.0, 14.0))
+	_add_obstacle(Rect2(116.0, 706.0, 48.0, 26.0))
+	_add_obstacle(Rect2(330.0, 640.0, 20.0, 20.0))
+
+	# Zona 4: Marsh pond & dense canopy thicket cores
+	_add_obstacle(Rect2(744.0, -236.0, 72.0, 32.0))
+	_add_obstacle(Rect2(876.0, -366.0, 88.0, 52.0))
+
+	# Zona 5: Ancient root arch pillars, fossil boulder, root cleft
+	_add_obstacle(Rect2(-300.0, 654.0, 18.0, 32.0))
+	_add_obstacle(Rect2(-238.0, 654.0, 18.0, 32.0))
+	_add_obstacle(Rect2(-442.0, 702.0, 44.0, 36.0))
+	_add_obstacle(Rect2(-322.0, 588.0, 24.0, 24.0))
+
+	# Zona 6: Great tree southern trunk, sanctuary tree upper trunk, altar, lantern pedestal
+	_add_obstacle(Rect2(GREAT_TREE_POSITION.x - 9.0, GREAT_TREE_POSITION.y - 5.0, 18.0, 26.0))
+	_add_obstacle(Rect2(200.0, 248.0, 20.0, 24.0))
+	_add_obstacle(Rect2(282.0, 298.0, 36.0, 24.0))
+	_add_obstacle(Rect2(134.0, 304.0, 12.0, 14.0))
+
+
+func _place_zone_trees() -> void:
+	var candidate_positions: Array[Vector2] = [
+		# Zona 1: Border trees framing path
+		Vector2(60.0, 1040.0),
+		Vector2(140.0, 1020.0),
+		Vector2(230.0, 1050.0),
+		Vector2(380.0, 1040.0),
+		Vector2(70.0, 1340.0),
+		Vector2(150.0, 1360.0),
+		Vector2(320.0, 1350.0),
+		Vector2(450.0, 1340.0),
+		# Zona 2: Riverbank outer trees
+		Vector2(-480.0, 1030.0),
+		Vector2(-390.0, 1040.0),
+		Vector2(-80.0, 1040.0),
+		Vector2(-490.0, 1360.0),
+		Vector2(-200.0, 1370.0),
+		Vector2(-80.0, 1360.0),
+		# Zona 3: Woodcutter grove trees
+		Vector2(60.0, 540.0),
+		Vector2(160.0, 530.0),
+		Vector2(420.0, 540.0),
+		Vector2(480.0, 720.0),
+		Vector2(70.0, 860.0),
+		Vector2(440.0, 860.0),
+		# Zona 4: Dense wet thicket trees
+		Vector2(630.0, -410.0),
+		Vector2(730.0, -420.0),
+		Vector2(620.0, -120.0),
+		Vector2(770.0, -90.0),
+		Vector2(1000.0, -420.0),
+		Vector2(1050.0, -150.0),
+		# Zona 5: Ancient valley trees
+		Vector2(-490.0, 540.0),
+		Vector2(-140.0, 540.0),
+		Vector2(-490.0, 850.0),
+		Vector2(-120.0, 840.0),
+		Vector2(-370.0, 870.0),
+		# Zona 6: Sacred grove trees
+		Vector2(80.0, 90.0),
+		Vector2(210.0, 80.0),
+		Vector2(350.0, 90.0),
+		Vector2(480.0, 90.0),
+		Vector2(80.0, 380.0),
+		Vector2(450.0, 220.0),
+		Vector2(450.0, 380.0),
+	]
+
+	for pos in candidate_positions:
+		var tree_obs := Rect2(pos.x - 7.0, pos.y - 2.0, 14.0, 16.0)
+		if _is_tree_position_valid(pos, tree_obs):
+			_tree_positions.append(pos)
+			_add_obstacle(tree_obs)
+
+
+func _is_tree_position_valid(tree_pos: Vector2, tree_obs: Rect2) -> bool:
+	var veg_rect := Rect2(104.0 - 24.0, 1178.0 - 24.0, 48.0, 48.0)
+	if tree_obs.intersects(veg_rect):
+		return false
+	if tree_pos.distance_to(Vector2(210.0, 462.0)) < 40.0:
+		return false
+	if tree_pos.distance_to(GREAT_TREE_POSITION) < 55.0:
+		return false
+	if tree_pos.distance_to(Vector2(210.0, 260.0)) < 55.0:
+		return false
+	for gate in _zone_gates:
+		var col: CollisionShape2D = null
+		for c in gate.get_children():
+			if c is CollisionShape2D:
+				col = c
+				break
+		if col != null and col.shape is RectangleShape2D:
+			var g_rect: Rect2 = Rect2(gate.position - col.shape.size * 0.5 - Vector2(24.0, 24.0), col.shape.size + Vector2(48.0, 48.0))
+			if tree_obs.intersects(g_rect):
+				return false
+		if tree_pos.distance_to(gate.target_spawn_position) < 40.0:
+			return false
+	for f in FORAGE_SPAWN_POINTS:
+		if tree_pos.distance_to(f["position"]) < 28.0:
+			return false
+	if tree_pos.distance_to(RAIN_FORAGE_SPAWN["position"]) < 28.0:
+		return false
+	for obs in _obstacle_rects:
+		if tree_obs.intersects(obs.grow(8.0)):
+			return false
+	for existing in _tree_positions:
+		if tree_pos.distance_to(existing) < 28.0:
+			return false
+	return true
+
+
 func _place_trees() -> void:
-	for index in 32:
-		var tree_position := Vector2(
-			_random.randf_range(42.0, FOREST_END_X - 42.0),
-			_random.randf_range(54.0, WORLD_SIZE.y - 54.0)
-		)
-		if tree_position.distance_to(GREAT_TREE_POSITION) < 70.0:
-			continue
-		var path_center := 432.0 + sin(tree_position.x / 16.0 * 0.085) * 32.0
-		if absf(tree_position.y - path_center) < 82.0:
-			continue
-		_tree_positions.append(tree_position)
-		_add_obstacle(Rect2(tree_position.x - 7.0, tree_position.y - 2.0, 14.0, 16.0))
-	_add_obstacle(Rect2(
-		GREAT_TREE_POSITION.x - 9.0,
-		GREAT_TREE_POSITION.y - 5.0,
-		18.0,
-		26.0
-	))
+	_place_zone_trees()
 
 
 func _add_building_collisions() -> void:
@@ -634,6 +819,7 @@ func _load_schedule_data() -> Dictionary:
 
 
 func _add_obstacle(rect: Rect2) -> void:
+	_obstacle_rects.append(rect)
 	var body := StaticBody2D.new()
 	body.position = rect.position + rect.size * 0.5
 	var shape := CollisionShape2D.new()
@@ -645,6 +831,12 @@ func _add_obstacle(rect: Rect2) -> void:
 
 
 func _draw() -> void:
+	_draw_zone_1_landmarks()
+	_draw_zone_2_landmarks()
+	_draw_zone_3_landmarks()
+	_draw_zone_4_landmarks()
+	_draw_zone_5_landmarks()
+	_draw_zone_6_landmarks()
 	_draw_great_tree()
 	for tree_position in _tree_positions:
 		draw_rect(
@@ -678,6 +870,219 @@ func _draw() -> void:
 	draw_circle(COOKING_STATION_POSITION + Vector2(0.0, -4.0), 4.0, Color("#ffd26b"))
 	draw_rect(Rect2(1310.0, 465.0, 20.0, 8.0), Color("#d4b481"))
 	draw_rect(Rect2(1312.0, 467.0, 16.0, 3.0), Color("#76513a"))
+
+
+func _draw_zone_1_landmarks() -> void:
+	# Gravel trail
+	draw_rect(Rect2(80.0, 1188.0, 440.0, 24.0), Color("#705335"))
+	draw_rect(Rect2(90.0, 1192.0, 420.0, 16.0), Color("#8b7355"))
+	draw_rect(Rect2(120.0, 1195.0, 360.0, 10.0), Color("#a89f91"))
+	for offset_x in [140.0, 200.0, 270.0, 330.0, 400.0, 470.0]:
+		draw_circle(Vector2(offset_x, 1198.0), 3.0, Color("#c2b280"))
+		draw_circle(Vector2(offset_x + 25.0, 1204.0), 2.0, Color("#695843"))
+
+	# Wooden boundary arch at (520, 1200)
+	# North Pillar: stone foot + wood post + iron strap
+	draw_rect(Rect2(498.0, 1140.0, 18.0, 6.0), Color("#6b736e"))
+	draw_rect(Rect2(500.0, 1120.0, 14.0, 20.0), Color("#5a3d28"))
+	draw_rect(Rect2(500.0, 1124.0, 14.0, 3.0), Color("#333333"))
+
+	# South Pillar: stone foot + wood post + iron strap
+	draw_rect(Rect2(498.0, 1254.0, 18.0, 6.0), Color("#6b736e"))
+	draw_rect(Rect2(500.0, 1260.0, 14.0, 20.0), Color("#5a3d28"))
+	draw_rect(Rect2(500.0, 1272.0, 14.0, 3.0), Color("#333333"))
+
+	# Overhead crossbeam and lintel
+	draw_line(Vector2(507.0, 1120.0), Vector2(507.0, 1280.0), Color("#76513a"), 8.0)
+	draw_line(Vector2(507.0, 1122.0), Vector2(507.0, 1278.0), Color("#8b5a3c"), 4.0)
+	draw_rect(Rect2(503.0, 1192.0, 8.0, 16.0), Color("#d2b48c"))
+
+	# Forest signpost at (460, 1170)
+	draw_rect(Rect2(458.0, 1162.0, 4.0, 16.0), Color("#5a3d28"))
+	draw_rect(Rect2(462.0, 1164.0, 14.0, 5.0), Color("#d2b48c"))
+	draw_rect(Rect2(446.0, 1170.0, 14.0, 5.0), Color("#cba77b"))
+
+
+func _draw_zone_2_landmarks() -> void:
+	# River bed, banks, and water ribbon
+	draw_rect(Rect2(-560.0, 1162.0, 560.0, 76.0), Color("#695843"))
+	draw_rect(Rect2(-560.0, 1166.0, 560.0, 68.0), Color("#b5a274"))
+	draw_rect(Rect2(-560.0, 1172.0, 560.0, 56.0), Color("#588b9c"))
+	draw_rect(Rect2(-560.0, 1184.0, 560.0, 32.0), Color("#3d6674"))
+
+	# River ripples & foam
+	for rx in [-500.0, -420.0, -340.0, -220.0, -100.0]:
+		draw_line(Vector2(rx, 1192.0), Vector2(rx + 36.0, 1192.0), Color("#85b4c4"), 2.0)
+		draw_line(Vector2(rx + 15.0, 1204.0), Vector2(rx + 45.0, 1204.0), Color("#c6e2ed"), 1.5)
+
+	# Wet sand bank at (-420, 1260)
+	draw_circle(Vector2(-420.0, 1235.0), 28.0, Color("#c2b280"))
+	draw_circle(Vector2(-415.0, 1238.0), 18.0, Color("#b5a274"))
+	draw_circle(Vector2(-430.0, 1230.0), 8.0, Color("#5b8a54"))
+
+	# Stepping stones crossing at (-280, 1200)
+	draw_circle(Vector2(-280.0, 1180.0), 8.0, Color("#7d8c82"))
+	draw_circle(Vector2(-281.0, 1179.0), 5.0, Color("#a6b5ab"))
+	draw_circle(Vector2(-276.0, 1194.0), 9.0, Color("#6e7d73"))
+	draw_circle(Vector2(-277.0, 1193.0), 6.0, Color("#96a59b"))
+	draw_circle(Vector2(-282.0, 1208.0), 8.5, Color("#7d8c82"))
+	draw_circle(Vector2(-283.0, 1207.0), 5.0, Color("#a6b5ab"))
+	draw_circle(Vector2(-278.0, 1220.0), 8.0, Color("#6e7d73"))
+	draw_circle(Vector2(-279.0, 1219.0), 5.0, Color("#96a59b"))
+
+	# Weathered wooden bridge at (-140, 1200)
+	draw_rect(Rect2(-146.0, 1170.0, 6.0, 60.0), Color("#4a2e1b"))
+	draw_rect(Rect2(-120.0, 1170.0, 6.0, 60.0), Color("#4a2e1b"))
+	draw_rect(Rect2(-152.0, 1172.0, 38.0, 56.0), Color("#6e4b30"))
+	for by in range(1174, 1226, 6):
+		draw_line(Vector2(-152.0, float(by)), Vector2(-114.0, float(by)), Color("#4a2e1b"), 1.0)
+	draw_rect(Rect2(-152.0, 1172.0, 4.0, 56.0), Color("#b8860b"))
+	draw_rect(Rect2(-118.0, 1172.0, 4.0, 56.0), Color("#b8860b"))
+
+	# River boulders
+	draw_circle(Vector2(-348.0, 1170.0), 12.0, Color("#5a665d"))
+	draw_circle(Vector2(-350.0, 1168.0), 7.0, Color("#7d8c82"))
+	draw_circle(Vector2(-178.0, 1230.0), 11.0, Color("#5a665d"))
+	draw_circle(Vector2(-180.0, 1228.0), 6.0, Color("#7d8c82"))
+
+
+func _draw_zone_3_landmarks() -> void:
+	# Rast's canvas camp tent at (200, 620)
+	draw_rect(Rect2(170.0, 614.0, 60.0, 24.0), Color("#d4af37"))
+	var tent_pts: PackedVector2Array = [
+		Vector2(174.0, 636.0),
+		Vector2(200.0, 604.0),
+		Vector2(226.0, 636.0)
+	]
+	draw_colored_polygon(tent_pts, Color("#e5d2ad"))
+	var fold_pts: PackedVector2Array = [
+		Vector2(174.0, 636.0),
+		Vector2(200.0, 604.0),
+		Vector2(200.0, 636.0)
+	]
+	draw_colored_polygon(fold_pts, Color("#c8b48c"))
+	draw_line(Vector2(200.0, 604.0), Vector2(200.0, 636.0), Color("#76513a"), 2.0)
+	draw_rect(Rect2(195.0, 620.0, 10.0, 16.0), Color("#3a2312"))
+
+	# Campfire at (260, 640)
+	for i in 8:
+		var angle := float(i) * PI / 4.0
+		var stone_pos := Vector2(260.0 + cos(angle) * 11.0, 640.0 + sin(angle) * 11.0)
+		draw_circle(stone_pos, 3.5, Color("#696969"))
+	draw_circle(Vector2(260.0, 640.0), 8.0, Color("#3a2312"))
+	draw_circle(Vector2(260.0, 640.0), 5.0, Color("#d35400"))
+	draw_circle(Vector2(260.0, 639.0), 2.5, Color("#f39c12"))
+
+	# Timber log pile at (140, 720)
+	draw_rect(Rect2(116.0, 712.0, 48.0, 10.0), Color("#5a3d28"))
+	draw_circle(Vector2(116.0, 717.0), 5.0, Color("#c29b62"))
+	draw_circle(Vector2(116.0, 717.0), 2.0, Color("#8b5a2b"))
+	draw_rect(Rect2(120.0, 722.0, 44.0, 10.0), Color("#76513a"))
+	draw_circle(Vector2(120.0, 727.0), 5.0, Color("#c29b62"))
+	draw_circle(Vector2(120.0, 727.0), 2.0, Color("#8b5a2b"))
+	draw_rect(Rect2(124.0, 706.0, 40.0, 9.0), Color("#5a3d28"))
+	draw_circle(Vector2(124.0, 710.0), 4.5, Color("#c29b62"))
+	draw_circle(Vector2(124.0, 710.0), 2.0, Color("#8b5a2b"))
+
+	# Ancient woodcutter stump at (340, 650)
+	draw_circle(Vector2(340.0, 650.0), 12.0, Color("#654321"))
+	draw_circle(Vector2(340.0, 650.0), 9.0, Color("#8b6239"))
+	draw_circle(Vector2(340.0, 650.0), 4.0, Color("#5a3825"))
+	draw_rect(Rect2(338.0, 646.0, 5.0, 6.0), Color("#708090"))
+	draw_line(Vector2(339.0, 646.0), Vector2(346.0, 638.0), Color("#8b4513"), 2.0)
+
+
+func _draw_zone_4_landmarks() -> void:
+	# Mossy marsh pond at (780, -220)
+	draw_circle(Vector2(780.0, -220.0), 42.0, Color("#263824"))
+	draw_circle(Vector2(780.0, -220.0), 34.0, Color("#3b5738"))
+	draw_circle(Vector2(778.0, -220.0), 22.0, Color("#2d482a"))
+	# Lily pads
+	draw_circle(Vector2(765.0, -230.0), 6.0, Color("#557a46"))
+	draw_circle(Vector2(795.0, -215.0), 7.0, Color("#557a46"))
+	draw_circle(Vector2(775.0, -208.0), 5.0, Color("#557a46"))
+	draw_circle(Vector2(790.0, -232.0), 4.0, Color("#75934f"))
+	# Cattails
+	draw_line(Vector2(746.0, -210.0), Vector2(746.0, -230.0), Color("#5a3d28"), 2.0)
+	draw_rect(Rect2(744.0, -228.0, 4.0, 10.0), Color("#3a2312"))
+	draw_line(Vector2(812.0, -215.0), Vector2(812.0, -235.0), Color("#5a3d28"), 2.0)
+	draw_rect(Rect2(810.0, -233.0, 4.0, 10.0), Color("#3a2312"))
+
+	# Dense canopy thicket at (920, -340)
+	draw_circle(Vector2(920.0, -340.0), 48.0, Color("#1e3f20"))
+	draw_circle(Vector2(905.0, -350.0), 38.0, Color("#294d35"))
+	draw_circle(Vector2(935.0, -330.0), 36.0, Color("#3d6e3f"))
+	draw_circle(Vector2(918.0, -335.0), 28.0, Color("#4e7943"))
+	draw_circle(Vector2(912.0, -340.0), 16.0, Color("#75934f"))
+
+	# Abundant berry grove at (860, -280)
+	draw_circle(Vector2(860.0, -280.0), 20.0, Color("#27ae60"))
+	draw_circle(Vector2(852.0, -284.0), 14.0, Color("#2ecc71"))
+	for b_off in [Vector2(-8.0, -6.0), Vector2(6.0, -10.0), Vector2(4.0, 4.0), Vector2(-6.0, 6.0), Vector2(10.0, -2.0)]:
+		draw_circle(Vector2(860.0, -280.0) + b_off, 2.5, Color("#e74c3c"))
+
+
+func _draw_zone_5_landmarks() -> void:
+	# Ancient root archways at (-260, 670)
+	# Left root pillar
+	draw_rect(Rect2(-298.0, 654.0, 16.0, 32.0), Color("#4a2e1b"))
+	draw_rect(Rect2(-296.0, 656.0, 12.0, 28.0), Color("#382013"))
+	# Right root pillar
+	draw_rect(Rect2(-236.0, 654.0, 16.0, 32.0), Color("#4a2e1b"))
+	draw_rect(Rect2(-234.0, 656.0, 12.0, 28.0), Color("#382013"))
+	# Overhead arch curve
+	draw_line(Vector2(-290.0, 656.0), Vector2(-260.0, 636.0), Color("#5a3d28"), 8.0)
+	draw_line(Vector2(-260.0, 636.0), Vector2(-230.0, 656.0), Color("#5a3d28"), 8.0)
+	draw_line(Vector2(-290.0, 658.0), Vector2(-260.0, 638.0), Color("#4a2e1b"), 4.0)
+	draw_line(Vector2(-260.0, 638.0), Vector2(-230.0, 658.0), Color("#4a2e1b"), 4.0)
+	# Hanging moss strands
+	draw_line(Vector2(-275.0, 642.0), Vector2(-275.0, 655.0), Color("#556b2f"), 2.0)
+	draw_line(Vector2(-248.0, 644.0), Vector2(-248.0, 658.0), Color("#6b8e23"), 2.0)
+
+	# Mossy fossil boulder at (-420, 720)
+	draw_rect(Rect2(-442.0, 702.0, 44.0, 36.0), Color("#3f523d"))
+	draw_rect(Rect2(-438.0, 705.0, 36.0, 28.0), Color("#4e654c"))
+	draw_circle(Vector2(-420.0, 719.0), 8.0, Color("#7d8c7c"))
+	draw_circle(Vector2(-420.0, 719.0), 5.0, Color("#4e654c"))
+	draw_circle(Vector2(-420.0, 719.0), 2.0, Color("#7d8c7c"))
+	draw_rect(Rect2(-444.0, 699.0, 48.0, 6.0), Color("#5b8a54"))
+
+	# Ancient root cleft at (-310, 600)
+	draw_circle(Vector2(-310.0, 600.0), 16.0, Color("#4a2e1b"))
+	draw_circle(Vector2(-310.0, 600.0), 9.0, Color("#1c1008"))
+	draw_circle(Vector2(-312.0, 599.0), 2.0, Color("#cd853f"))
+
+
+func _draw_zone_6_landmarks() -> void:
+	# Enhanced Sanctuary Great Tree upper canopy & trunk at (210, 260)
+	draw_rect(Rect2(198.0, 240.0, 24.0, 60.0), Color("#3e2615"))
+	draw_line(Vector2(204.0, 242.0), Vector2(204.0, 298.0), Color("#8a9a86"), 1.5)
+	draw_line(Vector2(216.0, 244.0), Vector2(216.0, 296.0), Color("#5a3d28"), 2.0)
+	# Sprawling buttress roots
+	draw_line(Vector2(198.0, 290.0), Vector2(174.0, 316.0), Color("#4a2e1b"), 6.0)
+	draw_line(Vector2(222.0, 290.0), Vector2(246.0, 316.0), Color("#4a2e1b"), 6.0)
+	# Massive sacred canopy crown
+	draw_circle(Vector2(210.0, 220.0), 52.0, Color("#1e3f20"))
+	draw_circle(Vector2(182.0, 235.0), 38.0, Color("#294d35"))
+	draw_circle(Vector2(238.0, 235.0), 38.0, Color("#294d35"))
+	draw_circle(Vector2(210.0, 208.0), 36.0, Color("#4e7943"))
+	draw_circle(Vector2(198.0, 202.0), 18.0, Color("#75934f"))
+
+	# Ancient inscribed stone altar at (300, 310)
+	draw_rect(Rect2(280.0, 314.0, 40.0, 8.0), Color("#404743"))
+	draw_rect(Rect2(284.0, 300.0, 32.0, 16.0), Color("#525b56"))
+	draw_rect(Rect2(282.0, 298.0, 36.0, 6.0), Color("#6b736e"))
+	# Glowing ancient glyph carvings
+	draw_line(Vector2(290.0, 308.0), Vector2(300.0, 308.0), Color("#cd853f"), 2.0)
+	draw_line(Vector2(295.0, 304.0), Vector2(295.0, 312.0), Color("#ffd26b"), 2.0)
+	draw_line(Vector2(304.0, 305.0), Vector2(310.0, 311.0), Color("#cd853f"), 1.5)
+
+	# Sanctuary lantern pedestal at (140, 310)
+	draw_rect(Rect2(136.0, 306.0, 8.0, 14.0), Color("#6b736e"))
+	draw_rect(Rect2(134.0, 298.0, 12.0, 10.0), Color("#2a2a2a"))
+	draw_circle(Vector2(140.0, 303.0), 8.0, Color(1.0, 0.82, 0.42, 0.25))
+	draw_circle(Vector2(140.0, 303.0), 4.0, Color("#ffd26b"))
+	draw_circle(Vector2(140.0, 303.0), 2.0, Color("#ffffff"))
 
 
 func _draw_great_tree() -> void:
