@@ -1,0 +1,455 @@
+{
+  "forest_zone_1": {
+    "name": "Pintu Rimba",
+    "bounds": [0.0, 960.0, 560.0, 480.0],
+    "description": "Batas terluar pemukiman beradab Hearthwood yang menghubungkan jalan desa ke hamparan rimba luas dengan gapura kayu sederhana dan jalan setapak berkerikil.",
+    "landmarks": [
+      {
+        "id": "wooden_boundary_arch",
+        "name": "Gapura Kayu Perbatasan",
+        "type": "boundary_arch",
+        "position": [520.0, 1200.0],
+        "size": [32.0, 64.0],
+        "description": "Gapura kayu pasak sederhana penanda batas terluar pemukiman Hearthwood dan rimba liar."
+      },
+      {
+        "id": "gravel_pathways",
+        "name": "Jalan Setapak Kerikil",
+        "type": "pathway",
+        "position": [280.0, 1200.0],
+        "size": [160.0, 24.0],
+        "description": "Lajur setapak berkerikil halus yang mulai ditumbuhi lumut dan rerumputan liar."
+      },
+      {
+        "id": "forest_signpost_z1",
+        "name": "Papan Penunjuk Arah Rimba",
+        "type": "signpost",
+        "position": [460.0, 1170.0],
+        "size": [24.0, 24.0],
+        "description": "Papan kayu bertuliskan petunjuk arah: Timur ke Desa, Utara ke Pos Penebang, Barat ke Aliran Sungai."
+      }
+    ],
+    "props": [
+      {
+        "id": "signpost_pintu_rimba",
+        "name": "Papan Penunjuk Arah",
+        "type": "signpost",
+        "position": [460.0, 1170.0],
+        "interaction_text": "Membaca Papan Penunjuk Rimba"
+      },
+      {
+        "id": "fruit_tree_apel_hutan_z1",
+        "name": "Pohon Buah Liar Rimba",
+        "type": "fruit_tree",
+        "position": [160.0, 1080.0],
+        "drop_item_id": "buah_liar",
+        "interaction_text": "Goyang Pohon Buah"
+      },
+      {
+        "id": "rustling_bush_z1_a",
+        "name": "Semak Belukar Rimbun A",
+        "type": "rustling_bush",
+        "position": [190.0, 1220.0]
+      },
+      {
+        "id": "rustling_bush_z1_b",
+        "name": "Semak Belukar Rimbun B",
+        "type": "rustling_bush",
+        "position": [360.0, 1150.0]
+      }
+    ],
+    "forages": [
+      {
+        "spawn_id": "sayur_liar_1",
+        "id": "sayur_liar",
+        "position": [104.0, 1178.0]
+      },
+      {
+        "spawn_id": "daun_hutan_1",
+        "id": "daun_hutan",
+        "position": [420.0, 1120.0]
+      },
+      {
+        "spawn_id": "kayu_1_z1",
+        "id": "kayu",
+        "position": [220.0, 1310.0]
+      }
+    ]
+  },
+  "forest_zone_2": {
+    "name": "Aliran Sungai Bebatuan",
+    "bounds": [-560.0, 960.0, 560.0, 480.0],
+    "description": "Aliran sungai jernih berbatu kali dengan riak air tenang, jembatan lapuk penyeberangan, dan tepian berpasir basah yang kaya ikan serta lumut segar.",
+    "landmarks": [
+      {
+        "id": "rocky_riverbed",
+        "name": "Aliran Sungai Bebatuan",
+        "type": "river",
+        "position": [-280.0, 1200.0],
+        "size": [320.0, 72.0],
+        "description": "Aliran sungai jernih berarus tenang membelah lembah dari barat laut ke tenggara, dipenuhi kerikil bundar dan bebatuan kali."
+      },
+      {
+        "id": "stepping_stones_crossing",
+        "name": "Batu Loncatan Sungai",
+        "type": "stepping_stones",
+        "position": [-280.0, 1200.0],
+        "size": [64.0, 48.0],
+        "description": "Batu-batu pipih kokoh yang tertata alami menyeberangi aliran air dangkal."
+      },
+      {
+        "id": "weathered_wood_bridge",
+        "name": "Jembatan Kayu Lapuk",
+        "type": "bridge",
+        "position": [-140.0, 1200.0],
+        "size": [48.0, 32.0],
+        "description": "Jembatan balok kayu tua berlumut di hilir sungai, kokoh untuk dilintasi para pencari herba."
+      },
+      {
+        "id": "wet_sand_bank",
+        "name": "Tepian Pasir Basah",
+        "type": "sand_bank",
+        "position": [-420.0, 1260.0],
+        "size": [96.0, 48.0],
+        "description": "Tepian pasir sungai yang basah dan tenang tempat lumut sungai tumbuh lebat."
+      }
+    ],
+    "props": [
+      {
+        "id": "fresh_spring_sungai_z2",
+        "name": "Tepian Mata Air Alami",
+        "type": "fresh_spring",
+        "position": [-320.0, 1120.0],
+        "energy_heal": 10,
+        "interaction_text": "Basuh Muka di Mata Air"
+      },
+      {
+        "id": "rustling_bush_z2_a",
+        "name": "Semak Tepi Sungai A",
+        "type": "rustling_bush",
+        "position": [-220.0, 1080.0]
+      },
+      {
+        "id": "rustling_bush_z2_b",
+        "name": "Semak Tepi Sungai B",
+        "type": "rustling_bush",
+        "position": [-390.0, 1220.0]
+      }
+    ],
+    "forages": [
+      {
+        "spawn_id": "ikan_sungai_1",
+        "id": "ikan_sungai",
+        "position": [-280.0, 1200.0]
+      },
+      {
+        "spawn_id": "batu_1",
+        "id": "batu",
+        "position": [-150.0, 1050.0]
+      },
+      {
+        "spawn_id": "lumut_sungai_1",
+        "id": "lumut_sungai",
+        "position": [-380.0, 1280.0]
+      },
+      {
+        "spawn_id": "ikan_sungai_2",
+        "id": "ikan_sungai",
+        "position": [-430.0, 1140.0]
+      }
+    ]
+  },
+  "forest_zone_3": {
+    "name": "Pos Penebang Kayu",
+    "bounds": [0.0, 480.0, 560.0, 480.0],
+    "description": "Area penebangan kayu tua yang kini menjadi pos perkemahan Rast dengan tenda kanvas, perapian batu, dan tumpukan gelondongan kayu pinus.",
+    "landmarks": [
+      {
+        "id": "rast_canvas_camp",
+        "name": "Tenda Kanvas Rast",
+        "type": "camp_tent",
+        "position": [200.0, 620.0],
+        "size": [64.0, 48.0],
+        "description": "Tenda kanvas tebal berpalang pasak kayu milik Rast dengan alas jerami kering pelindung embun malam."
+      },
+      {
+        "id": "warm_stone_campfire",
+        "name": "Perapian Batu Hangat",
+        "type": "campfire",
+        "position": [260.0, 640.0],
+        "size": [24.0, 24.0],
+        "description": "Susunan batu kali melingkar mengelilingi abu perapian yang masih mengepulkan kehangatan tipis."
+      },
+      {
+        "id": "timber_log_pile",
+        "name": "Tumpukan Kayu Gelondongan",
+        "type": "log_pile",
+        "position": [140.0, 720.0],
+        "size": [64.0, 36.0],
+        "description": "Susunan balok kayu gelondongan pinus yang telah dirapikan oleh Rast untuk kebutuhan kayu bakar warga desa."
+      },
+      {
+        "id": "ancient_woodcutter_stump",
+        "name": "Tunggul Penebang Tua",
+        "type": "woodcutter_stump",
+        "position": [340.0, 650.0],
+        "size": [32.0, 32.0],
+        "description": "Tunggul pohon tua berdiameter lebar dengan kapak baja berkarat menancap tegak di atasnya."
+      }
+    ],
+    "props": [
+      {
+        "id": "inspectable_stump_z3",
+        "name": "Tunggul Lapuk Berongga",
+        "type": "inspectable_hollow",
+        "position": [340.0, 650.0],
+        "drop_item_id": "jamur_hutan",
+        "interaction_text": "Periksa Celah Tunggul Kayu"
+      },
+      {
+        "id": "rustling_bush_z3_a",
+        "name": "Semak Pos Penebang A",
+        "type": "rustling_bush",
+        "position": [420.0, 680.0]
+      },
+      {
+        "id": "rustling_bush_z3_b",
+        "name": "Semak Pos Penebang B",
+        "type": "rustling_bush",
+        "position": [180.0, 800.0]
+      }
+    ],
+    "forages": [
+      {
+        "spawn_id": "kayu_1",
+        "id": "kayu",
+        "position": [160.0, 680.0]
+      },
+      {
+        "spawn_id": "sayur_liar_2",
+        "id": "sayur_liar",
+        "position": [380.0, 720.0]
+      },
+      {
+        "spawn_id": "kayu_2",
+        "id": "kayu",
+        "position": [240.0, 820.0]
+      }
+    ]
+  },
+  "forest_zone_4": {
+    "name": "Semak Belukar Lembab",
+    "bounds": [560.0, -480.0, 560.0, 480.0],
+    "description": "Wilayah berkanopi rindang yang sejuk dan lembab, dipenuhi hamparan rawa kecil berlumut, jamur payung subur, serta semak berry liar yang rimbun.",
+    "landmarks": [
+      {
+        "id": "mossy_marsh_pond",
+        "name": "Rawa Kecil Berlumut",
+        "type": "marsh_pond",
+        "position": [780.0, -220.0],
+        "size": [112.0, 64.0],
+        "description": "Genangan air rawa dangkal berlumut dikelilingi pakis raksasa dan tanaman rambat air."
+      },
+      {
+        "id": "dense_canopy_thicket",
+        "name": "Rerimbunan Semak Lembab",
+        "type": "canopy_thicket",
+        "position": [920.0, -340.0],
+        "size": [128.0, 96.0],
+        "description": "Kelompok semak lebat dan pohon peneduh rindang berdaun pekat yang menepis terik matahari langsung."
+      },
+      {
+        "id": "abundant_berry_grove",
+        "name": "Gerombolan Pohon Beri Rimba",
+        "type": "berry_grove",
+        "position": [860.0, -280.0],
+        "size": [48.0, 48.0],
+        "description": "Pohon beri rimba yang lebat dengan buah merah matang bergelantungan di dahan-dahan rendah."
+      }
+    ],
+    "props": [
+      {
+        "id": "fruit_tree_beri_z4",
+        "name": "Pohon Buah Beri Rimbun",
+        "type": "fruit_tree",
+        "position": [860.0, -280.0],
+        "drop_item_id": "buah_liar",
+        "interaction_text": "Goyang Pohon Buah Beri"
+      },
+      {
+        "id": "rustling_bush_z4_a",
+        "name": "Semak Lembab Rawa A",
+        "type": "rustling_bush",
+        "position": [720.0, -140.0]
+      },
+      {
+        "id": "rustling_bush_z4_b",
+        "name": "Semak Lembab Rawa B",
+        "type": "rustling_bush",
+        "position": [810.0, -360.0]
+      },
+      {
+        "id": "rustling_bush_z4_c",
+        "name": "Semak Lembab Rawa C",
+        "type": "rustling_bush",
+        "position": [970.0, -210.0]
+      }
+    ],
+    "forages": [
+      {
+        "spawn_id": "jamur_hutan_1",
+        "id": "jamur_hutan",
+        "position": [750.0, -250.0]
+      },
+      {
+        "spawn_id": "buah_liar_1",
+        "id": "buah_liar",
+        "position": [850.0, -320.0]
+      },
+      {
+        "spawn_id": "daun_hutan_2",
+        "id": "daun_hutan",
+        "position": [680.0, -180.0]
+      },
+      {
+        "spawn_id": "hujan_jamur_1",
+        "id": "jamur_hutan",
+        "position": [900.0, -200.0]
+      }
+    ]
+  },
+  "forest_zone_5": {
+    "name": "Lembah Akar Purba",
+    "bounds": [-560.0, 480.0, 560.0, 480.0],
+    "description": "Bagian rimba dalam yang terlindung oleh kubah akar raksasa melengkung tinggi, menyimpan fosil batu berlumut dan aroma rempah purba yang langka.",
+    "landmarks": [
+      {
+        "id": "ancient_root_archways",
+        "name": "Lorong Lengkung Akar Purba",
+        "type": "root_archway",
+        "position": [-260.0, 670.0],
+        "size": [96.0, 72.0],
+        "description": "Jalinan akar raksasa melengkung tinggi menyerupai kubah katedral purba di atas tanah berhumus hitam."
+      },
+      {
+        "id": "mossy_fossil_boulder",
+        "name": "Fosil Batu Lumut Purba",
+        "type": "fossil_boulder",
+        "position": [-420.0, 720.0],
+        "size": [64.0, 54.0],
+        "description": "Batu purba besar berlapis fosil tumbuhan dan kerak lumut beludru tebal bernuansa magis."
+      },
+      {
+        "id": "ancient_root_cleft",
+        "name": "Celah Berongga Akar Purba",
+        "type": "root_cleft",
+        "position": [-310.0, 600.0],
+        "size": [36.0, 36.0],
+        "description": "Celah gelap di pangkal jalinan akar purba di mana aroma rempah hutan terperangkap."
+      }
+    ],
+    "props": [
+      {
+        "id": "inspectable_root_cleft_z5",
+        "name": "Celah Akar Purba Berongga",
+        "type": "inspectable_hollow",
+        "position": [-310.0, 600.0],
+        "drop_item_id": "akar_rempah",
+        "interaction_text": "Periksa Celah Akar Purba"
+      },
+      {
+        "id": "rustling_bush_z5_a",
+        "name": "Semak Belukar Purba A",
+        "type": "rustling_bush",
+        "position": [-160.0, 640.0]
+      },
+      {
+        "id": "rustling_bush_z5_b",
+        "name": "Semak Belukar Purba B",
+        "type": "rustling_bush",
+        "position": [-380.0, 810.0]
+      }
+    ],
+    "forages": [
+      {
+        "spawn_id": "akar_rempah_1",
+        "id": "akar_rempah",
+        "position": [-320.0, 680.0]
+      },
+      {
+        "spawn_id": "jamur_hutan_2",
+        "id": "jamur_hutan",
+        "position": [-180.0, 750.0]
+      },
+      {
+        "spawn_id": "akar_rempah_2",
+        "id": "akar_rempah",
+        "position": [-410.0, 590.0]
+      }
+    ]
+  },
+  "forest_zone_6": {
+    "name": "Suaka Pohon Raksasa",
+    "bounds": [0.0, 0.0, 560.0, 480.0],
+    "description": "Suaka sakral di jantung rimba tempat Pohon Raksasa Purba menaungi altar batu kuno bertatahkan glif misteri dan lentera tempa yang berpendar abadi.",
+    "landmarks": [
+      {
+        "id": "great_sanctuary_tree",
+        "name": "Pohon Raksasa Purba",
+        "type": "great_tree",
+        "position": [210.0, 260.0],
+        "size": [112.0, 128.0],
+        "description": "Pohon mahabesar berkulit kayu berurat perak dengan dahan megah yang memayungi suaka suci rimba."
+      },
+      {
+        "id": "ancient_inscribed_altar",
+        "name": "Altar Batu Bertulis Misterius",
+        "type": "altar",
+        "position": [300.0, 310.0],
+        "size": [48.0, 32.0],
+        "description": "Altar batu andesit bertatahkan glif kuno tentang misteri rimba dan desau asap di kejauhan."
+      },
+      {
+        "id": "sanctuary_lantern_pedestal",
+        "name": "Lentera Pilar Suaka",
+        "type": "lantern_pedestal",
+        "position": [140.0, 310.0],
+        "size": [24.0, 24.0],
+        "description": "Lentera besi tempa bertengger di pilar batu pendek, berpendar lembut menembus kabut malam rimba."
+      }
+    ],
+    "props": [
+      {
+        "id": "altar_batu_suaka_z6",
+        "name": "Altar Batu Bertulis Kuno",
+        "type": "altar",
+        "position": [300.0, 310.0],
+        "interaction_text": "Membaca Pahatan Altar Batu"
+      },
+      {
+        "id": "rustling_bush_z6_a",
+        "name": "Semak Suaka Purba A",
+        "type": "rustling_bush",
+        "position": [390.0, 340.0]
+      },
+      {
+        "id": "rustling_bush_z6_b",
+        "name": "Semak Suaka Purba B",
+        "type": "rustling_bush",
+        "position": [120.0, 180.0]
+      }
+    ],
+    "forages": [
+      {
+        "spawn_id": "buah_liar_2",
+        "id": "buah_liar",
+        "position": [350.0, 220.0]
+      },
+      {
+        "spawn_id": "daun_hutan_3",
+        "id": "daun_hutan",
+        "position": [160.0, 240.0]
+      }
+    ]
+  }
+}
