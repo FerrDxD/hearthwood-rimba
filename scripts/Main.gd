@@ -13,6 +13,8 @@ const WARUNG_SYSTEM_SCENE: PackedScene = preload("res://scenes/WarungSystem.tscn
 const QUEST_SYSTEM_SCENE: PackedScene = preload("res://scenes/QuestSystem.tscn")
 const QUEST_UI_SCENE: PackedScene = preload("res://scenes/QuestUI.tscn")
 const WARUNG_UI_SCENE: PackedScene = preload("res://scenes/WarungUI.tscn")
+const WARUNG_REPORT_UI_SCENE: PackedScene = preload("res://scenes/ui/WarungReportUI.tscn")
+const WARUNG_REPORT_UI_SCRIPT: Script = preload("res://scripts/ui/WarungReportUI.gd")
 const LOCATION_TOAST_UI_SCENE: PackedScene = preload("res://scenes/LocationToastUI.tscn")
 const PAUSE_MENU_SCENE: PackedScene = preload("res://scenes/PauseMenu.tscn")
 const MAIN_MENU_SCENE_PATH: String = "res://scenes/MainMenu.tscn"
@@ -52,6 +54,7 @@ var _affection_system: HearthwoodAffectionSystem
 var _gift_ui: HearthwoodGiftUI
 var _warung_system: HearthwoodWarungSystem
 var _warung_ui: HearthwoodWarungUI
+var _warung_report_ui: CanvasLayer
 var _quest_system: HearthwoodQuestSystem
 var _quest_ui: HearthwoodQuestUI
 var _pause_menu: HearthwoodPauseMenu
@@ -89,6 +92,18 @@ func _start_gameplay() -> void:
 		var initial_zone_name := _world.get_zone_name(_world.current_zone_id)
 		if not initial_zone_name.is_empty():
 			_location_toast.show_location(initial_zone_name)
+
+
+func get_warung_system() -> HearthwoodWarungSystem:
+	return _warung_system
+
+
+func get_world() -> HearthwoodWorld:
+	return _world
+
+
+func get_warung_report_ui() -> CanvasLayer:
+	return _warung_report_ui
 
 
 func _ready() -> void:
@@ -135,6 +150,7 @@ func _ready() -> void:
 	add_child(_affection_system)
 	_warung_system = WARUNG_SYSTEM_SCENE.instantiate()
 	_warung_system.set_systems(_cooking_system, _affection_system)
+	_warung_system.set_world(_world)
 	add_child(_warung_system)
 	_quest_system = QUEST_SYSTEM_SCENE.instantiate()
 	add_child(_quest_system)
@@ -151,6 +167,8 @@ func _ready() -> void:
 	_warung_ui = WARUNG_UI_SCENE.instantiate()
 	_warung_ui.set_warung_system(_warung_system)
 	add_child(_warung_ui)
+	_warung_report_ui = WARUNG_REPORT_UI_SCENE.instantiate()
+	add_child(_warung_report_ui)
 	_pause_menu = PAUSE_MENU_SCENE.instantiate()
 	add_child(_pause_menu)
 	_pause_menu.save_requested.connect(_on_manual_save_requested)
@@ -194,6 +212,7 @@ func _process(delta: float) -> void:
 		or _warung_ui.is_open()
 		or _pause_menu.is_open()
 		or _quest_ui.is_open()
+		or (_warung_report_ui != null and _warung_report_ui.is_open())
 	):
 		return
 
@@ -209,6 +228,36 @@ func _process(delta: float) -> void:
 	if nearby_pickup != null:
 		_hint_label.text = "Ambil %s  |  E" % nearby_pickup.get_display_name()
 		return
+
+	var warung_bell: Node2D = _world.get_warung_bell() if _world != null else null
+	if warung_bell != null and _player.global_position.distance_to(warung_bell.global_position) <= 64.0:
+		var game_state = get_node("/root/GameState")
+		if _warung_system != null and _warung_system.is_service_active():
+			_hint_label.text = "Tutup Sesi Warung  |  E"
+		elif game_state.current_hour >= 16 and game_state.current_hour <= 21:
+			_hint_label.text = "Buka Warung (Santap Malam)  |  E"
+		else:
+			_hint_label.text = "Lonceng Warung (Buka pukul 16:00 - 21:00)  |  E"
+		return
+
+	var nearby_table = _get_nearby_warung_table(56.0)
+	if nearby_table != null:
+		var game_state = get_node("/root/GameState")
+		match int(nearby_table.current_state):
+			2: # WAITING_FOOD
+				var r_id: String = str(nearby_table.requested_recipe_id)
+				var r_name: String = str(game_state.get_item_definition(r_id).get("nama", r_id))
+				if game_state.get_item_count(r_id) > 0:
+					_hint_label.text = "Sajikan %s  |  E" % r_name
+				else:
+					_hint_label.text = "Meja memesan %s (belum ada di tas)" % r_name
+				return
+			3: # EATING
+				_hint_label.text = "Pelanggan sedang menikmati santapan..."
+				return
+			4: # DIRTY
+				_hint_label.text = "Bersihkan meja & ambil %d koin  |  E" % int(nearby_table.uncollected_coins)
+				return
 
 	if _world.is_near_cooking_station(_player.global_position):
 		_hint_label.text = "Masak di api unggun  |  E"
@@ -394,8 +443,12 @@ func _update_coins(value: int) -> void:
 	_coins_label.text = "Koin: %d" % value
 
 
-func _on_minute_changed(_day: int, _hour: int, _minute: int) -> void:
+func _on_minute_changed(_day: int, hour: int, _minute: int) -> void:
 	_update_hud()
+	if _warung_system != null and _warung_system.is_service_active():
+		if hour >= 22 or hour < 16:
+			var summary := _warung_system.end_service_rush()
+			_show_warung_report(summary)
 
 
 func _on_day_changed(_day: int) -> void:
@@ -503,6 +556,7 @@ func _open_pause_menu() -> void:
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
 		or _quest_ui.is_open()
+		or (_warung_report_ui != null and _warung_report_ui.is_open())
 	):
 		return
 	_pause_menu.open_menu()
@@ -562,6 +616,7 @@ func _toggle_inventory() -> void:
 		or _warung_ui.is_open()
 		or _pause_menu.is_open()
 		or _quest_ui.is_open()
+		or (_warung_report_ui != null and _warung_report_ui.is_open())
 	):
 		return
 	_inventory_ui.toggle_inventory()
@@ -576,6 +631,7 @@ func _toggle_quests() -> void:
 		or _gift_ui.is_open()
 		or _warung_ui.is_open()
 		or _pause_menu.is_open()
+		or (_warung_report_ui != null and _warung_report_ui.is_open())
 	):
 		return
 	_quest_ui.toggle_quests()
@@ -591,6 +647,7 @@ func _interact() -> void:
 		or _warung_ui.is_open()
 		or _pause_menu.is_open()
 		or _quest_ui.is_open()
+		or (_warung_report_ui != null and _warung_report_ui.is_open())
 	):
 		return
 	_audio_director.play_sfx("interact")
@@ -632,7 +689,46 @@ func _interact() -> void:
 				_hint_label.text = "%s dikumpulkan." % item_name
 				_advance_prologue_after_foraging()
 			return
-		elif _world.is_near_cooking_station(_player.global_position):
+
+		var warung_bell: Node2D = _world.get_warung_bell() if _world != null else null
+		if warung_bell != null and _player.global_position.distance_to(warung_bell.global_position) <= 56.0:
+			if _warung_system.is_service_active():
+				var summary := _warung_system.end_service_rush()
+				_show_warung_report(summary)
+				_hint_label.text = "Sesi warung ditutup untuk malam ini."
+			else:
+				var result := _warung_system.start_service_rush()
+				if bool(result.get("valid", false)):
+					_show_hint_feedback(str(result.get("pesan", "Warung dibuka!")))
+					_warung_system.spawn_next_customer()
+				else:
+					_show_hint_feedback(str(result.get("pesan", "Belum bisa buka warung.")))
+			return
+
+		var nearby_table = _get_nearby_warung_table(56.0)
+		if nearby_table != null:
+			var game_state = get_node("/root/GameState")
+			match int(nearby_table.current_state):
+				2: # WAITING_FOOD
+					var recipe_id: String = str(nearby_table.requested_recipe_id)
+					var recipe_name: String = str(game_state.get_item_definition(recipe_id).get("nama", recipe_id))
+					if game_state.get_item_count(recipe_id) > 0:
+						var served := _warung_system.serve_table(nearby_table)
+						if served:
+							_show_hint_feedback("Menyajikan %s kepada pelanggan!" % recipe_name)
+						else:
+							_show_hint_feedback("Gagal menyajikan hidangan.")
+					else:
+						_show_hint_feedback("Kamu belum memiliki %s di tas!" % recipe_name)
+					return
+				4: # DIRTY
+					var collected: int = nearby_table.clear_table()
+					_show_hint_feedback("Meja dibersihkan. Memperoleh %d koin!" % collected)
+					if _warung_system.is_service_active():
+						_warung_system.spawn_next_customer()
+					return
+
+		if _world.is_near_cooking_station(_player.global_position):
 			_cooking_ui.open_cooking(_cooking_system)
 		elif _world.is_near_bed(_player.global_position):
 			if _current_prologue_step() == PROLOGUE_SETTLE_IN_HUT:
@@ -644,6 +740,20 @@ func _interact() -> void:
 			_hint_label.text = "Hari baru dimulai. Energi sudah pulih."
 		else:
 			_hint_label.text = "Jelajahi jalan menuju desa untuk menemukan tempat beristirahat."
+
+
+func _get_nearby_warung_table(radius: float = 56.0) -> Node:
+	if _world == null or not is_instance_valid(_player):
+		return null
+	for t in _world.get_warung_tables():
+		if is_instance_valid(t) and _player.global_position.distance_to(t.global_position) <= radius:
+			return t
+	return null
+
+
+func _show_warung_report(summary: Dictionary) -> void:
+	if _warung_report_ui != null:
+		_warung_report_ui.open_report(summary)
 
 
 func _load_prologue_data() -> bool:
