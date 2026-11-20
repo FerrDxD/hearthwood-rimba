@@ -537,6 +537,50 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ---
 
+## Versi 0.5.3 — Full UI Kit Godot Implementation (Superpowers Workflow)
+
+**Tujuan:** Mengimplementasikan seluruh rancangan desain UI Kit v0.5.2 (FigCraft) ke dalam kode GDScript/Godot 4.x di seluruh antarmuka permainan, menggunakan pendekatan prosedural terstruktur (Pendekatan A) berbasis token `StyleBoxFlat` dan `_draw()`, dengan 100% kelulusan test suite (21/21 suite lulus).
+
+- [x] **Theme Helper Terpusat (`scripts/ui/UIThemeHelper.gd`):**
+  - Menerapkan seluruh token palet warna resmi `DESIGN.md` (`COLOR_CREAM`, `COLOR_SADDLE_WOOD`, `COLOR_TAVERN_WOOD`, `COLOR_GOLD`, `COLOR_SAGE`, `COLOR_TERRACOTTA`, dll).
+  - Helper gaya panel kayu kedai (`create_tavern_panel_style`), panel perkamen jurnal (`create_parchment_panel_style`), ceruk slot retro (`create_sunken_slot_style`), dan plat badge kuningan (`create_brass_badge_style`).
+  - Helper tombol 3D beveled (`apply_3d_button`) dengan 4 preset taktil: hero gold, secondary saddle-wood, danger terracotta, dan muted wood.
+- [x] **Main Menu Rebuild (`scripts/ui/MainMenu.gd`):**
+  - Menggambar siluet hutan cemara conifer multi-tingkat (`MenuLandscape._draw()`) dan partikel bara api melayang.
+  - Plang kedai kayu taktil (`contentPanel`) dengan 4 plat sudut kuningan, badge `WARTEG MEDIEVAL`, judul `HEARTHWOOD: WARUNG RIMBA`, dan tagline ramah.
+  - Recessed save slot card dengan ringkasan simpanan hari, jam, tier, dan koin.
+  - 5 tombol taktil 3D beveled (`continueButton`, `newGameButton`, `loadButton`, `settingsButton`, `exitButton`) yang memenuhi target sentuh Android ≥ 44×44 px.
+- [x] **Pause Menu Polish (`scripts/ui/PauseMenu.gd`):**
+  - Panel kayu kedai dengan 4 baut kuningan sudut dan ceruk kartu status.
+  - 4 tombol aksi 3D beveled ("Lanjutkan", "Simpan game", "Muat game", "Ke menu utama") yang menjaga kompatibilitas kontrak test.
+- [x] **Buku Catatan Journal UI (`InventoryUI.gd`, `QuestUI.gd`, `WarungUI.gd`):**
+  - Panel perkamen krem hangat dengan border sage dan 4 plat siku kuningan.
+  - 24 slot inventori retro sunken 48×48 px dengan seleksi border emas beveled.
+  - Tab navigasi Buku Catatan ("Tas Bahan", "Misi Harian", "Kedai Rimba") bergaya folder tab taktil.
+  - Kartu quest dan progresi tier warung dengan rincian alat masak dan pelanggan harian.
+- [x] **Modal Memasak & Bar Timing (`CookingUI.gd`):**
+  - Panel dialog perkamen dengan header kayu kedai.
+  - Casing ceruk brass pada track timing mini-game dengan zona hijau, kuning, dan merah.
+  - Tombol aksi 3D beveled ("Mulai timing", "Masak", "Batal").
+- [x] **UI Toko Pedagang Giral & Talia (`ShopUI.gd`):**
+  - Layout gerobak dagang ramah sentuh dengan kartu baris item sunken (quick-buy row cards).
+  - Badge diskon afeksi kuningan dan badge koin dompet emas.
+  - Tombol aksi 3D ("Bicara", "Beli", "Batal") ≥ 44×44 px.
+- [x] **Dialog Box & Drawer Hadiah Masakan (`DialogUI.gd`, `GiftUI.gd`):**
+  - Dialog box papan kayu kedai dengan badge nama pembicara kuningan berpahat.
+  - Drawer horizontal masakan afeksi dengan slot kartu makanan sunken dan handle sentuh taktil.
+- [x] **HUD Gameplay & Touch Controls (`Main.gd`, `TouchControls.gd`):**
+  - Badge waktu/hari papan kayu kedai di pojok kiri atas dengan bar energi berbingkai ceruk dan peringatan terracotta saat energi kritis (<25%).
+  - Tombol HUD Menu dan Quest bergaya 3D beveled.
+  - Virtual joystick taktil dengan ring kayu pelana dan knob kuningan emas.
+  - Tombol aksi "E" (terakota beveled) dan inventori "I" (kayu pelana beveled).
+- [x] **Verifikasi & Regresi Penuh (Superpowers Verification):**
+  - 100% kelulusan seluruh 21 file test suite di direktori `tests/` (`AffectionSystemTest`, `AudioSystemTest`, `CookingSystemTest`, `FallenTreeBarrierTest`, `ForageDistributionTest`, `ForestNPCIsolationTest`, `InventorySystemTest`, `LocationToastTest`, `MainGameFlowTest`, `MainMenuTest`, `NPCSystemTest`, `QuestSystemTest`, `SaveSystemTest`, `ShopSystemTest`, `TimeSystemTest`, `UITouchTargetTest`, `WarungSystemTest`, `WeatherSystemTest`, `WorldZoneManagerTest`, `ZoneGateTest`, `ZoneStateSaveTest`).
+  - Nol emoji struktural pada seluruh elemen UI.
+  - Semua tombol memenuhi standar ergonomi sentuh Android (≥ 44×44 px).
+
+---
+
 ## Tabel Dependensi Antar Fase
 
 ```
