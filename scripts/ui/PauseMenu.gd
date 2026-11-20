@@ -111,19 +111,19 @@ func _create_interface() -> void:
 	_status_label.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_CREAM_MUTED)
 	status_margin.add_child(_status_label)
 
-	var resume_button := _create_button("Lanjutkan Permainan", "hero", 48.0)
+	var resume_button := _create_button("Lanjutkan", "hero", 48.0)
 	resume_button.pressed.connect(close_menu)
 	layout.add_child(resume_button)
 
-	var save_button := _create_button("Simpan Permainan", "secondary", 46.0)
+	var save_button := _create_button("Simpan game", "secondary", 46.0)
 	save_button.pressed.connect(_on_save_pressed)
 	layout.add_child(save_button)
 
-	var load_button := _create_button("Muat Game Terakhir", "secondary", 46.0)
+	var load_button := _create_button("Muat game", "secondary", 46.0)
 	load_button.pressed.connect(_on_load_pressed)
 	layout.add_child(load_button)
 
-	var main_menu_button := _create_button("Ke Menu Utama", "danger", 46.0)
+	var main_menu_button := _create_button("Ke menu utama", "danger", 46.0)
 	main_menu_button.pressed.connect(_on_main_menu_pressed)
 	layout.add_child(main_menu_button)
 
