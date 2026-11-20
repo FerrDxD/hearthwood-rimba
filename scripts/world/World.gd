@@ -33,6 +33,11 @@ const TILESET_TEXTURE: Texture2D = preload("res://assets/sprites/tiles/main_tile
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
 const ITEM_PICKUP_SCENE: PackedScene = preload("res://scenes/ItemPickup.tscn")
+const INTERACTIVE_PROP_SCRIPT: Script = preload("res://scripts/world/InteractiveProp.gd")
+const FRUIT_TREE_SCRIPT: Script = preload("res://scripts/world/FruitTree.gd")
+const FRESH_SPRING_SCRIPT: Script = preload("res://scripts/world/FreshSpring.gd")
+const INSPECTABLE_HOLLOW_SCRIPT: Script = preload("res://scripts/world/InspectableHollow.gd")
+const RUSTLING_BUSH_SCRIPT: Script = preload("res://scripts/world/RustlingBush.gd")
 const FORAGE_SPAWN_POINTS: Array[Dictionary] = [
 	{"spawn_id": "sayur_liar_1", "id": "sayur_liar", "position": Vector2(104.0, 1178.0)},
 	{"spawn_id": "daun_hutan_1", "id": "daun_hutan", "position": Vector2(420.0, 1120.0)},
@@ -99,6 +104,10 @@ var _tree_positions: Array[Vector2] = []
 var _named_npcs: Array[HearthwoodNPC] = []
 var _ambient_npcs: Array[HearthwoodNPC] = []
 var _item_pickups: Array[HearthwoodItemPickup] = []
+var _interactive_props: Array[HearthwoodInteractiveProp] = []
+var _rustling_bushes: Array[HearthwoodRustlingBush] = []
+var _ambient_particles: Dictionary = {}
+var _zone_props: Dictionary = {}
 var _landmarks: Dictionary = {}
 var _obstacle_rects: Array[Rect2] = []
 var _building_rects: Array[Rect2] = [
@@ -122,12 +131,16 @@ func _init() -> void:
 		_spawn_named_npcs()
 	if _ambient_npcs.is_empty():
 		_spawn_ambient_npcs()
+	if _interactive_props.is_empty() and _rustling_bushes.is_empty():
+		_spawn_forest_props()
+	if _ambient_particles.is_empty():
+		_setup_ambient_particles()
 
 
 func _ready() -> void:
 	_random.seed = 713
 	_setup_fade_layer()
-	if _landmarks.is_empty():
+	if _landmarks.is_empty() or _zone_props.is_empty():
 		_load_forest_zones_data()
 	if _zone_gates.is_empty():
 		_setup_zones_and_gates()
@@ -150,6 +163,10 @@ func _ready() -> void:
 	if _ambient_npcs.is_empty():
 		_spawn_ambient_npcs()
 	_spawn_forage_items()
+	if _interactive_props.is_empty() and _rustling_bushes.is_empty():
+		_spawn_forest_props()
+	if _ambient_particles.is_empty():
+		_setup_ambient_particles()
 	if has_node("/root/TimeSystem"):
 		get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
 	if has_node("/root/GameState"):
@@ -493,7 +510,7 @@ func _paint_ground() -> void:
 
 
 func _load_forest_zones_data() -> void:
-	if not _landmarks.is_empty():
+	if not _landmarks.is_empty() and not _zone_props.is_empty():
 		return
 	var path := "res://data/world/forest_zones.json"
 	if FileAccess.file_exists(path):
@@ -504,6 +521,7 @@ func _load_forest_zones_data() -> void:
 				for zid in parsed:
 					var zdict: Dictionary = parsed[zid]
 					_landmarks[zid] = zdict.get("landmarks", [])
+					_zone_props[zid] = zdict.get("props", [])
 				return
 	_landmarks = {
 		"forest_zone_1": [
@@ -539,6 +557,40 @@ func _load_forest_zones_data() -> void:
 			{"id": "sanctuary_lantern_pedestal", "name": "Lentera Pilar Suaka", "type": "lantern_pedestal", "position": [140.0, 310.0], "size": [24.0, 24.0]},
 		],
 	}
+	_zone_props = {
+		"forest_zone_1": [
+			{"id": "fruit_tree_apel_hutan_z1", "name": "Pohon Buah Liar Rimba", "type": "fruit_tree", "position": [160.0, 1080.0], "drop_item_id": "buah_liar", "interaction_text": "Goyang Pohon Buah"},
+			{"id": "rustling_bush_z1_a", "name": "Semak Belukar Rimbun A", "type": "rustling_bush", "position": [190.0, 1220.0]},
+			{"id": "rustling_bush_z1_b", "name": "Semak Belukar Rimbun B", "type": "rustling_bush", "position": [360.0, 1150.0]},
+			{"id": "signpost_pintu_rimba", "name": "Papan Penunjuk Arah", "type": "signpost", "position": [460.0, 1170.0], "interaction_text": "Membaca Papan Penunjuk Rimba"},
+		],
+		"forest_zone_2": [
+			{"id": "fresh_spring_sungai_z2", "name": "Tepian Mata Air Alami", "type": "fresh_spring", "position": [-320.0, 1120.0], "energy_heal": 10, "interaction_text": "Basuh Muka di Mata Air"},
+			{"id": "rustling_bush_z2_a", "name": "Semak Tepi Sungai A", "type": "rustling_bush", "position": [-220.0, 1080.0]},
+			{"id": "rustling_bush_z2_b", "name": "Semak Tepi Sungai B", "type": "rustling_bush", "position": [-390.0, 1220.0]},
+		],
+		"forest_zone_3": [
+			{"id": "inspectable_stump_z3", "name": "Tunggul Lapuk Berongga", "type": "inspectable_hollow", "position": [340.0, 650.0], "drop_item_id": "jamur_hutan", "interaction_text": "Periksa Celah Tunggul Kayu"},
+			{"id": "rustling_bush_z3_a", "name": "Semak Pos Penebang A", "type": "rustling_bush", "position": [420.0, 680.0]},
+			{"id": "rustling_bush_z3_b", "name": "Semak Pos Penebang B", "type": "rustling_bush", "position": [180.0, 800.0]},
+		],
+		"forest_zone_4": [
+			{"id": "fruit_tree_beri_z4", "name": "Pohon Buah Beri Rimbun", "type": "fruit_tree", "position": [860.0, -280.0], "drop_item_id": "buah_liar", "interaction_text": "Goyang Pohon Buah Beri"},
+			{"id": "rustling_bush_z4_a", "name": "Semak Lembab Rawa A", "type": "rustling_bush", "position": [720.0, -140.0]},
+			{"id": "rustling_bush_z4_b", "name": "Semak Lembab Rawa B", "type": "rustling_bush", "position": [810.0, -360.0]},
+			{"id": "rustling_bush_z4_c", "name": "Semak Lembab Rawa C", "type": "rustling_bush", "position": [970.0, -210.0]},
+		],
+		"forest_zone_5": [
+			{"id": "inspectable_root_cleft_z5", "name": "Celah Akar Purba Berongga", "type": "inspectable_hollow", "position": [-310.0, 600.0], "drop_item_id": "akar_rempah", "interaction_text": "Periksa Celah Akar Purba"},
+			{"id": "rustling_bush_z5_a", "name": "Semak Belukar Purba A", "type": "rustling_bush", "position": [-160.0, 640.0]},
+			{"id": "rustling_bush_z5_b", "name": "Semak Belukar Purba B", "type": "rustling_bush", "position": [-380.0, 810.0]},
+		],
+		"forest_zone_6": [
+			{"id": "altar_batu_suaka_z6", "name": "Altar Batu Bertulis Kuno", "type": "altar", "position": [300.0, 310.0], "interaction_text": "Membaca Pahatan Altar Batu"},
+			{"id": "rustling_bush_z6_a", "name": "Semak Suaka Purba A", "type": "rustling_bush", "position": [390.0, 340.0]},
+			{"id": "rustling_bush_z6_b", "name": "Semak Suaka Purba B", "type": "rustling_bush", "position": [120.0, 180.0]},
+		],
+	}
 
 
 func get_zone_landmarks(zone_id: String) -> Array:
@@ -555,6 +607,176 @@ func get_zone_gates() -> Array[ZoneGate2D]:
 
 func get_obstacle_rects() -> Array[Rect2]:
 	return _obstacle_rects
+
+
+func get_interactive_props() -> Array[HearthwoodInteractiveProp]:
+	return _interactive_props
+
+
+func get_interactive_prop(id: String) -> HearthwoodInteractiveProp:
+	for prop in _interactive_props:
+		if is_instance_valid(prop) and prop.prop_id == id:
+			return prop
+	return null
+
+
+func get_rustling_bushes() -> Array[HearthwoodRustlingBush]:
+	return _rustling_bushes
+
+
+func get_closest_interactive_prop(pos: Vector2, radius: float = 64.0) -> HearthwoodInteractiveProp:
+	var closest: HearthwoodInteractiveProp = null
+	var closest_distance := radius
+	for prop in _interactive_props:
+		if not is_instance_valid(prop):
+			continue
+		var dist := pos.distance_to(prop.global_position)
+		if dist <= closest_distance:
+			closest = prop
+			closest_distance = dist
+	return closest
+
+
+func get_ambient_particles() -> Dictionary:
+	return _ambient_particles
+
+
+func _spawn_forest_props() -> void:
+	if not _interactive_props.is_empty() or not _rustling_bushes.is_empty():
+		return
+	if _zone_props.is_empty():
+		_load_forest_zones_data()
+
+	for zid in _zone_props:
+		var props_list: Array = _zone_props[zid]
+		for pdata in props_list:
+			if typeof(pdata) != TYPE_DICTIONARY:
+				continue
+			var p_id: String = str(pdata.get("id", ""))
+			var p_type: String = str(pdata.get("type", ""))
+			var pos_val = pdata.get("position", [0.0, 0.0])
+			var pos: Vector2
+			if typeof(pos_val) == TYPE_VECTOR2:
+				pos = pos_val
+			elif typeof(pos_val) == TYPE_ARRAY and pos_val.size() >= 2:
+				pos = Vector2(float(pos_val[0]), float(pos_val[1]))
+			else:
+				pos = Vector2.ZERO
+			var prompt: String = str(pdata.get("interaction_text", "Periksa"))
+
+			if p_type == "rustling_bush":
+				var bush: HearthwoodRustlingBush = RUSTLING_BUSH_SCRIPT.new()
+				bush.name = "Bush_%s" % p_id
+				bush.bush_id = p_id
+				bush.position = pos
+				add_child(bush)
+				_rustling_bushes.append(bush)
+			elif p_type == "fruit_tree":
+				var tree: HearthwoodFruitTree = FRUIT_TREE_SCRIPT.new()
+				tree.name = "FruitTree_%s" % p_id
+				tree.prop_id = p_id
+				tree.position = pos
+				tree.fruit_item_id = str(pdata.get("drop_item_id", "buah_liar"))
+				tree.interaction_prompt = prompt
+				add_child(tree)
+				_interactive_props.append(tree)
+			elif p_type == "fresh_spring":
+				var spring: HearthwoodFreshSpring = FRESH_SPRING_SCRIPT.new()
+				spring.name = "FreshSpring_%s" % p_id
+				spring.prop_id = p_id
+				spring.position = pos
+				spring.energy_restore = int(pdata.get("energy_heal", 10))
+				spring.interaction_prompt = prompt
+				add_child(spring)
+				_interactive_props.append(spring)
+			elif p_type == "inspectable_hollow":
+				var hollow: HearthwoodInspectableHollow = INSPECTABLE_HOLLOW_SCRIPT.new()
+				hollow.name = "InspectableHollow_%s" % p_id
+				hollow.prop_id = p_id
+				hollow.position = pos
+				hollow.hollow_name = str(pdata.get("name", "Ceruk Berongga"))
+				if pdata.has("drop_item_id"):
+					hollow.possible_loot = [str(pdata["drop_item_id"])]
+				hollow.interaction_prompt = prompt
+				add_child(hollow)
+				_interactive_props.append(hollow)
+			else:
+				var prop: HearthwoodInteractiveProp = INTERACTIVE_PROP_SCRIPT.new()
+				prop.name = "Prop_%s" % p_id
+				prop.prop_id = p_id
+				prop.prop_type = p_type
+				prop.position = pos
+				prop.interaction_prompt = prompt
+				add_child(prop)
+				_interactive_props.append(prop)
+
+
+func _setup_ambient_particles() -> void:
+	if not _ambient_particles.is_empty():
+		return
+
+	# Zone 4: Soft creeping ground mist
+	var mist := CPUParticles2D.new()
+	mist.name = "MistParticles_Zone4"
+	mist.position = Vector2(840.0, -240.0)
+	mist.amount = 32
+	mist.lifetime = 6.0
+	mist.preprocess = 3.0
+	mist.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	mist.emission_rect_extents = Vector2(260.0, 220.0)
+	mist.direction = Vector2(1.0, 0.2)
+	mist.spread = 25.0
+	mist.gravity = Vector2.ZERO
+	mist.initial_velocity_min = 8.0
+	mist.initial_velocity_max = 16.0
+	mist.scale_amount_min = 6.0
+	mist.scale_amount_max = 14.0
+	mist.color = Color(0.85, 0.90, 0.85, 0.18)
+	mist.z_index = 0
+	add_child(mist)
+	_ambient_particles["mist"] = mist
+
+	# Zone 5: Ancient dim glowing spores
+	var spores := CPUParticles2D.new()
+	spores.name = "SporeParticles_Zone5"
+	spores.position = Vector2(-280.0, 720.0)
+	spores.amount = 28
+	spores.lifetime = 5.0
+	spores.preprocess = 2.5
+	spores.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	spores.emission_rect_extents = Vector2(260.0, 220.0)
+	spores.direction = Vector2(0.0, -1.0)
+	spores.spread = 35.0
+	spores.gravity = Vector2(0.0, -2.0)
+	spores.initial_velocity_min = 6.0
+	spores.initial_velocity_max = 14.0
+	spores.scale_amount_min = 2.0
+	spores.scale_amount_max = 4.0
+	spores.color = Color(0.70, 0.85, 0.65, 0.40)
+	spores.z_index = 0
+	add_child(spores)
+	_ambient_particles["spores"] = spores
+
+	# Zone 6: Warm golden fireflies around the Great Tree
+	var fireflies := CPUParticles2D.new()
+	fireflies.name = "FireflyParticles_Zone6"
+	fireflies.position = Vector2(210.0, 280.0)
+	fireflies.amount = 22
+	fireflies.lifetime = 4.0
+	fireflies.preprocess = 2.0
+	fireflies.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	fireflies.emission_rect_extents = Vector2(160.0, 140.0)
+	fireflies.direction = Vector2.ZERO
+	fireflies.spread = 180.0
+	fireflies.gravity = Vector2.ZERO
+	fireflies.initial_velocity_min = 4.0
+	fireflies.initial_velocity_max = 10.0
+	fireflies.scale_amount_min = 2.0
+	fireflies.scale_amount_max = 3.5
+	fireflies.color = Color(0.96, 0.77, 0.35, 0.65)
+	fireflies.z_index = 1
+	add_child(fireflies)
+	_ambient_particles["fireflies"] = fireflies
 
 
 func _build_forest_landmarks() -> void:
@@ -752,8 +974,11 @@ func _spawn_forage_items() -> void:
 		_item_pickups.append(pickup)
 
 
-func _on_day_changed(_day: int) -> void:
+func _on_day_changed(_day: int = 1) -> void:
 	_spawn_forage_items()
+	for prop in _interactive_props:
+		if is_instance_valid(prop):
+			prop.reset_daily()
 
 
 func _on_state_changed() -> void:
