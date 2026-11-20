@@ -451,6 +451,38 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ---
 
+## Versi 0.4.0 — Desain Antarmuka Penuh (FigCraft UI Kit)
+
+### Fase 21 — Design Tokens & Component Library
+**Tujuan:** Membangun fondasi desain visual, 8 token warna, tipografi, panduan export, serta 23 komponen UI (14 Atom + 9 Molekul).
+- [x] Setup file FigCraft: `design/Hearthwood_UI_Kit_v0.4.0.figcraft`
+- [x] Halaman `📐 Design Tokens` (8 swatches, tipografi, export guide)
+- [x] Halaman `🧩 Component Library` (14 Atom + 9 Molekul)
+- [x] Verifikasi touch target >= 44×44 px pada seluruh tombol
+
+### Fase 22 — HUD Gameplay & Buku Catatan
+**Tujuan:** Merancang antarmuka utama gameplay dan jurnal dual-page 4 tab.
+- [x] Halaman `🎮 HUD Gameplay` (960×540, <=15% screen coverage)
+- [x] Halaman `📖 Buku Catatan — Inventori` (Grid 5×4 + kartu inspeksi + 3 tombol aksi)
+- [x] Halaman `📖 Buku Catatan — Resep` (List scroll resep + status bahan + detail masak)
+- [x] Halaman `📖 Buku Catatan — Quest` (Kartu Rast/Veral + meteran hati + catatan lapangan)
+- [x] Halaman `📖 Buku Catatan — Warung` (Status tier 1 + log 5 kepuasan + progress upgrade tier 2)
+
+### Fase 23 — Layar Memasak & Toko
+**Tujuan:** Merancang modal memasak tier-agnostik dan layar toko pedagang.
+- [x] Halaman `🍳 Layar Memasak` (Modal kartu melayang, dropdown, stepper, bar timing tungku 3 zona)
+- [x] Halaman `🛒 Layar Toko Giral` (Quick Buy Rows, diskon afeksi hati 2, stok sayur pagi)
+- [x] Halaman `🛒 Layar Toko Talia` (Diferensiasi visual baja/tempa, perkakas & cookware)
+
+### Fase 24 — Dialog, Main Menu & Pause Menu
+**Tujuan:** Merancang antarmuka naratif dialog dan navigasi sistem permainan.
+- [x] Halaman `💬 Dialog & Gift Drawer` (Kotak dialog sepertiga bawah + drawer masakan kanan tanpa overlap)
+- [x] Halaman `🏠 Main Menu` (Papan kayu rimba, slot save aktif, 5 tombol navigasi)
+- [x] Halaman `⏸ Pause Menu` (Modal jeda kompak di atas gameplay)
+- [x] Nol kode GDScript ditulis (design-only constraint terpenuhi)
+
+---
+
 ## Tabel Dependensi Antar Fase
 
 ```
