@@ -483,6 +483,21 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ---
 
+## Versi 0.5.1 — UI Polish & Tactile Craft (Impeccable & UI-UX Pro Max)
+
+**Tujuan:** Meningkatkan kualitas estetika, kedalaman taktil, dan ergonomi sentuh Android dari seluruh komponen dan mockup v0.4.0 tanpa keluar dari palet warna `DESIGN.md`.
+
+- [x] Inisialisasi `PRODUCT.md` via `/impeccable init` dengan konteks Android 960×540
+- [x] **Taktil 3D Bevels:** Tombol utama (`#CD853F`), sekunder (`#8B4513`), dan bahaya (`#E07050`) diberi highlight tepian atas (1px) dan bayangan bawah (4px)
+- [x] **Sunken Inset Slots:** Slot item 48×48 diberi bayangan ceruk retro RPG
+- [x] **Brass Corner Ornaments:** Buku Catatan diberi 4 siku ornamen kuningan berpelindung sudut di keempat tab
+- [x] **Cooking Modal Elevation:** Diberi rivet kuningan, casing brass pada bar timing, dan tombol masak 3D
+- [x] **HUD Gameplay Elevation:** Badge waktu/cuaca berbingkai plat kayu-kuningan, bar energi berskala tick 25%/50%/75%, tombol interaksi berlingkar pulse
+- [x] **Dialog & Drawer Ergonomics:** Tombol aksi beveled dan handle geser taktil pada drawer masakan
+- [x] File FigCraft tersimpan di `design/Hearthwood_UI_Kit_v0.5.1.figcraft`
+
+---
+
 ## Tabel Dependensi Antar Fase
 
 ```
