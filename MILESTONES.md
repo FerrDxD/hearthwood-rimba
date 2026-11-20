@@ -581,6 +581,39 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ---
 
+## Versi 0.6.0 — Ekosistem & Pembangunan 6 Wilayah Rimba (Impeccable & UI-UX Pro Max)
+
+**Tujuan:** Membangun seluruh 6 wilayah hutan rimba (`forest_zone_1` s/d `forest_zone_6`) dari sekadar area transisi kosong menjadi ekosistem tematik hidup dan interaktif, mengedepankan kualitas visual bebas AI-slop bergaya cozy medieval foraging, dengan 100% kelulusan test suite (25/25 suite lulus).
+
+- [x] **Metadata Ekosistem & Skema Foraging (`data/world/forest_zones.json`):**
+  - Mendaftarkan batas `Rect2`, landmark, titik objek interaktif, dan spawn foraging spesifik per zona.
+  - Mempertahankan sayur liar prolog di `Vector2(104.0, 1178.0)` dan menambahkan item baru `lumut_sungai` ke `data/items/items.json`.
+- [x] **Framework Komponen Objek Interaktif Lingkungan (`InteractiveProp.gd` & Turunannya):**
+  - Kelas basis `HearthwoodInteractiveProp` (`Area2D`) dengan radius sentuh ergonomis (≥ 44-48 px).
+  - `FruitTree.gd`: Pohon buah dengan animasi getar dahan taktil, menjatuhkan 1-3 buah segar (1x sehari).
+  - `FreshSpring.gd`: Mata air alami di sungai Zona 2 untuk membasuh muka dan memulihkan +10 energi (1x sehari).
+  - `InspectableHollow.gd`: Tunggul lapuk Zona 3 dan celah akar Zona 5 yang dapat diperiksa untuk loot harian.
+- [x] **Landmark Visual & Karakteristik Tematik (`World.gd`):**
+  - Zona 1 (Pintu Rimba): Gapura kayu perbatasan, papan penunjuk arah, dan jalan setapak kerikil.
+  - Zona 2 (Aliran Sungai Bebatuan): Sungai jernih beriak, batu loncatan kali, dan jembatan kayu lapuk.
+  - Zona 3 (Pos Penebang Kayu): Perkemahan Rast (tenda kanvas, perapian batu dengan abu arang, tumpukan kayu gelondongan).
+  - Zona 4 (Semak Belukar Lembab): Rawa berair lumut, semak vegetasi lebat, dan pohon buah rimbun.
+  - Zona 5 (Lembah Akar Purba): Lengkungan terowongan akar pohon purba raksasa dan fosil bebatuan purba.
+  - Zona 6 (Suaka Pohon Raksasa): Pohon Raksasa agung, lentera suaka, dan altar batu kuno bertulis misterius.
+  - Collider rintangan bebas dari tabrakan gerbang `ZoneGate2D`.
+- [x] **Semak Berdesir & Efek Partikel Ambience Atmosferik:**
+  - `RustlingBush.gd`: Semak rimbun non-blocking yang meliuk dan memutar desau gemerisik saat dilintasi tubuh pemain.
+  - Partikel kabut lembut melayang di Zona 4, spora hutan redup di Zona 5, dan kunang-kunang keemasan di Zona 6 (`CPUParticles2D`).
+- [x] **Penempatan Pos Rast & Rutinitas Rimba:**
+  - Kemah Zona 3 menjadi titik kumpul Rast di `data/schedules.json` (06:00-16:00 dan malam hari), mempertahankan jarak < 300 px dari titik awal suaka saat fajar.
+- [x] **Penyimpanan State Harian Objek Lingkungan (`GameState.gd` & `SaveSystem.gd`):**
+  - Serialisasi array `interacted_props_today` dengan backward compatibility penuh.
+  - Penyelarasan dua arah saat load game dan reset otomatis saat pergantian hari/tidur.
+- [x] **Uji Regresi Penuh (25/25 Tests Passed):**
+  - 100% lulus seluruh 25 file test suite di `tests/` tanpa error atau kegagalan.
+
+---
+
 ## Tabel Dependensi Antar Fase
 
 ```

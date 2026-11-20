@@ -1,6 +1,6 @@
 # Implementasi Ekosistem & Pembangunan 6 Wilayah Rimba (Versi 0.6.0)
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Membangun seluruh 6 wilayah hutan rimba (`forest_zone_1` s/d `forest_zone_6`) dengan landmark visual tematik, persebaran sumber daya alam terkurasi, interaktivitas lingkungan baru (goyang pohon buah, mata air pemulih energi, celah tunggul/akar periksa, dan semak berdesir), pos kemah Rast, serta efek partikel suasana dengan mempertahankan 100% kelulusan test suite eksisting.
 
@@ -46,7 +46,7 @@
 - Produces: `data/world/forest_zones.json` berisi entri 6 zona dengan struktur `{"landmarks": [...], "props": [...], "forages": [...]}`.
 - Consumes: `data/items/items.json` menambahkan item `lumut_sungai` (`#5b8a54`).
 
-- [ ] **Step 1: Tulis tes verifikasi data ekosistem hutan (`tests/ForestZonesDataTest.gd`)**
+- [x] **Step 1: Tulis tes verifikasi data ekosistem hutan (`tests/ForestZonesDataTest.gd`)**
 
 ```gdscript
 # tests/ForestZonesDataTest.gd
@@ -78,21 +78,21 @@ func _init() -> void:
 	quit(0)
 ```
 
-- [ ] **Step 2: Jalankan tes untuk memastikan gagal sebelum implementasi**
+- [x] **Step 2: Jalankan tes untuk memastikan gagal sebelum implementasi**
 
 Jalankan: `& $godot --headless --script res://tests/ForestZonesDataTest.gd`  
 Ekspektasi: FAIL (file `forest_zones.json` belum ada).
 
-- [ ] **Step 3: Buat `data/world/forest_zones.json` dan perbarui `data/items/items.json`**
+- [x] **Step 3: Buat `data/world/forest_zones.json` dan perbarui `data/items/items.json`**
 
 Buat struktur data 6 zona lengkap dengan koordinat landmark, objek interaktif, dan spawn forage. Tambahkan `lumut_sungai` ke `data/items/items.json`.
 
-- [ ] **Step 4: Jalankan tes verifikasi**
+- [x] **Step 4: Jalankan tes verifikasi**
 
 Jalankan: `& $godot --headless --script res://tests/ForestZonesDataTest.gd`  
 Ekspektasi: PASS ("ForestZonesDataTest passed.").
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add data/world/forest_zones.json data/items/items.json tests/ForestZonesDataTest.gd
@@ -117,25 +117,25 @@ git commit -m "feat(data): tambahkan metadata ekosistem 6 wilayah hutan dan item
   - `HearthwoodFreshSpring`: mata air alami yang memulihkan energi pemain sebesar +10 sekali per hari.
   - `HearthwoodInspectableHollow`: ceruk bebatuan/akar/tunggul yang memberikan 1 bahan tersembunyi per hari.
 
-- [ ] **Step 1: Tulis tes fungsional objek interaktif (`tests/InteractivePropTest.gd`)**
+- [x] **Step 1: Tulis tes fungsional objek interaktif (`tests/InteractivePropTest.gd`)**
 
 Uji fungsionalitas pohon buah (goyang -> spawn item), mata air (+10 energi, 1x sehari), ceruk periksa (drop item, 1x sehari), dan reset harian (`reset_daily()`).
 
-- [ ] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
+- [x] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
 
 Jalankan: `& $godot --headless --script res://tests/InteractivePropTest.gd`  
 Ekspektasi: FAIL (kelas-kelas belum ada).
 
-- [ ] **Step 3: Implementasikan kelas-kelas objek interaktif**
+- [x] **Step 3: Implementasikan kelas-kelas objek interaktif**
 
 Tulis `InteractiveProp.gd`, `FruitTree.gd`, `FreshSpring.gd`, dan `InspectableHollow.gd` dengan collision shape 2D, integrasi sinyal, feedback visual, dan proteksi interaksi ganda harian.
 
-- [ ] **Step 4: Jalankan tes untuk memverifikasi kelulusan**
+- [x] **Step 4: Jalankan tes untuk memverifikasi kelulusan**
 
 Jalankan: `& $godot --headless --script res://tests/InteractivePropTest.gd`  
 Ekspektasi: PASS ("InteractivePropTest passed.").
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/world/InteractiveProp.gd scripts/world/FruitTree.gd scripts/world/FreshSpring.gd scripts/world/InspectableHollow.gd tests/InteractivePropTest.gd
@@ -160,25 +160,25 @@ git commit -m "feat(world): buat framework objek interaktif lingkungan pohon bua
   - Zona 6: Altar batu kuno berpahat, lentera suaka, pohon raksasa agung.
 - Consumes: `data/world/forest_zones.json` untuk konfigurasi penempatan.
 
-- [ ] **Step 1: Tulis tes verifikasi kehadiran landmark (`tests/ForestLandmarksTest.gd`)**
+- [x] **Step 1: Tulis tes verifikasi kehadiran landmark (`tests/ForestLandmarksTest.gd`)**
 
 Verifikasi setiap zona memiliki node/komponen landmark khusus dan collider rintangan yang tidak bertabrakan dengan gerbang transisi `ZoneGate2D`.
 
-- [ ] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
+- [x] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
 
 Jalankan: `& $godot --headless --script res://tests/ForestLandmarksTest.gd`  
 Ekspektasi: FAIL.
 
-- [ ] **Step 3: Implementasikan rendering landmark dan struktur visual di `World.gd`**
+- [x] **Step 3: Implementasikan rendering landmark dan struktur visual di `World.gd`**
 
 Gantikan pohon acak generik dengan penataan vegetasi dan landmark tematik terstruktur, menambahkan visual sungai, gapura, tenda Rast, dan lorong akar.
 
-- [ ] **Step 4: Jalankan tes landmark dan tes gerbang**
+- [x] **Step 4: Jalankan tes landmark dan tes gerbang**
 
 Jalankan: `& $godot --headless --script res://tests/ForestLandmarksTest.gd; & $godot --headless --script res://tests/ZoneGateTest.gd`  
 Ekspektasi: PASS (kedua tes lulus).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/world/World.gd tests/ForestLandmarksTest.gd
@@ -200,25 +200,25 @@ git commit -m "feat(world): bangun visual landmark tematik dan rintangan alam di
   - Partikel kanvas atmosfer: kabut melayang di Zona 4, spora redup di Zona 5, kunang-kunang di Zona 6.
   - Integrasi reset harian objek interaktif di `World.gd` saat menerima sinyal `time_system.day_changed`.
 
-- [ ] **Step 1: Tulis tes interaksi semak dan pemulihan harian (`tests/RustlingBushTest.gd`)**
+- [x] **Step 1: Tulis tes interaksi semak dan pemulihan harian (`tests/RustlingBushTest.gd`)**
 
 Uji deteksi pemain pada `RustlingBush`, pemutaran sinyal tanpa tabrakan keras, serta reset harian prop interaktif.
 
-- [ ] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
+- [x] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
 
 Jalankan: `& $godot --headless --script res://tests/RustlingBushTest.gd`  
 Ekspektasi: FAIL.
 
-- [ ] **Step 3: Implementasikan `RustlingBush.gd` dan efek suasana zona di `World.gd`**
+- [x] **Step 3: Implementasikan `RustlingBush.gd` dan efek suasana zona di `World.gd`**
 
 Tambahkan semak berdesir pada jalur semak lebat dan pasang partikel suasana alami pada zona 4, 5, dan 6. Hubungkan `_on_day_changed` ke semua `InteractiveProp`.
 
-- [ ] **Step 4: Jalankan tes unit dan alur permainan utama**
+- [x] **Step 4: Jalankan tes unit dan alur permainan utama**
 
 Jalankan: `& $godot --headless --script res://tests/RustlingBushTest.gd; & $godot --headless --script res://tests/MainGameFlowTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/world/RustlingBush.gd scripts/world/World.gd tests/RustlingBushTest.gd
@@ -242,21 +242,21 @@ git commit -m "feat(world): tambahkan semak berdesir, partikel atmosfer zona, da
   - 14.00 – 18.00: Aliran Sungai Bebatuan (Zona 2)
   - 18.00 – 22.00: Kembali istirahat di tenda kemah Zona 3
 
-- [ ] **Step 1: Pastikan `ForestNPCIsolationTest.gd` memverifikasi posisi Rast di Zona 3 jam 06.00**
+- [x] **Step 1: Pastikan `ForestNPCIsolationTest.gd` memverifikasi posisi Rast di Zona 3 jam 06.00**
 
 Jalankan: `& $godot --headless --script res://tests/ForestNPCIsolationTest.gd`  
 Ekspektasi: PASS (memastikan ekspektasi baseline valid).
 
-- [ ] **Step 2: Perbarui segmen jadwal Rast di `data/schedules.json`**
+- [x] **Step 2: Perbarui segmen jadwal Rast di `data/schedules.json`**
 
 Sesuaikan titik koordinat patroli Rast agar singgah di kemah Zona 3, gapura Zona 1, dan sungai Zona 2.
 
-- [ ] **Step 3: Jalankan tes isolasi NPC dan dialog**
+- [x] **Step 3: Jalankan tes isolasi NPC dan dialog**
 
 Jalankan: `& $godot --headless --script res://tests/ForestNPCIsolationTest.gd; & $godot --headless --script res://tests/NPCSystemTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add data/schedules.json scripts/world/World.gd
@@ -277,21 +277,21 @@ git commit -m "feat(npc): integrasikan jadwal patroli rimba dan kemah peristirah
 - Produces: Serialisasi `interacted_props_today: Array[String]` di `GameState` dan `SaveSystem`.
 - Consumes: State yang dipulihkan saat pemain memuat game (`load_game`) untuk menyelaraskan status pohon buah/mata air yang sudah digunakan di hari berjalan.
 
-- [ ] **Step 1: Jalankan `ZoneStateSaveTest.gd` sebagai baseline**
+- [x] **Step 1: Jalankan `ZoneStateSaveTest.gd` sebagai baseline**
 
 Jalankan: `& $godot --headless --script res://tests/ZoneStateSaveTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 2: Tambahkan array `interacted_props_today` di `GameState.gd` dan `SaveSystem.gd`**
+- [x] **Step 2: Tambahkan array `interacted_props_today` di `GameState.gd` dan `SaveSystem.gd`**
 
 Simpan dan pulihkan status interaksi harian prop hutan ke file `user://savegame.json`. Reset array ini saat `sleep()`.
 
-- [ ] **Step 3: Jalankan tes penyimpanan menyeluruh**
+- [x] **Step 3: Jalankan tes penyimpanan menyeluruh**
 
 Jalankan: `& $godot --headless --script res://tests/ZoneStateSaveTest.gd; & $godot --headless --script res://tests/SaveSystemTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add scripts/autoload/GameState.gd scripts/systems/SaveSystem.gd scripts/world/World.gd
@@ -309,7 +309,7 @@ git commit -m "feat(save): simpan dan muat status interaksi harian objek lingkun
 **Interfaces:**
 - Produces: Laporan kelulusan 100% dari seluruh 25 test suite tanpa galat.
 
-- [ ] **Step 1: Eksekusi seluruh 25 file test suite secara headless**
+- [x] **Step 1: Eksekusi seluruh 25 file test suite secara headless**
 
 ```powershell
 $godot = "C:\Users\Hype GLK\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.2-stable_win64_console.exe"
@@ -331,15 +331,15 @@ Write-Host "=== TEST RUN COMPLETE: $passed PASSED, $failed FAILED out of $($test
 
 Ekspektasi: 25 PASSED, 0 FAILED.
 
-- [ ] **Step 2: Dokumentasikan penyelesaian Versi 0.6.0 di `MILESTONES.md`**
+- [x] **Step 2: Dokumentasikan penyelesaian Versi 0.6.0 di `MILESTONES.md`**
 
 Tambahkan rincian deliverable dan checklist Definition of Done v0.6.0 di `MILESTONES.md`.
 
-- [ ] **Step 3: Centang seluruh daftar tugas di dokumen rencana ini**
+- [x] **Step 3: Centang seluruh daftar tugas di dokumen rencana ini**
 
-Ubah seluruh `- [ ]` menjadi `- [x]` di `docs/superpowers/plans/2026-11-20-forest-ecosystem-v0.6.0-implementation.md`.
+Ubah seluruh `- [x]` menjadi `- [x]` di `docs/superpowers/plans/2026-11-20-forest-ecosystem-v0.6.0-implementation.md`.
 
-- [ ] **Step 4: Commit penyelesaian rilis v0.6.0**
+- [x] **Step 4: Commit penyelesaian rilis v0.6.0**
 
 ```bash
 git add MILESTONES.md docs/superpowers/plans/2026-11-20-forest-ecosystem-v0.6.0-implementation.md
