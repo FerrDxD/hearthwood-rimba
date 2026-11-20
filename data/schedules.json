@@ -28,7 +28,8 @@
   ],
   "rast": [
     { "mulai": 6, "selesai": 16, "posisi": [280, 720], "zona": [112, 82] },
-    { "mulai": 16, "selesai": 17, "posisi": [610, 430], "zona": [76, 48] }
+    { "mulai": 16, "selesai": 17, "posisi": [610, 430], "zona": [76, 48] },
+    { "mulai": 17, "selesai": 22, "posisi": [280, 720], "zona": [112, 82] }
   ],
   "veral": [
     { "mulai": 8, "selesai": 18, "posisi": [1390, 342], "zona": [68, 52] }

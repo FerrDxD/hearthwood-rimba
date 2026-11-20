@@ -469,6 +469,10 @@ func _update_npc_positions_for_hour(hour: int) -> void:
 				npc.call("_refresh_schedule", hour, 0)
 
 
+func update_npc_positions_for_hour(hour: int) -> void:
+	_update_npc_positions_for_hour(hour)
+
+
 func get_named_npc_name(npc_id: String) -> String:
 	for npc in _named_npcs:
 		if npc.npc_id == npc_id:
