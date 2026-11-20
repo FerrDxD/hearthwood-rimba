@@ -1,0 +1,192 @@
+{
+  "districts": {
+    "market_district": {
+      "id": "market_district",
+      "name": "Distrik Pasar & Perdagangan",
+      "bounds": [850.0, 180.0, 350.0, 360.0],
+      "description": "Kawasan perniagaan ramai dengan lapak pedagang keliling, Toko Kelontong Giral, dan Toko Perkakas Talia."
+    },
+    "civic_district": {
+      "id": "civic_district",
+      "name": "Distrik Balai Desa",
+      "bounds": [1260.0, 180.0, 320.0, 220.0],
+      "description": "Pusat pemerintahan dan administrasi pemukiman dengan Balai Desa Hearthwood dan teras musyawarah Tetua Veral."
+    },
+    "tavern_district": {
+      "id": "tavern_district",
+      "name": "Distrik Warung Rimba & Alun-Alun",
+      "bounds": [1150.0, 360.0, 380.0, 280.0],
+      "description": "Pusat kehangatan kuliner dan temu warga di sekitar Warung Rimba, Sumur Desa Tua, dan Papan Pengumuman Desa."
+    },
+    "residential_district": {
+      "id": "residential_district",
+      "name": "Distrik Pemukiman Warga",
+      "bounds": [600.0, 540.0, 850.0, 300.0],
+      "description": "Kawasan hunian tenang beratap sirap kayu dengan lumbung padi komunal, pagar rustic, dan pondok-pondok warga."
+    }
+  },
+  "buildings": {
+    "town_hall": {
+      "id": "town_hall",
+      "name": "Balai Desa Hearthwood",
+      "position": [1330.0, 240.0],
+      "size": [130.0, 84.0],
+      "roof_color": "#5c3a1e",
+      "wall_color": "#d2b48c",
+      "accent_color": "#b8482d",
+      "description": "Gedung utama pemerintahan desa tempat Tetua Veral menyambut pendatang dan mengurus urusan warga."
+    },
+    "giral_store": {
+      "id": "giral_store",
+      "name": "Toko Kelontong Giral",
+      "position": [970.0, 246.0],
+      "size": [92.0, 72.0],
+      "roof_color": "#5c3a1e",
+      "wall_color": "#d2b48c",
+      "accent_color": "#cd853f",
+      "description": "Toko bahan makanan pokok, bumbu masak, dan rempah yang dikelola oleh pedagang ramah Giral."
+    },
+    "talia_store": {
+      "id": "talia_store",
+      "name": "Toko Perkakas Talia",
+      "position": [1102.0, 246.0],
+      "size": [92.0, 72.0],
+      "roof_color": "#5c3a1e",
+      "wall_color": "#8f9692",
+      "accent_color": "#76513a",
+      "description": "Bengkel pandai besi dan toko perkakas pertanian yang dikelola oleh pengrajin tegas Talia."
+    },
+    "player_warung": {
+      "id": "player_warung",
+      "name": "Warung Rimba",
+      "position": [1268.0, 380.0],
+      "size": [104.0, 76.0],
+      "roof_color": "#76513a",
+      "wall_color": "#f5f5dc",
+      "accent_color": "#8fbc8f",
+      "description": "Kedai makan kayu hangat milik pemain di persimpangan jalan desa dan pintu rimba."
+    },
+    "village_granary": {
+      "id": "village_granary",
+      "name": "Lumbung Padi Komunal",
+      "position": [680.0, 640.0],
+      "size": [100.0, 76.0],
+      "roof_color": "#5c3a1e",
+      "wall_color": "#76513a",
+      "accent_color": "#d6ba68",
+      "description": "Lumbung panggung kayu rustic tempat penyimpanan hasil panen gabah dan cadangan pangan warga."
+    },
+    "residential_cottages": [
+      {
+        "id": "cottage_casha",
+        "name": "Pondok Tenun Casha",
+        "occupant": "casha",
+        "position": [820.0, 640.0],
+        "size": [76.0, 64.0],
+        "roof_color": "#5c3a1e",
+        "wall_color": "#d2b48c",
+        "description": "Pondok sederhana Casha dengan teras berhias kain rajut dan bunga liar."
+      },
+      {
+        "id": "cottage_jev_gil",
+        "name": "Pondok Bersama Jev & Gil",
+        "occupants": ["jev", "gil"],
+        "position": [930.0, 640.0],
+        "size": [80.0, 64.0],
+        "roof_color": "#5c3a1e",
+        "wall_color": "#d2b48c",
+        "description": "Pondok pemuda desa tempat tinggal Jev si petualang dan Gil si pemburu muda."
+      },
+      {
+        "id": "cottage_pak_udin",
+        "name": "Pondok Nelayan Pak Udin",
+        "occupant": "pak_udin",
+        "position": [1040.0, 640.0],
+        "size": [76.0, 64.0],
+        "roof_color": "#5c3a1e",
+        "wall_color": "#d2b48c",
+        "description": "Pondok Pak Udin yang dipenuhi jala ikan terjemur dan aroma air sungai."
+      },
+      {
+        "id": "cottage_budi",
+        "name": "Pondok Petani Budi",
+        "occupant": "budi",
+        "position": [1150.0, 640.0],
+        "size": [76.0, 64.0],
+        "roof_color": "#5c3a1e",
+        "wall_color": "#d2b48c",
+        "description": "Pondok petani Budi dengan pekarangan sayuran dan cangkul kayu di samping pintu."
+      },
+      {
+        "id": "cottage_siti",
+        "name": "Pondok Peramu Siti",
+        "occupant": "siti",
+        "position": [1260.0, 640.0],
+        "size": [76.0, 64.0],
+        "roof_color": "#5c3a1e",
+        "wall_color": "#d2b48c",
+        "description": "Pondok peramu Siti yang selalu wangi oleh rebusan daun teh dan ramuan rempah."
+      },
+      {
+        "id": "cottage_arin",
+        "name": "Pondok Pengrajin Arin",
+        "occupant": "arin",
+        "position": [1370.0, 640.0],
+        "size": [76.0, 64.0],
+        "roof_color": "#5c3a1e",
+        "wall_color": "#d2b48c",
+        "description": "Pondok Arin dengan meja ukir kayu dan rak penyimpanan anyaman bambu."
+      }
+    ]
+  },
+  "props": {
+    "village_well": {
+      "id": "village_well",
+      "name": "Sumur Desa Tua",
+      "type": "village_well",
+      "position": [1050.0, 460.0],
+      "interaction_radius": 48.0,
+      "energy_restore": 5,
+      "give_item_id": "air_bersih",
+      "description": "Sumur batu tua dengan katrol kayu kokoh dan ember timba berisi air jernih segar yang memulihkan tenaga warga."
+    },
+    "notice_board": {
+      "id": "notice_board",
+      "name": "Papan Pengumuman Desa",
+      "type": "notice_board",
+      "position": [1130.0, 460.0],
+      "interaction_radius": 48.0,
+      "description": "Papan kayu jati beratap sirap dengan segel lilin merah tempat menempel warta cuaca harian dan selera kuliner warga."
+    }
+  },
+  "clusters": {
+    "market_cluster": {
+      "id": "market_cluster",
+      "name": "Klaster Pasar Pagi",
+      "bounds": [920.0, 220.0, 260.0, 160.0],
+      "active_hours": [8, 12],
+      "description": "Warga berkerumun berbelanja kebutuhan pokok dan perkakas di depan toko Giral dan Talia."
+    },
+    "plaza_cluster": {
+      "id": "plaza_cluster",
+      "name": "Klaster Alun-Alun & Sumur Siang",
+      "bounds": [1000.0, 380.0, 240.0, 160.0],
+      "active_hours": [12, 16],
+      "description": "Warga berkumpul menimba air segar, membaca warta desa, dan bersosialisasi di alun-alun desa."
+    },
+    "tavern_cluster": {
+      "id": "tavern_cluster",
+      "name": "Klaster Warung Rimba Sore",
+      "bounds": [1180.0, 380.0, 200.0, 160.0],
+      "active_hours": [16, 20],
+      "description": "Warga bersantai menyantap masakan hangat dan bercengkerama di sekitar Warung Rimba menjelang malam."
+    },
+    "residential_cluster": {
+      "id": "residential_cluster",
+      "name": "Klaster Pemukiman Malam",
+      "bounds": [650.0, 560.0, 350.0, 200.0],
+      "active_hours": [20, 8],
+      "description": "Warga kembali ke kawasan pemukiman untuk beristirahat malam di dekat pondok dan lumbung."
+    }
+  }
+}

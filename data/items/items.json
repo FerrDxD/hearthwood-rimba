@@ -9,6 +9,7 @@
     { "id": "kayu", "nama": "Kayu", "kategori": "bahan", "sumber": "hutan", "warna": "#76513a" },
     { "id": "batu", "nama": "Batu", "kategori": "bahan", "sumber": "hutan", "warna": "#8f9692" },
     { "id": "lumut_sungai", "nama": "Lumut sungai", "kategori": "bahan", "sumber": "sungai", "warna": "#5b8a54" },
+    { "id": "air_bersih", "nama": "Air bersih", "kategori": "bahan", "sumber": "desa", "warna": "#6b9db3" },
     { "id": "tepung", "nama": "Tepung", "kategori": "bahan", "sumber": "Giral", "warna": "#e9dfc4" },
     { "id": "beras", "nama": "Beras", "kategori": "bahan", "sumber": "Giral", "warna": "#e7dfc3" },
     { "id": "garam", "nama": "Garam", "kategori": "bahan", "sumber": "Giral", "warna": "#faf7e9" },
