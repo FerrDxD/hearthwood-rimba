@@ -29,6 +29,22 @@ const ZONE_NAMES: Dictionary = {
 	"forest_zone_6": "Suaka Pohon Raksasa",
 }
 const VILLAGE_AMBIENT_RECT: Rect2 = Rect2(580.0, 120.0, 950.0, 680.0)
+const AMBIENT_CLUSTER_MARKET: Rect2 = Rect2(920.0, 220.0, 260.0, 160.0)
+const AMBIENT_CLUSTER_PLAZA: Rect2 = Rect2(1000.0, 380.0, 240.0, 160.0)
+const AMBIENT_CLUSTER_TAVERN: Rect2 = Rect2(1180.0, 380.0, 200.0, 160.0)
+const AMBIENT_CLUSTER_RESIDENTIAL: Rect2 = Rect2(650.0, 560.0, 350.0, 200.0)
+const CLUSTERED_AMBIENT_NPC_COUNT: int = 24
+const FREE_WANDERER_NPC_COUNT: int = 8
+const FREE_WANDERER_ANCHORS: Array[Vector2] = [
+	Vector2(620.0, 220.0),
+	Vector2(780.0, 320.0),
+	Vector2(680.0, 480.0),
+	Vector2(880.0, 680.0),
+	Vector2(1120.0, 180.0),
+	Vector2(1380.0, 280.0),
+	Vector2(1440.0, 600.0),
+	Vector2(1260.0, 720.0),
+]
 const TILESET_TEXTURE: Texture2D = preload("res://assets/sprites/tiles/main_tiles.png")
 const NPC_SCENE: PackedScene = preload("res://scenes/NPC.tscn")
 const SHOP_NPC_SCENE: PackedScene = preload("res://scenes/ShopNPC.tscn")
@@ -115,6 +131,7 @@ var _ambient_particles: Dictionary = {}
 var _zone_props: Dictionary = {}
 var _landmarks: Dictionary = {}
 var _village_data: Dictionary = {}
+var _current_ambient_clustering_hour: int = 6
 var _obstacle_rects: Array[Rect2] = []
 var _building_rects: Array[Rect2] = [
 	Rect2(1330.0, 240.0, 130.0, 84.0), # Town Hall
@@ -184,9 +201,15 @@ func _ready() -> void:
 	if _ambient_particles.is_empty():
 		_setup_ambient_particles()
 	if has_node("/root/TimeSystem"):
-		get_node("/root/TimeSystem").day_changed.connect(_on_day_changed)
+		var time_system: Node = get_node("/root/TimeSystem")
+		time_system.day_changed.connect(_on_day_changed)
+		if time_system.has_signal("hour_changed") and not time_system.hour_changed.is_connected(_on_hour_changed):
+			time_system.hour_changed.connect(_on_hour_changed)
 	if has_node("/root/GameState"):
-		get_node("/root/GameState").state_changed.connect(_on_state_changed)
+		var game_state: Node = get_node("/root/GameState")
+		game_state.state_changed.connect(_on_state_changed)
+		if "current_hour" in game_state:
+			_update_ambient_npc_clustering(int(game_state.current_hour))
 	queue_redraw()
 
 
@@ -485,10 +508,72 @@ func _update_npc_positions_for_hour(hour: int) -> void:
 				npc.refresh_schedule(hour, 0)
 			elif npc.has_method("_refresh_schedule"):
 				npc.call("_refresh_schedule", hour, 0)
+	_update_ambient_npc_clustering(hour)
 
 
 func update_npc_positions_for_hour(hour: int) -> void:
 	_update_npc_positions_for_hour(hour)
+
+
+func update_ambient_clustering_for_hour(hour: int) -> void:
+	_update_ambient_npc_clustering(hour)
+
+
+func get_ambient_cluster_name_for_hour(hour: int) -> String:
+	if hour >= 8 and hour < 12:
+		return "market"
+	elif hour >= 12 and hour < 16:
+		return "plaza"
+	elif hour >= 16 and hour < 20:
+		return "tavern"
+	else:
+		return "residential"
+
+
+func get_ambient_cluster_rect_for_hour(hour: int) -> Rect2:
+	match get_ambient_cluster_name_for_hour(hour):
+		"market":
+			return AMBIENT_CLUSTER_MARKET
+		"plaza":
+			return AMBIENT_CLUSTER_PLAZA
+		"tavern":
+			return AMBIENT_CLUSTER_TAVERN
+		"residential":
+			return AMBIENT_CLUSTER_RESIDENTIAL
+		_:
+			return AMBIENT_CLUSTER_RESIDENTIAL
+
+
+func get_ambient_clustering_info() -> Dictionary:
+	var cluster_rect := get_ambient_cluster_rect_for_hour(_current_ambient_clustering_hour)
+	var cluster_name := get_ambient_cluster_name_for_hour(_current_ambient_clustering_hour)
+	var clustered: Array[HearthwoodNPC] = []
+	var wanderers: Array[HearthwoodNPC] = []
+	for i in range(_ambient_npcs.size()):
+		var npc := _ambient_npcs[i]
+		if i < CLUSTERED_AMBIENT_NPC_COUNT:
+			clustered.append(npc)
+		else:
+			wanderers.append(npc)
+	return {
+		"current_hour": _current_ambient_clustering_hour,
+		"current_cluster_name": cluster_name,
+		"current_cluster_rect": cluster_rect,
+		"clustered_npcs": clustered,
+		"free_wanderers": wanderers,
+		"clustered_count": clustered.size(),
+		"free_wanderer_count": wanderers.size(),
+		"cluster_rects": {
+			"market": AMBIENT_CLUSTER_MARKET,
+			"plaza": AMBIENT_CLUSTER_PLAZA,
+			"tavern": AMBIENT_CLUSTER_TAVERN,
+			"residential": AMBIENT_CLUSTER_RESIDENTIAL,
+		}
+	}
+
+
+func get_ambient_npcs() -> Array[HearthwoodNPC]:
+	return _ambient_npcs
 
 
 func get_named_npc_name(npc_id: String) -> String:
@@ -1202,17 +1287,83 @@ func _spawn_named_npcs() -> void:
 
 func _spawn_ambient_npcs() -> void:
 	for index in 32:
-		var spawn_position := Vector2(
-			_random.randf_range(VILLAGE_AMBIENT_RECT.position.x, VILLAGE_AMBIENT_RECT.end.x),
-			_random.randf_range(VILLAGE_AMBIENT_RECT.position.y, VILLAGE_AMBIENT_RECT.end.y)
-		)
-		var zone_size := Vector2(72.0, 52.0)
+		var spawn_position := Vector2(700.0, 600.0)
+		var zone_size := Vector2(36.0, 28.0)
 		var movement_zone := Rect2(spawn_position - zone_size * 0.5, zone_size)
 		movement_zone.position.x = maxf(movement_zone.position.x, 560.0)
 		var npc := NPC_SCENE.instantiate() as HearthwoodNPC
 		npc.configure_ambient(index, spawn_position, movement_zone)
 		add_child(npc)
 		_ambient_npcs.append(npc)
+	_update_ambient_npc_clustering(_current_ambient_clustering_hour)
+
+
+func _on_hour_changed(hour: int, _minute: int = 0) -> void:
+	_update_ambient_npc_clustering(hour)
+
+
+func _update_ambient_npc_clustering(hour: int) -> void:
+	_current_ambient_clustering_hour = hour
+	if _ambient_npcs.is_empty():
+		return
+	var cluster_rect := get_ambient_cluster_rect_for_hour(hour)
+	var margin_x: float = 24.0
+	var margin_y: float = 20.0
+	var avail_w: float = cluster_rect.size.x - margin_x * 2.0
+	var avail_h: float = cluster_rect.size.y - margin_y * 2.0
+
+	for i in range(_ambient_npcs.size()):
+		var npc := _ambient_npcs[i]
+		if not is_instance_valid(npc):
+			continue
+		if i < CLUSTERED_AMBIENT_NPC_COUNT:
+			var col: int = i % 6
+			var row: int = i / 6
+			var t_x: float = float(col) / 5.0
+			var t_y: float = float(row) / 3.0
+			var base_pos := cluster_rect.position + Vector2(margin_x + t_x * avail_w, margin_y + t_y * avail_h)
+			var offset_x: float = (((i * 7 + hour * 3) % 11) - 5) * 1.5
+			var offset_y: float = (((i * 13 + hour * 5) % 9) - 4) * 1.5
+			var pos := base_pos + Vector2(offset_x, offset_y)
+			var zone_size := Vector2(36.0, 28.0)
+			var mz := Rect2(pos - zone_size * 0.5, zone_size)
+			var min_x: float = maxf(cluster_rect.position.x, 560.0)
+			var max_x: float = cluster_rect.end.x - mz.size.x
+			if max_x < min_x:
+				mz.size.x = cluster_rect.size.x
+				mz.position.x = min_x
+			else:
+				mz.position.x = clampf(mz.position.x, min_x, max_x)
+			var min_y: float = cluster_rect.position.y
+			var max_y: float = cluster_rect.end.y - mz.size.y
+			if max_y < min_y:
+				mz.size.y = cluster_rect.size.y
+				mz.position.y = min_y
+			else:
+				mz.position.y = clampf(mz.position.y, min_y, max_y)
+
+			pos = mz.get_center()
+			npc.position = pos
+			npc.global_position = pos
+			npc._movement_zone = mz
+			npc.velocity = Vector2.ZERO
+		else:
+			# Free wanderers (remain in VILLAGE_AMBIENT_RECT with hard constraint x >= 560.0)
+			var wanderer_idx: int = i - CLUSTERED_AMBIENT_NPC_COUNT
+			var anchor: Vector2 = FREE_WANDERER_ANCHORS[wanderer_idx % FREE_WANDERER_ANCHORS.size()]
+			var zone_size := Vector2(80.0, 60.0)
+			var mz: Rect2 = npc._movement_zone
+			if mz.size.is_zero_approx():
+				mz = Rect2(anchor - zone_size * 0.5, zone_size)
+			mz.position.x = maxf(mz.position.x, 560.0)
+			mz.position.x = clampf(mz.position.x, 560.0, VILLAGE_AMBIENT_RECT.end.x - mz.size.x)
+			mz.position.y = clampf(mz.position.y, VILLAGE_AMBIENT_RECT.position.y, VILLAGE_AMBIENT_RECT.end.y - mz.size.y)
+			npc._movement_zone = mz
+			if not VILLAGE_AMBIENT_RECT.has_point(npc.position) or npc.position.x < 560.0:
+				npc.position = mz.get_center()
+				npc.global_position = npc.position
+			npc.position.x = maxf(npc.position.x, 560.0)
+			npc.global_position.x = maxf(npc.global_position.x, 560.0)
 
 
 func _spawn_forage_items() -> void:
