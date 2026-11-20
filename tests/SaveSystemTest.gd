@@ -47,6 +47,7 @@ func _run_tests() -> void:
 	game_state.npc_recently_returned_from_forest["rast"] = true
 	game_state.items_received_from_npcs.assign(["pisau_kecil"])
 	game_state.collected_forage_today.assign(["sayur_liar_1"])
+	game_state.interacted_props_today.assign(["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2"])
 	game_state.unlocked_quests.assign(["rast_main"])
 	game_state.completed_quests.assign(["village_intro"])
 	if (
@@ -73,6 +74,7 @@ func _run_tests() -> void:
 		or str(saved_data.get("nama_pemain", "")) != "Sari"
 		or str(saved_data.get("inventori", [])[1].get("item", "")) != "sup_sayur_bening"
 		or int(saved_data.get("inventori", [])[1].get("hari_terakhir_diproses", 0)) != 4
+		or saved_data.get("interacted_props_today", []) != ["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2"]
 	):
 		push_error("Save JSON should preserve the PRD fields and cooked-item metadata.")
 		quit(1)
@@ -110,6 +112,7 @@ func _run_tests() -> void:
 		or not game_state.npc_recently_returned_from_forest.has("rast")
 		or game_state.items_received_from_npcs != ["pisau_kecil"]
 		or game_state.collected_forage_today != ["sayur_liar_1"]
+		or game_state.interacted_props_today != ["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2"]
 		or game_state.unlocked_quests != ["rast_main"]
 		or game_state.completed_quests != ["village_intro"]
 	):
@@ -124,11 +127,22 @@ func _run_tests() -> void:
 		push_error("A collected forage spot should stay empty after loading a save.")
 		quit(1)
 		return
+	var loaded_tree = world.get_interactive_prop("fruit_tree_apel_hutan_z1")
+	if loaded_tree == null or not loaded_tree.daily_interacted or loaded_tree.has_fruit:
+		push_error("An interacted prop should preserve its interacted state after loading a save.")
+		quit(1)
+		return
 	game_state.collected_forage_today.clear()
+	game_state.interacted_props_today.clear()
 	time_system.sync_from_game_state()
+	world._on_day_changed(game_state.current_day)
 	await process_frame
 	if world.get_closest_item_pickup(Vector2(104.0, 1178.0), 2.0) == null:
 		push_error("Synchronizing a loaded day should refresh the forage world.")
+		quit(1)
+		return
+	if loaded_tree.daily_interacted or not loaded_tree.has_fruit:
+		push_error("An interacted prop should reset to interactable after a new day.")
 		quit(1)
 		return
 
@@ -239,6 +253,7 @@ func _reset_game_state(game_state: Variant) -> void:
 	game_state.completed_quests.clear()
 	game_state.items_received_from_npcs.clear()
 	game_state.collected_forage_today.clear()
+	game_state.interacted_props_today.clear()
 	game_state.business_permits.clear()
 	game_state.npc_heart_levels.clear()
 	game_state.npc_met.clear()

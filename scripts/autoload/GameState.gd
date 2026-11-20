@@ -37,6 +37,7 @@ var smoke_clues: Array[String] = []
 var unlocked_features: Array[String] = []
 var items_received_from_npcs: Array[String] = []
 var collected_forage_today: Array[String] = []
+var interacted_props_today: Array[String] = []
 var business_permits: Array[int] = []
 var npc_heart_levels: Dictionary = {}
 var npc_met: Dictionary = {}
@@ -79,6 +80,7 @@ func sleep(wake_hour: int, recovery_ratio: float) -> void:
 	gifts_given_today.clear()
 	customers_served_today.clear()
 	collected_forage_today.clear()
+	interacted_props_today.clear()
 	energy_changed.emit(energy)
 	state_changed.emit()
 
@@ -115,6 +117,7 @@ func start_new_game(new_player_name: String) -> bool:
 	unlocked_features.clear()
 	items_received_from_npcs.clear()
 	collected_forage_today.clear()
+	interacted_props_today.clear()
 	business_permits.clear()
 	npc_heart_levels.clear()
 	npc_met.clear()
@@ -132,7 +135,8 @@ func start_new_game(new_player_name: String) -> bool:
 	coins_changed.emit(coins)
 	inventory_changed.emit()
 	state_changed.emit()
-	get_node("/root/TimeSystem").sync_from_game_state()
+	if is_inside_tree() and has_node("/root/TimeSystem"):
+		get_node("/root/TimeSystem").sync_from_game_state()
 	return true
 
 
@@ -201,6 +205,22 @@ func complete_quest(quest_id: String) -> bool:
 	quest_completed.emit(quest_id)
 	state_changed.emit()
 	return true
+
+
+func mark_prop_interacted(prop_id: String) -> void:
+	var normalized_id := prop_id.strip_edges()
+	if normalized_id.is_empty():
+		return
+	if not interacted_props_today.has(normalized_id):
+		interacted_props_today.append(normalized_id)
+		state_changed.emit()
+
+
+func is_prop_interacted_today(prop_id: String) -> bool:
+	var normalized_id := prop_id.strip_edges()
+	if normalized_id.is_empty():
+		return false
+	return interacted_props_today.has(normalized_id)
 
 
 func has_save_game(file_path: String = SAVE_FILE_PATH) -> bool:
@@ -448,6 +468,7 @@ func _create_save_data(player_position: Vector2, scene_path: String) -> Dictiona
 		"fitur_terbuka": unlocked_features.duplicate(),
 		"npc_ditemui": npc_met.duplicate(true),
 		"forage_terkumpul_hari_ini": collected_forage_today.duplicate(),
+		"interacted_props_today": interacted_props_today.duplicate(),
 		"hadiah_hari_ini": gifts_given_today.duplicate(true),
 		"pelanggan_hari_ini": customers_served_today.duplicate(true),
 		"streak_tidak_suka": disliked_gift_streaks.duplicate(true),
@@ -623,6 +644,16 @@ func _load_save_data(data: Dictionary) -> void:
 	collected_forage_today.clear()
 	for spawn_id in data.get("forage_terkumpul_hari_ini", []):
 		collected_forage_today.append(str(spawn_id))
+	interacted_props_today.clear()
+	var saved_props: Variant = data.get(
+		"interacted_props_today",
+		data.get("objek_interaktif_hari_ini", [])
+	)
+	if typeof(saved_props) == TYPE_ARRAY:
+		for prop_id in saved_props:
+			var id_str := str(prop_id).strip_edges()
+			if not id_str.is_empty() and not interacted_props_today.has(id_str):
+				interacted_props_today.append(id_str)
 	gifts_given_today = data.get("hadiah_hari_ini", {}).duplicate(true)
 	customers_served_today = data.get("pelanggan_hari_ini", {}).duplicate(true)
 	disliked_gift_streaks = data.get("streak_tidak_suka", {}).duplicate(true)

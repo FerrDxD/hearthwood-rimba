@@ -98,6 +98,7 @@ var _game_state: Node = null:
 			if not _game_state.deep_forest_unlocked_changed.is_connected(_on_deep_forest_unlocked_changed):
 				_game_state.deep_forest_unlocked_changed.connect(_on_deep_forest_unlocked_changed)
 		_update_fallen_tree_barriers()
+		_sync_interactive_props_state()
 var _ground: TileMapLayer
 var _random := RandomNumberGenerator.new()
 var _tree_positions: Array[Vector2] = []
@@ -148,6 +149,7 @@ func _ready() -> void:
 		self._game_state = get_node("/root/GameState")
 	else:
 		_update_fallen_tree_barriers()
+		_sync_interactive_props_state()
 	_ground = TileMapLayer.new()
 	_ground.name = "ground"
 	_ground.z_index = -1
@@ -438,9 +440,11 @@ func collect_item_pickup(pickup: HearthwoodItemPickup) -> bool:
 		return false
 	if not pickup.collect():
 		return false
-	var game_state = get_node("/root/GameState")
+	var game_state := _get_active_game_state()
 	if (
-		not pickup.spawn_id.is_empty()
+		game_state != null
+		and not pickup.spawn_id.is_empty()
+		and "collected_forage_today" in game_state
 		and not game_state.collected_forage_today.has(pickup.spawn_id)
 	):
 		game_state.collected_forage_today.append(pickup.spawn_id)
@@ -641,6 +645,72 @@ func get_closest_interactive_prop(pos: Vector2, radius: float = 64.0) -> Hearthw
 	return closest
 
 
+func interact_with_prop(prop: HearthwoodInteractiveProp, player: Node2D = null) -> Dictionary:
+	if not is_instance_valid(prop):
+		return {"success": false, "message": "Objek interaktif tidak valid."}
+	var res := prop.interact(player)
+	if res.get("success", false) and not prop.prop_id.is_empty():
+		_mark_prop_in_game_state(prop.prop_id)
+	return res
+
+
+func _register_interactive_prop(prop: HearthwoodInteractiveProp) -> void:
+	_interactive_props.append(prop)
+	prop.interacted.connect(func(res: Dictionary): _on_prop_interacted(prop, res))
+	_sync_interactive_prop_state(prop)
+
+
+func _on_prop_interacted(prop: HearthwoodInteractiveProp, res: Dictionary) -> void:
+	if res.get("success", false) and is_instance_valid(prop) and not prop.prop_id.is_empty():
+		_mark_prop_in_game_state(prop.prop_id)
+
+
+func _mark_prop_in_game_state(prop_id: String) -> void:
+	var gs := _get_active_game_state()
+	if gs != null:
+		if gs.has_method("mark_prop_interacted"):
+			gs.mark_prop_interacted(prop_id)
+		elif "interacted_props_today" in gs and not gs.interacted_props_today.has(prop_id):
+			gs.interacted_props_today.append(prop_id)
+
+
+func _get_active_game_state() -> Node:
+	if _game_state != null:
+		return _game_state
+	if is_inside_tree() and has_node("/root/GameState"):
+		return get_node("/root/GameState")
+	return null
+
+
+func _sync_interactive_props_state() -> void:
+	for prop in _interactive_props:
+		if is_instance_valid(prop):
+			_sync_interactive_prop_state(prop)
+
+
+func _sync_interactive_prop_state(prop: HearthwoodInteractiveProp) -> void:
+	if not is_instance_valid(prop):
+		return
+	var gs := _get_active_game_state()
+	if gs == null:
+		return
+	
+	var is_interacted := false
+	if gs.has_method("is_prop_interacted_today"):
+		is_interacted = gs.is_prop_interacted_today(prop.prop_id)
+	elif "interacted_props_today" in gs:
+		is_interacted = gs.interacted_props_today.has(prop.prop_id)
+	
+	if is_interacted:
+		prop.daily_interacted = true
+		if "has_fruit" in prop:
+			prop.has_fruit = false
+	else:
+		prop.daily_interacted = false
+		if "has_fruit" in prop:
+			prop.has_fruit = true
+
+
 func get_ambient_particles() -> Dictionary:
 	return _ambient_particles
 
@@ -683,7 +753,7 @@ func _spawn_forest_props() -> void:
 				tree.fruit_item_id = str(pdata.get("drop_item_id", "buah_liar"))
 				tree.interaction_prompt = prompt
 				add_child(tree)
-				_interactive_props.append(tree)
+				_register_interactive_prop(tree)
 			elif p_type == "fresh_spring":
 				var spring: HearthwoodFreshSpring = FRESH_SPRING_SCRIPT.new()
 				spring.name = "FreshSpring_%s" % p_id
@@ -692,7 +762,7 @@ func _spawn_forest_props() -> void:
 				spring.energy_restore = int(pdata.get("energy_heal", 10))
 				spring.interaction_prompt = prompt
 				add_child(spring)
-				_interactive_props.append(spring)
+				_register_interactive_prop(spring)
 			elif p_type == "inspectable_hollow":
 				var hollow: HearthwoodInspectableHollow = INSPECTABLE_HOLLOW_SCRIPT.new()
 				hollow.name = "InspectableHollow_%s" % p_id
@@ -703,7 +773,7 @@ func _spawn_forest_props() -> void:
 					hollow.possible_loot = [str(pdata["drop_item_id"])]
 				hollow.interaction_prompt = prompt
 				add_child(hollow)
-				_interactive_props.append(hollow)
+				_register_interactive_prop(hollow)
 			else:
 				var prop: HearthwoodInteractiveProp = INTERACTIVE_PROP_SCRIPT.new()
 				prop.name = "Prop_%s" % p_id
@@ -712,7 +782,7 @@ func _spawn_forest_props() -> void:
 				prop.position = pos
 				prop.interaction_prompt = prompt
 				add_child(prop)
-				_interactive_props.append(prop)
+				_register_interactive_prop(prop)
 
 
 func _setup_ambient_particles() -> void:
@@ -963,14 +1033,18 @@ func _spawn_forage_items() -> void:
 			pickup.queue_free()
 	_item_pickups.clear()
 
-	var game_state = get_node("/root/GameState")
+	var game_state := _get_active_game_state()
 	var spawn_points: Array[Dictionary] = FORAGE_SPAWN_POINTS.duplicate()
 	# Rain speeds up regrowth with one extra forage spot for the day.
-	if game_state.is_raining():
+	if game_state != null and game_state.has_method("is_raining") and game_state.is_raining():
 		spawn_points.append(RAIN_FORAGE_SPAWN)
 	for spawn_point in spawn_points:
 		var spawn_id := str(spawn_point["spawn_id"])
-		if game_state.collected_forage_today.has(spawn_id):
+		if (
+			game_state != null
+			and "collected_forage_today" in game_state
+			and game_state.collected_forage_today.has(spawn_id)
+		):
 			continue
 		var pickup := ITEM_PICKUP_SCENE.instantiate() as HearthwoodItemPickup
 		pickup.configure(str(spawn_point["id"]), spawn_point["position"], spawn_id)
@@ -979,6 +1053,9 @@ func _spawn_forage_items() -> void:
 
 
 func _on_day_changed(_day: int = 1) -> void:
+	var gs := _get_active_game_state()
+	if gs != null and "interacted_props_today" in gs:
+		gs.interacted_props_today.clear()
 	_spawn_forage_items()
 	for prop in _interactive_props:
 		if is_instance_valid(prop):
@@ -986,6 +1063,7 @@ func _on_day_changed(_day: int = 1) -> void:
 
 
 func _on_state_changed() -> void:
+	_sync_interactive_props_state()
 	queue_redraw()
 
 
