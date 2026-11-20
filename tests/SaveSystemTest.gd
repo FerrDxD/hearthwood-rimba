@@ -47,12 +47,13 @@ func _run_tests() -> void:
 	game_state.npc_recently_returned_from_forest["rast"] = true
 	game_state.items_received_from_npcs.assign(["pisau_kecil"])
 	game_state.collected_forage_today.assign(["sayur_liar_1"])
-	game_state.interacted_props_today.assign(["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2"])
+	game_state.interacted_props_today.assign(["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2", "village_well"])
 	game_state.unlocked_quests.assign(["rast_main"])
 	game_state.completed_quests.assign(["village_intro"])
 	if (
 		not game_state.add_item("kayu", 3)
 		or not game_state.add_item("sup_sayur_bening", 2, 4, 3)
+		or not game_state.add_item("air_bersih", 5)
 	):
 		push_error("Save fixture inventory could not be created.")
 		quit(1)
@@ -74,7 +75,7 @@ func _run_tests() -> void:
 		or str(saved_data.get("nama_pemain", "")) != "Sari"
 		or str(saved_data.get("inventori", [])[1].get("item", "")) != "sup_sayur_bening"
 		or int(saved_data.get("inventori", [])[1].get("hari_terakhir_diproses", 0)) != 4
-		or saved_data.get("interacted_props_today", []) != ["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2"]
+		or saved_data.get("interacted_props_today", []) != ["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2", "village_well"]
 	):
 		push_error("Save JSON should preserve the PRD fields and cooked-item metadata.")
 		quit(1)
@@ -96,6 +97,7 @@ func _run_tests() -> void:
 		or game_state.business_permits != [1, 2]
 		or game_state.get_item_count("kayu") != 3
 		or game_state.get_item_count("sup_sayur_bening") != 2
+		or game_state.get_item_count("air_bersih") != 5
 		or game_state.unlocked_recipes != [
 			"sup_sayur_bening",
 			"bubur_hangat_hutan",
@@ -112,7 +114,7 @@ func _run_tests() -> void:
 		or not game_state.npc_recently_returned_from_forest.has("rast")
 		or game_state.items_received_from_npcs != ["pisau_kecil"]
 		or game_state.collected_forage_today != ["sayur_liar_1"]
-		or game_state.interacted_props_today != ["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2"]
+		or game_state.interacted_props_today != ["fruit_tree_apel_hutan_z1", "fresh_spring_sungai_z2", "village_well"]
 		or game_state.unlocked_quests != ["rast_main"]
 		or game_state.completed_quests != ["village_intro"]
 	):
@@ -132,6 +134,11 @@ func _run_tests() -> void:
 		push_error("An interacted prop should preserve its interacted state after loading a save.")
 		quit(1)
 		return
+	var loaded_well = world.get_village_well()
+	if loaded_well == null or not loaded_well.daily_interacted:
+		push_error("Village well should preserve its interacted state after loading a save.")
+		quit(1)
+		return
 	game_state.collected_forage_today.clear()
 	game_state.interacted_props_today.clear()
 	time_system.sync_from_game_state()
@@ -143,6 +150,16 @@ func _run_tests() -> void:
 		return
 	if loaded_tree.daily_interacted or not loaded_tree.has_fruit:
 		push_error("An interacted prop should reset to interactable after a new day.")
+		quit(1)
+		return
+	if loaded_well.daily_interacted:
+		push_error("Village well should reset to interactable after a new day.")
+		quit(1)
+		return
+	game_state.interacted_props_today.append("village_well")
+	game_state.sleep(8, 0.8)
+	if game_state.interacted_props_today.has("village_well"):
+		push_error("Sleeping should reset interacted_props_today including village_well.")
 		quit(1)
 		return
 
