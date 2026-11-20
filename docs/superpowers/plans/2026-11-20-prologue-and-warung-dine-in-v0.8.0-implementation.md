@@ -39,7 +39,7 @@
 **Interfaces:**
 - Produces: `data/quests/opening_prologue.json` berisi array `monologues` (id, text, audio_hint, duration) dan objek `awakening` (text, question).
 
-- [ ] **Step 1: Tulis tes verifikasi skema naskah prolog (`tests/PrologueDataTest.gd`)**
+- [x] **Step 1: Tulis tes verifikasi skema naskah prolog (`tests/PrologueDataTest.gd`)**
 
 ```gdscript
 # tests/PrologueDataTest.gd
@@ -67,21 +67,21 @@ func _init() -> void:
 	quit(0)
 ```
 
-- [ ] **Step 2: Jalankan tes untuk memastikan gagal sebelum implementasi**
+- [x] **Step 2: Jalankan tes untuk memastikan gagal sebelum implementasi**
 
 Jalankan: `& $godot --headless --script res://tests/PrologueDataTest.gd`  
 Ekspektasi: FAIL (file `opening_prologue.json` belum ada).
 
-- [ ] **Step 3: Buat data naskah `data/quests/opening_prologue.json`**
+- [x] **Step 3: Buat data naskah `data/quests/opening_prologue.json`**
 
 Tulis naskah monolog asal-usul warteg, kebakaran gudang, dan aroma sejuk rimba fantasi sesuai PRD v0.8.0.
 
-- [ ] **Step 4: Jalankan tes verifikasi**
+- [x] **Step 4: Jalankan tes verifikasi**
 
 Jalankan: `& $godot --headless --script res://tests/PrologueDataTest.gd`  
 Ekspektasi: PASS ("PrologueDataTest passed.").
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add data/quests/opening_prologue.json tests/PrologueDataTest.gd
@@ -102,7 +102,7 @@ git commit -m "feat(data): susun naskah narasi prolog pembuka warteg dan rimba h
 - Produces: `HearthwoodPrologueSequence` (`CanvasLayer`) dengan sinyal `sequence_completed` dan fungsi `start_sequence(player_name: String)`.
 - Consumes: `data/quests/opening_prologue.json` dan `scripts/ui/MainMenu.gd` untuk memicu prolog saat "Mulai Permainan Baru".
 
-- [ ] **Step 1: Tulis tes fungsionalitas sekuens prolog (`tests/PrologueSequenceTest.gd`)**
+- [x] **Step 1: Tulis tes fungsionalitas sekuens prolog (`tests/PrologueSequenceTest.gd`)**
 
 ```gdscript
 # tests/PrologueSequenceTest.gd
@@ -138,12 +138,12 @@ func _run_tests() -> void:
 	quit(0)
 ```
 
-- [ ] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
+- [x] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
 
 Jalankan: `& $godot --headless --script res://tests/PrologueSequenceTest.gd`  
 Ekspektasi: FAIL (scene `PrologueSequence.tscn` belum dibuat).
 
-- [ ] **Step 3: Implementasikan `PrologueSequence.gd` dan integrasikan ke `MainMenu.gd`**
+- [x] **Step 3: Implementasikan `PrologueSequence.gd` dan integrasikan ke `MainMenu.gd`**
 
 Bangun `PrologueSequence.gd` dengan:
 - Latar ColorRect hitam pekat.
@@ -152,12 +152,12 @@ Bangun `PrologueSequence.gd` dengan:
 - Animasi masker kelopak mata (dua panel ColorRect atas-bawah yang mengerjap membuka).
 - Pada `MainMenu.gd`, saat `_start_new_game()` dipanggil, instansiasi `PrologueSequence`, tampilkan, dan saat `sequence_completed` terpancar, baru alihkan ke `GAME_SCENE_PATH`.
 
-- [ ] **Step 4: Jalankan tes verifikasi**
+- [x] **Step 4: Jalankan tes verifikasi**
 
 Jalankan: `& $godot --headless --script res://tests/PrologueSequenceTest.gd; & $godot --headless --script res://tests/MainMenuTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scenes/ui/PrologueSequence.tscn scripts/ui/PrologueSequence.gd scripts/ui/MainMenu.gd tests/PrologueSequenceTest.gd
@@ -177,7 +177,7 @@ git commit -m "feat(ui): implementasikan sekuens sinematik prolog pembuka saat m
 - Produces: `HearthwoodWarungTable` (`Area2D`) dengan state enum `TableState { EMPTY, OCCUPIED, WAITING_FOOD, EATING, DIRTY }`, posisi duduk NPC, dan fungsi `seat_customer(npc_id, recipe_id)`, `serve_food(item_id)`, `clear_table()`.
 - Produces: `HearthwoodOrderBubble` (`Node2D`) untuk merender balon pesanan mengambang dengan ikon hidangan dan progress bar tenang.
 
-- [ ] **Step 1: Tulis tes komponen meja warung dan balon pesanan (`tests/WarungTablePropsTest.gd`)**
+- [x] **Step 1: Tulis tes komponen meja warung dan balon pesanan (`tests/WarungTablePropsTest.gd`)**
 
 ```gdscript
 # tests/WarungTablePropsTest.gd
@@ -220,12 +220,12 @@ func _run_tests() -> void:
 	quit(0)
 ```
 
-- [ ] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
+- [x] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
 
 Jalankan: `& $godot --headless --script res://tests/WarungTablePropsTest.gd`  
 Ekspektasi: FAIL (file `WarungTable.gd` belum ada).
 
-- [ ] **Step 3: Implementasikan `WarungTable.gd` dan `OrderBubble.gd`**
+- [x] **Step 3: Implementasikan `WarungTable.gd` dan `OrderBubble.gd`**
 
 Bangun `WarungTable.gd`:
 - Turunan dari `Area2D` dengan radius sentuh ergonomis (48 px).
@@ -233,12 +233,12 @@ Bangun `WarungTable.gd`:
 - `OrderBubble.gd`: Balon mengambang animasi lembut (bobbing tween) menampilkan nama/ikon masakan yang dipesan.
 - Metode manajemen siklus hidup: `seat_customer`, `serve_food`, `finish_eating`, `clear_table`.
 
-- [ ] **Step 4: Jalankan tes verifikasi**
+- [x] **Step 4: Jalankan tes verifikasi**
 
 Jalankan: `& $godot --headless --script res://tests/WarungTablePropsTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/world/WarungTable.gd scripts/ui/OrderBubble.gd tests/WarungTablePropsTest.gd
@@ -257,7 +257,7 @@ git commit -m "feat(world): implementasikan komponen meja makan warung dan balon
 - Produces: Penempatan 2-4 `WarungTable` dan 1 `WarungSign`/Lonceng di Distrik Warung Pemain pada `World.gd`.
 - Consumes: Fungsi penempatan landmark di `World.gd` tanpa bertabrakan dengan collider solid atau stasiun memasak.
 
-- [ ] **Step 1: Tulis tes integrasi meja warung di World (`tests/WarungWorldIntegrationTest.gd`)**
+- [x] **Step 1: Tulis tes integrasi meja warung di World (`tests/WarungWorldIntegrationTest.gd`)**
 
 ```gdscript
 # tests/WarungWorldIntegrationTest.gd
@@ -291,12 +291,12 @@ func _run_tests() -> void:
 	quit(0)
 ```
 
-- [ ] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
+- [x] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
 
 Jalankan: `& $godot --headless --script res://tests/WarungWorldIntegrationTest.gd`  
 Ekspektasi: FAIL (metode `get_warung_tables` dan `get_warung_bell` belum ada di `World.gd`).
 
-- [ ] **Step 3: Pasang meja warung dan lonceng operasional di `World.gd`**
+- [x] **Step 3: Pasang meja warung dan lonceng operasional di `World.gd`**
 
 Di `World.gd`:
 - Tambahkan array `_warung_tables: Array[HearthwoodWarungTable] = []`.
@@ -304,12 +304,12 @@ Di `World.gd`:
 - Buat titik interaksi `WarungBell` pada `Vector2(1170.0, 470.0)` untuk membuka/menutup sesi operasional.
 - Implementasikan `get_warung_tables()` dan `get_warung_bell()`.
 
-- [ ] **Step 4: Jalankan tes integrasi meja warung**
+- [x] **Step 4: Jalankan tes integrasi meja warung**
 
 Jalankan: `& $godot --headless --script res://tests/WarungWorldIntegrationTest.gd; & $godot --headless --script res://tests/VillageLandmarksTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/world/World.gd tests/WarungWorldIntegrationTest.gd
@@ -331,7 +331,7 @@ git commit -m "feat(world): pasang meja makan dan lonceng operasional di distrik
 - Produces: `WarungSystem.start_service_rush()`, `WarungSystem.end_service_rush()`, `WarungSystem.is_service_active()`, `WarungReportUI.show_report(summary_data)`.
 - Consumes: `GameState` (inventori masakan, koin, reputasi) dan `TimeSystem` (jam 16:00–21:00).
 
-- [ ] **Step 1: Tulis tes siklus penuh pelayanan warung (`tests/WarungDineInTest.gd`)**
+- [x] **Step 1: Tulis tes siklus penuh pelayanan warung (`tests/WarungDineInTest.gd`)**
 
 ```gdscript
 # tests/WarungDineInTest.gd
@@ -392,12 +392,12 @@ func _run_tests() -> void:
 	quit(0)
 ```
 
-- [ ] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
+- [x] **Step 2: Jalankan tes untuk memverifikasi kegagalan**
 
 Jalankan: `& $godot --headless --script res://tests/WarungDineInTest.gd`  
 Ekspektasi: FAIL (metode `start_service_rush`, `spawn_next_customer`, `serve_table` belum ada).
 
-- [ ] **Step 3: Implementasikan logika sesi warung dan UI rekapitulasi penjualan**
+- [x] **Step 3: Implementasikan logika sesi warung dan UI rekapitulasi penjualan**
 
 1. Pada `WarungSystem.gd`:
    - Tambahkan variabel: `_is_service_active: bool`, `_daily_rush_customers: int`, `_daily_rush_coins: int`, `_daily_rush_rep: int`.
@@ -410,12 +410,12 @@ Ekspektasi: FAIL (metode `start_service_rush`, `spawn_next_customer`, `serve_tab
    - Hubungkan interaksi lonceng warung ke `start_service_rush()`.
    - Saat pemain mendekati meja yang sedang memesan (`WAITING_FOOD`), munculkan prompt tombol interaksi "Sajikan Pesanan".
 
-- [ ] **Step 4: Jalankan tes verifikasi**
+- [x] **Step 4: Jalankan tes verifikasi**
 
 Jalankan: `& $godot --headless --script res://tests/WarungDineInTest.gd; & $godot --headless --script res://tests/WarungSystemTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/systems/WarungSystem.gd scenes/ui/WarungReportUI.tscn scripts/ui/WarungReportUI.gd scripts/Main.gd tests/WarungDineInTest.gd
@@ -435,17 +435,17 @@ git commit -m "feat(warung): terapkan siklus aktif pelayanan meja warung dan mod
 - Produces: Memastikan alur permainan dari pembukaan prolog, awakening rimba, tutorial, eksplorasi desa, hingga pelayanan warung berjalan mulus.
 - Consumes: `GameState` save/load round-trip untuk memverifikasi kompatibilitas data meja dan pendapatan warung.
 
-- [ ] **Step 1: Tingkatkan `tests/SaveSystemTest.gd` dan `tests/MainGameFlowTest.gd`**
+- [x] **Step 1: Tingkatkan `tests/SaveSystemTest.gd` dan `tests/MainGameFlowTest.gd`**
 
 - Verifikasi bahwa save/load mempertahankan state warung tanpa korupsi data.
 - Verifikasi bahwa fungsi tidur (`GameState.sleep()`) mereset meja makan yang kotor/terisi menjadi bersih untuk hari berikutnya.
 
-- [ ] **Step 2: Jalankan tes alur utama dan simpan-muat**
+- [x] **Step 2: Jalankan tes alur utama dan simpan-muat**
 
 Jalankan: `& $godot --headless --script res://tests/SaveSystemTest.gd; & $godot --headless --script res://tests/MainGameFlowTest.gd`  
 Ekspektasi: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add tests/SaveSystemTest.gd tests/MainGameFlowTest.gd
@@ -466,7 +466,7 @@ git commit -m "test(flow): verifikasi kelancaran alur prolog, pelayanan meja war
 **Interfaces:**
 - Produces: 100% kelulusan dari 33 test suites tanpa galat.
 
-- [ ] **Step 1: Eksekusi seluruh 33 file test suite secara headless**
+- [x] **Step 1: Eksekusi seluruh 33 file test suite secara headless**
 
 ```powershell
 $godot = "C:\Users\Hype GLK\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.2-stable_win64_console.exe"
@@ -488,15 +488,15 @@ Write-Host "=== TEST RUN COMPLETE: $passed PASSED, $failed FAILED out of $($test
 
 Ekspektasi: 33 PASSED, 0 FAILED.
 
-- [ ] **Step 2: Perbarui versi ke 0.8.0 di `project.godot`**
+- [x] **Step 2: Perbarui versi ke 0.8.0 di `project.godot`**
 
-- [ ] **Step 3: Dokumentasikan penyelesaian Versi 0.8.0 di `MILESTONES.md` dan `RELEASE.md`**
+- [x] **Step 3: Dokumentasikan penyelesaian Versi 0.8.0 di `MILESTONES.md` dan `RELEASE.md`**
 
-- [ ] **Step 4: Centang seluruh daftar tugas di dokumen rencana ini**
+- [x] **Step 4: Centang seluruh daftar tugas di dokumen rencana ini**
 
 Ubah seluruh `- [ ]` menjadi `- [x]` di dokumen rencana ini.
 
-- [ ] **Step 5: Commit penyelesaian rilis v0.8.0**
+- [x] **Step 5: Commit penyelesaian rilis v0.8.0**
 
 ```bash
 git add project.godot MILESTONES.md RELEASE.md docs/superpowers/plans/2026-11-20-prologue-and-warung-dine-in-v0.8.0-implementation.md

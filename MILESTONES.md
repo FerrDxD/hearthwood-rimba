@@ -651,6 +651,39 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ---
 
+## Versi 0.8.0 — Sekuens Prolog Pembuka & Pengalaman Pelayanan Meja Warung Makan (*Dine-In Table Service*)
+
+**Tujuan:** Menghadirkan sekuens prolog naratif pembuka saat memulai permainan baru (latar belakang pemilik warteg asal Indonesia, tragedi asap kebakaran gudang, dan efek transisi mengerjap mata di bawah Suaka Pohon Raksasa) serta sistem pelayanan meja warung makan interaktif (*Dine-In Table Service Loop*) di Distrik Warung Pemain, lengkap dengan perabotan meja-kursi rustic, balon pesanan (*order bubble*), penyajian masakan dari stok inventori, dan modal laporan penjualan harian, menjaga 100% kelulusan seluruh test suite (35/35 suite lulus).
+
+- [x] **Data Model & Naskah Monolog Prolog Pembuka (`opening_prologue.json`):**
+  - Naskah data-driven narasi latar belakang warteg asal, asap kebakaran gudang tanpa jendela, desau angin hutan fantasi, dan monolog heran saat terbangun di bawah kanopi suaka.
+- [x] **Komponen Sekuens Prolog Pembuka (`PrologueSequence.gd`) & Integrasi di `MainMenu.gd`:**
+  - `HearthwoodPrologueSequence` (`CanvasLayer`) berlayar hitam gelap dengan kemunculan teks bertahap (*typewriter effect*).
+  - Tombol sentuh "Lewati >>" (*Skip* ≥ 44×44 dp) di pojok kanan atas untuk langsung menuju gameplay awal di `Vector2(100.0, 1180.0)`.
+  - Efek kelopak mata mengerjap (*eye-blink animation*) dua tahap menyingkap kanopi rimbun Suaka Pohon Raksasa.
+  - Integrasi di `MainMenu.gd` saat tombol "Mulai Permainan Baru" ditekan.
+- [x] **Komponen Meja Makan Warung (`WarungTable.gd`) & Balon Pesanan (`OrderBubble.gd`):**
+  - Turunan `Area2D` dengan visual prosedural meja kayu rustic, taplak linen, dua bangku kayu, dan tableware (piring bersih, mangkuk berasap, piring kotor + kantong koin).
+  - Balon pesanan mengambang (`HearthwoodOrderBubble`) menampilkan pesanan masakan dengan animasi bobbing lembut.
+  - State machine siklus meja: `EMPTY`, `WAITING_FOOD`, `EATING`, `DIRTY`.
+- [x] **Integrasi Meja Warung & Lonceng Operasional di `World.gd`:**
+  - Penempatan 2 meja makan di beranda Warung Pemain (`Vector2(1150.0, 520.0)` dan `Vector2(1270.0, 520.0)`).
+  - Penempatan Lonceng Warung (`Vector2(1100.0, 470.0)`) untuk membuka/menutup sesi pelayanan tanpa mengganggu radius cooking station `(1210.0, 478.0)`.
+  - Reset meja makan kotor/terisi otomatis menjadi bersih saat pergantian hari/tidur.
+- [x] **Pengendali Sesi Pelayanan Warung (*Dine-In Service Loop*) & Modal Rekapitulasi:**
+  - Siklus buka warung (16:00–21:00) membutuhkan minimal 1 masakan matang di inventori.
+  - Kedatangan tamu acak sesuai tier warung yang duduk di meja kosong dan memesan hidangan.
+  - Penyajian hidangan langsung dari stok inventori tas pemain.
+  - Perhitungan koin pembayaran, bonus kualitas bintang, dan tip afeksi NPC.
+  - Modal estetik `WarungReportUI` bergaya plakat kayu dan perkamen menampilkan rekapitulasi penjualan saat warung tutup.
+- [x] **Verifikasi Alur Game Utama & Simpan-Muat State Warung:**
+  - `MainGameFlowTest.gd`: Alur permainan utama dari awal hingga pembukaan warung malam, melayani tamu, membersihkan meja, dan tidur lulus mulus.
+  - `SaveSystemTest.gd`: Round-trip serialisasi data pelanggan warung dan persistensi inventori lulus tanpa galat.
+- [x] **Uji Regresi Penuh (35/35 Test Suites Lulus):**
+  - 100% kelulusan seluruh 35 unit test Godot tanpa error (exit code 0).
+
+---
+
 ## Tabel Dependensi Antar Fase
 
 ```

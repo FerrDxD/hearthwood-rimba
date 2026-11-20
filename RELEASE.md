@@ -1,5 +1,28 @@
 # QA, Build, dan Rilis
 
+## Status 0.8.0 (20 November 2026)
+
+Versi project telah diperbarui ke **0.8.0**. Pemeriksaan otomatis Godot 4.7.2 lulus: project parse tanpa error dan seluruh **35 unit test Godot** hijau (exit code 0).
+
+### Isi Rilis 0.8.0 (Sekuens Prolog & Pelayanan Meja Warung Makan)
+
+- **Sekuens Prolog Pembuka Sinematik (`PrologueSequence.gd`)**:
+  - Narasi monolog pembuka saat menekan "Mulai Permainan Baru" di Main Menu: kisah pemilik warteg lokal yang terjebak asap kebakaran gudang tertutup di Indonesia, transisi desau angin rimba, dan efek mengerjap mata (*eye-blink animation*) dua tahap menyingkap kanopi rimbun Suaka Pohon Raksasa (Zona 6).
+  - Naskah disimpan secara data-driven pada `data/quests/opening_prologue.json`.
+  - Tombol sentuh "Lewati >>" (*Skip* ≥ 44×44 dp) di pojok kanan atas untuk navigasi instan bagi pemain veteran atau testing.
+- **Pengalaman Pelayanan Meja Warung Makan (*Dine-In Table Service*)**:
+  - Meja makan kayu rustic dengan taplak linen dan bangku santai (`WarungTable.gd`) terpasang di Distrik Warung Pemain.
+  - Lonceng/Papan Operasional Warung di beranda warung (`Vector2(1100.0, 470.0)`) untuk membuka sesi makan malam (16:00–21:00) jika pemain memiliki minimal 1 porsi hidangan matang.
+  - Balon Pesanan Mengambang (`OrderBubble.gd`): Tamu yang duduk menampilkan pesanan hidangan favorit mereka dengan animasi bobbing lembut.
+  - Penyajian Makanan Langsung: Pemain menyajikan hidangan dari inventori tas langsung ke meja tamu, atau memasak on-the-spot di stasiun masak samping meja.
+  - Pembayaran & Pembersihan Meja: Tamu menikmati hidangan selama beberapa detik, lalu meninggalkan koin dan bonus tip di atas meja untuk dikumpulkan pemain.
+- **Modal Laporan Penjualan Harian (`WarungReportUI.gd`)**:
+  - Menampilkan rekapitulasi penjualan saat warung tutup: jumlah tamu terlayani, total koin diperoleh, kenaikan reputasi desa, dan komentar lucu pelanggan.
+- **Integritas Alur Permainan & Simpan-Muat**:
+  - Seluruh alur utama dari pembukaan prolog, awakening rimba, hingga operasional warung malam dan tidur lulus tanpa galat.
+  - Meja makan kotor/terisi otomatis direset bersih saat pergantian hari/tidur.
+- **Cakupan Pengujian**: 35 dari 35 test suite lulus (100% PASS).
+
 ## Status 0.7.0 (20 November 2026)
 
 Versi project telah diperbarui ke **0.7.0**. Pemeriksaan otomatis Godot 4.7.2 lulus: project parse tanpa error dan seluruh **30 unit test Godot** hijau (exit code 0).
@@ -121,7 +144,7 @@ Pastikan ekspor Web berjalan di browser melalui HTTP server, bukan membuka berka
 
 ## Checklist sebelum rilis
 
-- [x] Versi project dan dokumentasi sesuai 0.7.0.
+- [x] Versi project dan dokumentasi sesuai 0.8.0.
 - [x] Project parse bersih dan seluruh unit test otomatis lulus.
 - [x] Blocker ekspor Windows/Web/Android dicatat eksplisit di dokumen ini.
 - [ ] Pasang export template standar Godot 4.7.2 dan hasilkan ketiga target di atas.
