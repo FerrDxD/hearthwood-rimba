@@ -1,6 +1,8 @@
 extends CanvasLayer
 class_name HearthwoodShopUI
 
+const HearthwoodThemeHelper := preload("res://scripts/ui/UIThemeHelper.gd")
+
 signal talk_requested(shop_id: String)
 signal closed
 
@@ -49,8 +51,8 @@ func open_shop(shop_id: String, merchant_name: String, discount_percent: int) ->
 	for item in goods:
 		_goods.append(item)
 
-	_title_label.text = "Toko %s - %s" % [str(store.get("kategori", "")), merchant_name]
-	_discount_label.text = "Diskon kedekatan: %d%%" % _discount_percent
+	_title_label.text = "Toko %s - %s" % [str(store.get("kategori", "")).capitalize(), merchant_name]
+	_discount_label.text = "Diskon afeksi: %d%%" % _discount_percent
 	_status_label.text = ""
 	_update_wallet()
 	_refresh_goods()
@@ -118,42 +120,42 @@ func _create_interface() -> void:
 
 	var shade := ColorRect.new()
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	shade.color = Color(0.08, 0.1, 0.08, 0.52)
+	shade.color = Color(0.04, 0.07, 0.04, 0.65)
 	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_interface.add_child(shade)
 
 	var panel := PanelContainer.new()
 	panel.anchor_left = 0.12
-	panel.anchor_top = 0.1
+	panel.anchor_top = 0.08
 	panel.anchor_right = 0.88
-	panel.anchor_bottom = 0.9
+	panel.anchor_bottom = 0.92
 	_interface.add_child(panel)
 
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("#f5f5dc")
-	panel_style.border_color = Color("#8fbc8f")
-	panel_style.set_border_width_all(3)
-	panel_style.set_corner_radius_all(8)
-	panel_style.content_margin_left = 18.0
-	panel_style.content_margin_top = 14.0
-	panel_style.content_margin_right = 18.0
-	panel_style.content_margin_bottom = 14.0
-	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.add_theme_stylebox_override(
+		"panel",
+		HearthwoodThemeHelper.create_parchment_panel_style(
+			HearthwoodThemeHelper.COLOR_CREAM,
+			HearthwoodThemeHelper.COLOR_BROWN,
+			8,
+			3
+		)
+	)
 
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 8)
 	panel.add_child(layout)
 
 	_title_label = Label.new()
-	_title_label.add_theme_font_size_override("font_size", 22)
-	_title_label.add_theme_color_override("font_color", Color("#5d422c"))
+	_title_label.add_theme_font_size_override("font_size", 20)
+	_title_label.add_theme_color_override("font_color", Color("#4a2e18"))
 	layout.add_child(_title_label)
 
 	var summary := HBoxContainer.new()
 	layout.add_child(summary)
 
 	_wallet_label = Label.new()
-	_wallet_label.add_theme_font_size_override("font_size", 17)
+	_wallet_label.add_theme_font_size_override("font_size", 15)
+	_wallet_label.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_GOLD)
 	summary.add_child(_wallet_label)
 
 	var summary_spacer := Control.new()
@@ -161,7 +163,8 @@ func _create_interface() -> void:
 	summary.add_child(summary_spacer)
 
 	_discount_label = Label.new()
-	_discount_label.add_theme_font_size_override("font_size", 16)
+	_discount_label.add_theme_font_size_override("font_size", 14)
+	_discount_label.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_BROWN)
 	summary.add_child(_discount_label)
 
 	var scroll_container := ScrollContainer.new()
@@ -171,11 +174,13 @@ func _create_interface() -> void:
 
 	_goods_container = VBoxContainer.new()
 	_goods_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_goods_container.add_theme_constant_override("separation", 6)
 	scroll_container.add_child(_goods_container)
 
 	_status_label = Label.new()
 	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status_label.add_theme_font_size_override("font_size", 15)
+	_status_label.add_theme_font_size_override("font_size", 13)
+	_status_label.add_theme_color_override("font_color", HearthwoodThemeHelper.COLOR_BROWN_LIGHT)
 	layout.add_child(_status_label)
 
 	var footer := HBoxContainer.new()
@@ -184,6 +189,7 @@ func _create_interface() -> void:
 	var talk_button := Button.new()
 	talk_button.text = "Bicara"
 	talk_button.custom_minimum_size = Vector2(112.0, 48.0)
+	HearthwoodThemeHelper.apply_3d_button(talk_button, "secondary", 48.0, 13)
 	talk_button.pressed.connect(_talk_to_merchant)
 	footer.add_child(talk_button)
 
@@ -194,6 +200,7 @@ func _create_interface() -> void:
 	var close_button := Button.new()
 	close_button.text = "Batal"
 	close_button.custom_minimum_size = Vector2(112.0, 48.0)
+	HearthwoodThemeHelper.apply_3d_button(close_button, "secondary", 48.0, 13)
 	close_button.pressed.connect(close_shop)
 	footer.add_child(close_button)
 
@@ -206,12 +213,31 @@ func _refresh_goods() -> void:
 
 	var game_state = get_node("/root/GameState")
 	for item in _goods:
+		var row_card := PanelContainer.new()
+		row_card.add_theme_stylebox_override(
+			"panel",
+			HearthwoodThemeHelper.create_sunken_slot_style(
+				Color("#fffcf5"),
+				Color("#c4a47c"),
+				6
+			)
+		)
+		_goods_container.add_child(row_card)
+
+		var row_margin := MarginContainer.new()
+		row_margin.add_theme_constant_override("margin_left", 8)
+		row_margin.add_theme_constant_override("margin_top", 4)
+		row_margin.add_theme_constant_override("margin_right", 8)
+		row_margin.add_theme_constant_override("margin_bottom", 4)
+		row_card.add_child(row_margin)
+
 		var row := HBoxContainer.new()
-		_goods_container.add_child(row)
+		row_margin.add_child(row)
 
 		var item_label := Label.new()
 		item_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		item_label.add_theme_font_size_override("font_size", 17)
+		item_label.add_theme_font_size_override("font_size", 15)
+		item_label.add_theme_color_override("font_color", Color("#4a2e18"))
 		var base_price := int(item["harga"])
 		var final_price := _calculate_price(base_price, _discount_percent)
 		var owned_count: int = game_state.get_item_count(str(item["id"]))
@@ -233,6 +259,7 @@ func _refresh_goods() -> void:
 		var buy_button := Button.new()
 		buy_button.text = "Beli"
 		buy_button.custom_minimum_size = Vector2(92.0, 48.0)
+		HearthwoodThemeHelper.apply_3d_button(buy_button, "hero", 48.0, 13)
 		buy_button.pressed.connect(_buy_item.bind(item))
 		row.add_child(buy_button)
 
