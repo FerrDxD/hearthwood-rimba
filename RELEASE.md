@@ -1,5 +1,28 @@
 # QA, Build, dan Rilis
 
+## Status 0.7.0 (20 November 2026)
+
+Versi project telah diperbarui ke **0.7.0**. Pemeriksaan otomatis Godot 4.7.2 lulus: project parse tanpa error dan seluruh **30 unit test Godot** hijau (exit code 0).
+
+### Isi Rilis 0.7.0 (Ekspansi Wilayah Desa Hearthwood)
+
+- **4 Distrik Terpadu Desa**: Peta desa tunggal terpadu `Rect2(560.0, 0.0, 1040.0, 880.0)` yang dirancang estetik dan ergonomis:
+  1. **Distrik Pasar**: Kios pasar sayur-rempah Giral dan kios kerajinan-alat Talia yang berjejer rapi dengan karpet terpal, peti hasil bumi, dan lumbung padi desa.
+  2. **Distrik Pusat Pemerintahan (Balai Desa)**: Gedung megah Balai Desa dengan pilar batu berukir, kanopi megah di atas pintu masuk, dan lentera teras di mana Kepala Desa Veral berkantor (`Vector2(1390.0, 342.0)`).
+  3. **Distrik Warung Pemain**: Area warung makan yang nyaman dengan stasiun memasak, perapian hangat, dan tempat tidur peristirahatan pemain.
+  4. **Distrik Pemukiman Warga**: 6 pondok hunian beratap genteng terakota, pagar kayu rustic, dan pekarangan asri tempat warga beristirahat.
+- **Cobblestone Plaza**: Lapangan batu bulat di persimpangan utama desa yang menghubungkan seluruh distrik secara organik dengan pencahayaan lentera jalan.
+- **Fasilitas Interaktif Baru**:
+  1. **Sumur Desa (`VillageWell.gd`)**: Sumur batu beratap sirap kayu di Plaza Tengah (`Vector2(1050.0, 460.0)`). Interaksi harian memulihkan +5 energi dan memberikan 1 `air_bersih` (1x/hari).
+  2. **Papan Pengumuman (`NoticeBoard.gd`)**: Papan buletin kayu di Plaza Tengah (`Vector2(1130.0, 460.0)`). Menyajikan warta harian dinamis (prakiraan cuaca, selera/ngidam masakan warga desa, dan memo resmi Kepala Desa Veral).
+- **Dinamika Kerumunan Sosial (Ambient Crowd Clustering)**:
+  - 32 NPC ambient berpenampilan bervariasi terorganisasi dinamis: 24 warga berkerumun mengikuti jadwal harian (08-12 Pasar, 12-16 Plaza/Sumur, 16-20 Warung, 20-08 Pemukiman) dan 8 warga berkelana bebas mengitari desa.
+  - Isolasi absolut batas desa: seluruh 32 NPC ambient strictly berada di `x >= 560.0` dan tidak pernah merembes ke wilayah rimba.
+- **Integritas Alur Permainan & Simpan-Muat**:
+  - Alur prolog (hutan, Rast, foraging, Veral, memasak, warung, tidur) berjalan lancar tanpa rintangan collider.
+  - Dukungan serialisasi `air_bersih` dan state interaksi harian sumur desa dengan backward-compatibility penuh.
+- **Cakupan Pengujian**: 30 dari 30 test suite lulus (100% PASS).
+
 ## Status 0.3.0 (19 November 2026)
 
 Versi project telah diperbarui ke **0.3.0**. Pemeriksaan otomatis Godot 4.7.2 lulus: project parse tanpa error dan seluruh unit test Godot hijau (exit code 0).
@@ -98,7 +121,7 @@ Pastikan ekspor Web berjalan di browser melalui HTTP server, bukan membuka berka
 
 ## Checklist sebelum rilis
 
-- [x] Versi project dan dokumentasi sesuai 0.3.0.
+- [x] Versi project dan dokumentasi sesuai 0.7.0.
 - [x] Project parse bersih dan seluruh unit test otomatis lulus.
 - [x] Blocker ekspor Windows/Web/Android dicatat eksplisit di dokumen ini.
 - [ ] Pasang export template standar Godot 4.7.2 dan hasilkan ketiga target di atas.

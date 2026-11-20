@@ -614,6 +614,43 @@ Jika ada konflik, urutan kebenaran adalah: **PRD > ARCHITECT.md > DESIGN.md > AG
 
 ---
 
+## Versi 0.7.0 — Ekspansi Wilayah Desa Hearthwood (4 Distrik, Landmark, Fasilitas & Dinamika Warga)
+
+**Tujuan:** Memperluas area desa menjadi sebuah pemukiman abad pertengahan yang utuh, hidup, dan terstruktur ke dalam 4 distrik fungsional (Distrik Pasar, Distrik Pusat Pemerintahan & Balai Desa, Distrik Warung Pemain, dan Distrik Pemukiman Warga), dilengkapi fasilitas interaktif (Sumur Desa & Papan Pengumuman) dan sistem klastering dinamis 32 NPC ambient dengan standar craft anti-AI-slop (*Impeccable* + *UI-UX Pro Max*), menjaga 100% kelulusan seluruh test suite (30/30 suite lulus).
+
+- [x] **Data Model & Skema Distrik Desa (`data/world/village_zones.json`):**
+  - Pemetaan 4 distrik dalam batas desa terpadu `Rect2(560.0, 0.0, 1040.0, 880.0)`.
+  - Mendaftarkan batas distrik, landmark, koordinat objek interaktif, dan kuota NPC ambient per distrik.
+  - Penambahan item baru `air_bersih` (kategori bahan, nilai energi 5, harga jual 2 koin) pada `data/items/items.json`.
+- [x] **Framework Komponen Objek Interaktif Desa (`VillageWell.gd` & `NoticeBoard.gd`):**
+  - Turunan dari `HearthwoodInteractiveProp` (`Area2D`) dengan area interaksi ergonomis (radius 48 px, sentuh ≥ 44×44 dp).
+  - `VillageWell.gd`: Sumur batu desa beratap sirap kayu dengan tali katrol dan ember, memberikan +5 energi dan 1x `air_bersih` per hari.
+  - `NoticeBoard.gd`: Papan pengumuman beratap sirap kayu yang menyajikan warta desa harian (prakiraan cuaca, selera/ngidam harian warga desa, dan memo berkala Kepala Desa Veral).
+- [x] **Pembangunan Landmark Visual & Fasad Bangunan Desa (`World.gd`):**
+  - Balai Desa (Town Hall): Fasad batu berukir, kanopi megah di atas pintu masuk, dan lentera teras di hadapan kantor Kepala Desa Veral (`Vector2(1390.0, 342.0)`).
+  - Toko Pedagang Bersebelahan: Fasad toko kayu Giral dengan kanopi hijau lumut dan peti rempah; toko kerajinan Talia dengan kanopi terakota dan etalase kain/perkakas.
+  - Lumbung Padi Desa: Fasad dinding kayu rapat dengan atap jerami runcing dan karung gandum di beranda.
+  - 6 Pondok Hunian Warga: Pondok beratap genteng terakota, pagar kayu rustic, dan pekarangan bunga di Distrik Pemukiman.
+  - Plaza Desa Berbatu (Cobblestone Paving): Lapangan batu bulat di persimpangan utama desa yang menghubungkan keempat distrik.
+  - Jalur navigasi bersih dari tabrakan collider (mempertahankan kelancaran jalur bebas dari Cooking Station `(1210, 478)` ke Balai Desa `(1390, 342)`).
+- [x] **Integrasi Objek Interaktif Desa & Penyelarasan State di `World.gd`:**
+  - Instansiasi Sumur Desa pada `Vector2(1050.0, 460.0)` dan Papan Pengumuman pada `Vector2(1130.0, 460.0)` di Plaza Tengah Desa.
+  - Penyelarasan dua arah dengan `GameState.interacted_props_today` saat muat save dan reset otomatis saat pergantian hari/tidur.
+- [x] **Dinamika Sosial Warga Desa (Ambient Crowd Clustering):**
+  - Distribusi dinamis 32 NPC ambient: 24 warga berkerumun menurut jadwal aktivitas harian, 8 warga berpatroli/berkelana bebas di seluruh desa.
+  - Jam 08:00–12:00: Ramai di Distrik Pasar (12 NPC belanja & berdagang).
+  - Jam 12:00–16:00: Berkumpul santai di Plaza Balai Desa & Sumur (12 NPC mengobrol di ruang terbuka).
+  - Jam 16:00–20:00: Berkerumun di pelataran Warung Pemain (12 NPC mencari makan sore/malam).
+  - Jam 20:00–08:00: Kembali ke Distrik Pemukiman (12 NPC beristirahat di sekitar pondok warga).
+  - Seluruh 32 NPC ambient strictly terisolasi di dalam batas desa (`x >= 560.0`) tanpa pernah merembes ke wilayah rimba.
+- [x] **Verifikasi Alur Game Utama & Integritas State:**
+  - `MainGameFlowTest.gd`: Alur prolog dari awakening rimba, Rast, foraging, izin Veral, memasak, warung, hingga tidur lulus tanpa rintangan collider.
+  - `ZoneStateSaveTest.gd` & `SaveSystemTest.gd`: Serialisasi state sumur, inventori `air_bersih`, dan dynamic state tersimpan dan terpulihkan secara presisi.
+- [x] **Uji Regresi Penuh (30/30 Test Suites Lulus):**
+  - 100% kelulusan seluruh 30 unit test Godot tanpa error (exit code 0).
+
+---
+
 ## Tabel Dependensi Antar Fase
 
 ```
